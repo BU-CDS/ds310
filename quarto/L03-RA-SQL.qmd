@@ -1,0 +1,781 @@
+---
+title: "Relational Algebra (cont.)"
+subtitle: "A First Look at SQL"
+author: "Data Science 310 &mdash; Boston University"
+institute: Based on notes by David G. Sullivan
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    width: 1280
+    height: 960
+    incremental: false
+    transition: none
+    code-overflow: wrap
+    chalkboard: true
+---
+
+## Recall: Cartesian Product
+
+- Example:
+
+![](images/L03-RA-SQL/cartesian-tables.png){width="85%" fig-align="center"}
+
+::: {.fragment}
+![](images/L03-RA-SQL/cartesian-product.png){width="85%" fig-align="center"}
+:::
+
+## Recall: Performing the Natural Join
+
+- Step 1: take the full Cartesian product.
+
+::: {.fragment fragment-index=1}
+- Step 2: perform a selection in which we filter out tuples in which attributes with the same name have different values.
+    - if there are no attributes with the same name, skip this step
+:::
+
+::: {.fragment fragment-index=2}
+- Step 3: perform a projection that keeps only one copy of each duplicated column.
+:::
+
+::: {.fragment fragment-index=3}
+- Final result: a table with all combinations of "matching" rows from the original tables.
+:::
+
+::: {.r-stack}
+![](images/L03-RA-SQL/natjoin-1.png){width="75%"}
+
+![](images/L03-RA-SQL/natjoin-2.png){.fragment width="75%" fragment-index=1}
+
+![](images/L03-RA-SQL/natjoin-3.png){.fragment width="75%" fragment-index=2}
+
+![](images/L03-RA-SQL/natjoin-4.png){.fragment width="75%" fragment-index=3}
+:::
+
+## Recall: Condition Joins (aka Theta Joins)
+
+- What it does: performs a "filtered" Cartesian product according to a specified predicate
+- Syntax: R1 ⋈<sub>θ</sub> R2 , where θ is a predicate
+- Fundamental-operation equivalent: cross, select using θ
+
+::: {.fragment fragment-index=1}
+- Example: R1 ⋈<sub>(d > c)</sub> R2 = ?
+:::
+
+::: {.r-stack}
+::: {.fragment fragment-index=1}
+![](images/L03-RA-SQL/thetajoin-1.png){width="80%"}
+:::
+
+![](images/L03-RA-SQL/thetajoin-2.png){.fragment width="80%" fragment-index=2}
+
+![](images/L03-RA-SQL/thetajoin-3.png){.fragment width="80%" fragment-index=3}
+:::
+
+## Recall: Which of these queries finds the names of all courses taken by data science majors?
+
+![](images/L03-RA-SQL/quiz-courses-tables.png){width="80%" fig-align="center"}
+
+A.  π<sub>course_name</sub>(σ<sub>dept_name = 'data sci'</sub>(Enrolled × MajorsIn))
+B.  π<sub>course_name</sub>(σ<sub>dept_name = 'data sci'</sub>(Enrolled ⋈ MajorsIn))
+C.  π<sub>course_name</sub>(Enrolled ⋈<sub>dept_name = 'data sci'</sub> MajorsIn)
+D.  π<sub>course_name</sub>(Enrolled ⋈ (σ<sub>dept_name = 'data sci'</sub>(MajorsIn)))
+
+::: {.aside}
+*If there is more than one correct answer, select all answers that apply.*
+:::
+
+---
+
+::: {.r-stack}
+![](images/L03-RA-SQL/quiz-courses-A1.png){width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-A2.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-A3.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-A4.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L03-RA-SQL/quiz-courses-B1.png){width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-B2.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-B3.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-B4.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L03-RA-SQL/quiz-courses-C1.png){width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-C2.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-C3.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-C4.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L03-RA-SQL/quiz-courses-D1.png){width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-D2.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-D3.png){.fragment width="95%"}
+
+![](images/L03-RA-SQL/quiz-courses-D4.png){.fragment width="95%"}
+:::
+
+## Which of these queries finds the names of all courses taken by data science majors? (answer)
+
+![](images/L03-RA-SQL/quiz-courses-tables.png){width="70%" fig-align="center"}
+
+A.  π<sub>course_name</sub>(σ<sub>dept_name = 'data sci'</sub>(Enrolled × MajorsIn)) [&larr; A and C are equivalent!]{.fragment fragment-index=1 style="color:#3a5fcd;"}
+B.  π<sub>course_name</sub>(σ<sub>dept_name = 'data sci'</sub>(Enrolled ⋈ MajorsIn)) [&larr; B and D are equivalent &ndash; and correct!]{.fragment fragment-index=2 style="color:#c00;"}
+C.  π<sub>course_name</sub>(Enrolled ⋈<sub>dept_name = 'data sci'</sub> MajorsIn) [&larr; A and C are equivalent!]{.fragment fragment-index=1 style="color:#3a5fcd;"}
+D.  π<sub>course_name</sub>(Enrolled ⋈ (σ<sub>dept_name = 'data sci'</sub>(MajorsIn))) [&larr; B and D are equivalent &ndash; and correct!]{.fragment fragment-index=2 style="color:#c00;"}
+
+## Joins and Unmatched Tuples
+
+- Let's say we want to know the majors of all enrolled students &ndash; including those with no major.
+
+![](images/L03-RA-SQL/unmatched-tables.png){width="80%" fig-align="center"}
+
+::: {.fragment fragment-index=1}
+- We begin by trying natural join:
+
+![](images/L03-RA-SQL/unmatched-join.png){width="60%" fig-align="center"}
+:::
+
+::: {.fragment fragment-index=2}
+- Why isn't this sufficient? [enrolled students with no major are left out]{.fragment fragment-index=3 style="color:#c00;"}
+:::
+
+## Outer Joins
+
+- Outer joins allow us to include unmatched tuples in the result.
+
+::: {.fragment fragment-index=1}
+- Left outer join (R1 ⟕ R2): in addition to the natural-join tuples, include an extra tuple for each tuple from R1 with no match in R2
+:::
+
+::: {.fragment fragment-index=2}
+![](images/L03-RA-SQL/outerjoin-tables.png){width="70%" fig-align="center"}
+:::
+
+::: {.fragment fragment-index=3}
+- Enrolled ⟕ MajorsIn:
+
+![](images/L03-RA-SQL/outerjoin-left.png){width="55%" fig-align="center"}
+:::
+
+::: {.fragment fragment-index=4}
+- in the extra tuples, give the R2 attributes values of *null*
+:::
+
+## Outer Joins (cont.)
+
+- Right outer join (R1 ⟖ R2): include an extra tuple for each tuple from R2 with no match in R1
+
+![](images/L03-RA-SQL/rightjoin-tables.png){width="70%" fig-align="center"}
+
+::: {.fragment fragment-index=2}
+- Full outer join (R1 ⟗ R2): include an extra tuple for each tuple from *either* relation with no match in the other relation
+:::
+
+::: {.r-stack}
+![](images/L03-RA-SQL/rightjoin-result.png){.fragment width="55%" fragment-index=1}
+
+![](images/L03-RA-SQL/fulljoin-result.png){.fragment width="55%" fragment-index=2}
+:::
+
+## Set Difference
+
+- What it does: selects tuples that are in one relation but not in another.
+- Syntax: `R1 - R2`
+
+::: {.fragment}
+- Rules:
+    - the relations must have the same number of attributes, and corresponding attributes must have the same domain
+:::
+
+::: {.fragment .sub}
+- the resulting relation inherits its attribute names from the first relation
+:::
+
+::: {.fragment .sub}
+- duplicates are eliminated, since relational algebra treats relations as sets
+:::
+
+## Set Difference (cont.)
+
+- Example:
+
+![](images/L03-RA-SQL/setdiff-tables.png){width="80%" fig-align="center"}
+
+- π<sub>student_id</sub>(MajorsIn) &nbsp;&minus;&nbsp; π<sub>student_id</sub>(Enrolled)
+
+::: {.fragment}
+![](images/L03-RA-SQL/setdiff-result.png){width="18%" fig-align="center"}
+:::
+
+## Set Difference (cont.)
+
+- Example of where set difference is *required*:
+    - Of the students enrolled in courses, which ones are *not* enrolled in any courses for graduate credit?
+
+![](images/L03-RA-SQL/setdiff-enrolled.png){width="55%" fig-align="center"}
+
+::: {.fragment}
+- The following query does *not* work. Why?
+    - π<sub>student_id</sub>(σ<sub>credit_status != 'graduate'</sub>(Enrolled))
+:::
+
+::: {.fragment .sub}
+- example: 45678900 will be included, but shouldn't be.
+:::
+
+::: {.fragment}
+- This query does work:
+    - π<sub>student_id</sub>(Enrolled) &minus; π<sub>student_id</sub>(σ<sub>credit_status = 'graduate'</sub>(Enrolled))
+:::
+
+## Assignment
+
+- What it does: assigns the result of an operation to a temporary variable, or to an existing relation.
+- Syntax: `relation` &larr; rel. alg. expression
+
+::: {.fragment}
+- Uses:
+    - simplifying complex expressions
+        - example: recall this expression
+
+result = σ<sub>room = BigRoom.name</sub>(Course × ρ<sub>BigRoom</sub>(σ<sub>capacity > 200</sub>(Room)))
+:::
+
+::: {.fragment .sub}
+- simpler version using assignment:
+
+BigRoom &larr; σ<sub>capacity > 200</sub>(Room)<br>
+result &larr; σ<sub>room = BigRoom.name</sub>(Course × BigRoom)
+:::
+
+## SQL
+
+- [S]{.underline}tructured [Q]{.underline}uery [L]{.underline}anguage
+- The query language used by most RDBMSs.
+- Originally developed at IBM as part of System R &ndash; one of the first RDBMSs.
+
+## SELECT (from a single table)
+
+- Sample query:
+
+```sql
+SELECT student_id
+FROM Enrolled
+WHERE credit_status = 'grad';
+```
+
+- Basic syntax:
+
+```sql
+SELECT column1, column2, …
+FROM table
+WHERE selection condition;
+```
+
+::: {.fragment}
+- The FROM clause specifies which table you are using.
+- The WHERE clause specifies which rows should be included in the result.
+- The SELECT clause specifies which columns should be included.
+:::
+
+::: {.aside}
+*Non-numeric column values are surrounded by single quotes. Table/column names and SQL keywords are not.*
+:::
+
+## How could we get all info about movies released in 2010?
+
+![](images/L03-RA-SQL/movie-table.png){width="65%" fig-align="center"}
+
+:::: {.columns}
+::: {.column width="50%"}
+A\. &nbsp;`SELECT all FROM Movie WHERE year = 2010;`
+
+B\. &nbsp;`SELECT year = 2010 FROM Movie;`
+:::
+
+::: {.column width="50%"}
+C\. &nbsp;`FROM Movie SELECT year = 2010;`
+
+D\. &nbsp;`SELECT * FROM Movie WHERE year = 2010;`
+:::
+::::
+
+## How could we get all info about movies released in 2010? (answer)
+
+- D is correct:
+
+```sql
+SELECT *
+FROM Movie
+WHERE year = 2010;
+```
+
+![](images/L03-RA-SQL/movie-table.png){width="60%" fig-align="center"}
+
+::: {.fragment}
+![](images/L03-RA-SQL/movie-2010-result.png){width="60%" fig-align="center"}
+:::
+
+## SELECT and Relational Algebra
+
+- SELECT commands implement most rel-alg operations.
+- Basic syntax:
+
+```sql
+SELECT a1, a2, …
+FROM R1, R2, …
+WHERE selection predicate;
+```
+
+::: {.fragment}
+- Relational-algebra equivalent: cross, select, project
+    1. take the cartesian product `R1 × R2 × …`
+:::
+
+::: {.fragment .sub}
+2. perform a selection that selects tuples from the cross product that satisfy the predicate in the WHERE clause
+:::
+
+::: {.fragment .sub}
+3. perform a projection of attributes `a1, a2, …` from the tuples selected in step 2, *leaving duplicates alone by default*
+:::
+
+::: {.fragment}
+- (These steps tell us what tuples will appear in the resulting relation, but the command may be executed differently for the sake of efficiency.)
+:::
+
+::: {.fragment}
+- *Note:* the SELECT clause by itself specifies a projection! The WHERE clause specifies a selection.
+:::
+
+## Example Query
+
+- Given these relations:
+    - *Student(id, name)*
+    - *Enrolled(student_id, course_name, credit_status)*
+    - *MajorsIn(student_id, dept_name)*
+- We want to find the major of the student John Tukey\*.
+
+::: {.fragment}
+- Here's a query that will give us the answer:
+
+```sql
+SELECT dept_name
+FROM Student, MajorsIn
+WHERE name = 'John Tukey'
+AND id = student_id;
+```
+:::
+
+::: {.aside}
+*\*Curious? Read "The Future of Data Analysis" by John Tukey, 1962.*
+:::
+
+---
+
+```sql
+SELECT dept_name FROM Student, MajorsIn
+WHERE name = 'John Tukey' AND id = student_id;
+```
+
+![](images/L03-RA-SQL/tukey-tables.png){width="65%" fig-align="center"}
+
+::: {.r-stack}
+![](images/L03-RA-SQL/tukey-1.png){.fragment width="70%"}
+
+![](images/L03-RA-SQL/tukey-2.png){.fragment width="70%"}
+
+![](images/L03-RA-SQL/tukey-3.png){.fragment width="70%"}
+
+![](images/L03-RA-SQL/tukey-4.png){.fragment width="70%"}
+:::
+
+## Join Conditions
+
+- Here's the query from the previous problem:
+
+```sql
+SELECT dept_name
+FROM Student, MajorsIn
+WHERE name = 'John Tukey'
+  AND id = student_id;
+```
+
+::: {.fragment}
+- `id = student_id` is a *join condition* &ndash; a condition that is used to match up "related" tuples from the two tables.
+:::
+
+::: {.fragment .sub}
+- it selects the tuples in the Cartesian product that "make sense"
+:::
+
+::: {.fragment .sub}
+- for N tables, you typically need N &ndash; 1 join conditions
+:::
+
+![](images/L03-RA-SQL/joincond-tables.png){width="55%" fig-align="center"}
+
+## The LIKE Operator and Wildcards
+
+- Use LIKE whenever we need to match a pattern.
+- Form the pattern using one or more *wildcard characters*:
+    - % stands for 0 or more arbitrary characters
+    - _ stands for a single arbitrary character
+
+## How could we use pattern matching to get info about movies rated PG or PG-13?
+
+![](images/L03-RA-SQL/movie-table-assume.png){width="70%" fig-align="center"}
+
+A\. &nbsp;`SELECT * FROM Movie WHERE rating LIKE 'PG%';` [&larr; starts with PG, followed by 0 or more arbitrary characters]{.fragment style="color:#3a5fcd;"}
+
+B\. &nbsp;`SELECT * FROM Movie WHERE rating LIKE 'PG_';` [&larr; starts with PG, followed by exactly 1 arbitrary character]{.fragment style="color:#3a5fcd;"}
+
+C\. &nbsp;`SELECT * FROM Movie WHERE rating LIKE '_G%';` [&larr; starts with an arbitrary character, then G, then 0 or more characters]{.fragment style="color:#3a5fcd;"}
+
+## What about these patterns for finding PG and PG-13?
+
+![](images/L03-RA-SQL/movie-table-assume.png){width="70%" fig-align="center"}
+
+A\. &nbsp;`SELECT * FROM Movie WHERE rating LIKE '%G%';` [&larr; no. would also match G]{.fragment style="color:#c00;"}
+
+B\. &nbsp;`SELECT * FROM Movie WHERE rating LIKE 'PG';` [&larr; no. would not match PG-13]{.fragment style="color:#c00;"}
+
+C\. &nbsp;`SELECT * FROM Movie WHERE rating = 'PG-%';` [&larr; no. need to use LIKE with patterns! won't match any rating!]{.fragment style="color:#c00;"}
+
+## Comparisons Involving NULL
+
+- Because NULL is a special value, any comparison involving NULL that uses the standard operators is *always* false.
+- For example, all of the following will always be false:
+    - `room = NULL`     `NULL != 10`
+    - `room != NULL`     `NULL = NULL`
+
+::: {.fragment}
+:::: {.columns}
+::: {.column width="55%"}
+- This is useful for cases like the following:
+    - assume that we add a country column to Student
+    - use NULL for students whose country is unknown
+:::
+
+::: {.column width="45%"}
+![](images/L03-RA-SQL/null-country-table.png){width="100%"}
+:::
+::::
+:::
+
+::: {.fragment}
+- to get all students from a foreign country:
+
+```sql
+SELECT name FROM Student
+WHERE country != 'USA';   -- won't include NULLs
+```
+:::
+
+## Comparisons Involving NULL (cont.)
+
+- To test for the presence or absence of a NULL value, use special operators: `IS NULL`   `IS NOT NULL`
+- Example: find students whose country is unknown
+
+```sql
+SELECT name FROM Student WHERE country IS NULL;
+```
+
+## Removing Duplicates
+
+- By default, a SELECT command *may* produce duplicates.
+- To eliminate them, add the DISTINCT keyword:
+
+```sql
+SELECT DISTINCT column1, column2, …
+```
+
+## The COUNT Function
+
+- In what follows, we'll use the COUNT function.
+- COUNT is an *aggregate* function. It counts the number of values of an attribute or the number of tuples in a relation.
+- We will cover aggregate functions in the next lecture.
+
+## COUNT(*)   vs.  COUNT(attribute)
+
+- SELECT COUNT(\*) counts the number of tuples in a result.
+
+::: {.fragment fragment-index=1}
+:::: {.columns}
+::: {.column width="45%"}
+- example: find the total number of courses
+
+```sql
+SELECT COUNT(*)
+FROM Course;
+```
+
+[result: `COUNT(*) = 6`]{.fragment fragment-index=2}
+:::
+
+::: {.column width="55%"}
+![](images/L03-RA-SQL/count-course-table.png){width="100%"}
+:::
+::::
+:::
+
+::: {.fragment fragment-index=3}
+- SELECT COUNT(attribute) counts the number of *non-NULL* values of that attribute in a result.
+- example: find the number of courses that meet in a room
+
+```sql
+SELECT COUNT(room_id)
+FROM Course;
+```
+
+[result: `COUNT(room_id) = 5`]{.fragment fragment-index=4}
+:::
+
+## How could we determine how many people have won Best Actor?
+
+![](images/L03-RA-SQL/bestactor-table.png){width="65%" fig-align="center"}
+
+A\. &nbsp;`SELECT COUNT(person_id) FROM Oscar WHERE type = 'BEST-ACTOR';` [&larr; double counts repeat winners]{.fragment style="color:#c00;"}
+
+B\. &nbsp;`SELECT TOTAL(person_id) FROM Oscar WHERE type = 'BEST-ACTOR';` [&larr; invalid aggregate function]{.fragment style="color:#c00;"}
+
+C\. &nbsp;`SELECT COUNT(*) FROM Oscar WHERE type = 'BEST-ACTOR';` [&larr; double counts repeat winners]{.fragment style="color:#c00;"}
+
+D\. &nbsp;two or more of the queries above would work
+
+E\. &nbsp;none of the queries above would work
+
+## Removing Duplicates
+
+- By default, a SELECT command *may* produce duplicates.
+- To eliminate them, add the DISTINCT keyword:
+
+```sql
+SELECT DISTINCT column1, column2, …
+```
+
+## What would work?
+
+![](images/L03-RA-SQL/bestactor-table.png){width="65%" fig-align="center"}
+
+```sql
+SELECT COUNT(DISTINCT person_id)
+FROM Oscar
+WHERE type = 'BEST-ACTOR';
+```
+
+## What about this?
+
+![](images/L03-RA-SQL/bestactor-table.png){width="65%" fig-align="center"}
+
+```sql
+SELECT COUNT(DISTINCT *)
+FROM Oscar
+WHERE type = 'BEST-ACTOR';
+```
+
+::: {.fragment}
+[doesn't work!]{style="color:#c00; font-weight:bold;"}
+:::
+
+## Applying an Aggregate Function to Subgroups
+
+- A GROUP BY clause allows us to:
+    - group together tuples that have a common value
+    - apply an aggregate function to the tuples in each subgroup
+- Example: find the enrollment of each course:
+
+```sql
+SELECT course_name, COUNT(*)
+FROM Enrolled
+GROUP BY course_name;
+```
+
+::: {.fragment}
+- When you group by an attribute, you [can]{.underline} include it in the SELECT clause alongside an aggregate function.
+:::
+
+## How many rows would this query produce?
+
+:::: {.columns}
+::: {.column width="55%"}
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+GROUP BY dept_name;
+```
+
+A\. &nbsp;0 &emsp; B. 1 &emsp; C. 2 &emsp; D. 4 &emsp; E. 6
+:::
+
+::: {.column width="45%"}
+![](images/L03-RA-SQL/majorsin-table.png){width="75%"}
+:::
+::::
+
+::: {.fragment}
+[Answer: D &ndash; 4 rows]{style="color:#3a5fcd;"}
+
+![](images/L03-RA-SQL/groupby-result.png){width="65%" fig-align="center"}
+:::
+
+## How could we limit this to departments with only 1 student?
+
+:::: {.columns}
+::: {.column width="50%"}
+A\.
+
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+WHERE COUNT(*) = 1
+GROUP BY dept_name;
+```
+
+B\.
+
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+GROUP BY dept_name
+WHERE COUNT(*) = 1;
+```
+:::
+
+::: {.column width="50%"}
+C\.
+
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+HAVING COUNT(*) = 1
+GROUP BY dept_name;
+```
+
+D\.
+
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+GROUP BY dept_name
+HAVING COUNT(*) = 1;
+```
+:::
+::::
+
+E\. &nbsp;more than one of these works
+
+## How could we limit this to departments with only 1 student? (answer)
+
+- D is correct:
+
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+GROUP BY dept_name
+HAVING COUNT(*) = 1;
+```
+
+::: {.fragment}
+- WHERE is applied *before* GROUP BY.
+- HAVING is applied *after* GROUP BY.
+    - used for all conditions involving aggregates
+:::
+
+::: {.fragment}
+![](images/L03-RA-SQL/having-result.png){width="70%" fig-align="center"}
+:::
+
+## GROUP BY + WHERE
+
+```sql
+SELECT course_name, COUNT(*)
+FROM Enrolled
+WHERE credit_status = 'ugrad'
+GROUP BY course_name;
+```
+
+::: {.r-stack}
+![](images/L03-RA-SQL/groupbywhere-1.png){width="70%"}
+
+![](images/L03-RA-SQL/groupbywhere-2.png){.fragment width="70%"}
+
+![](images/L03-RA-SQL/groupbywhere-3.png){.fragment width="70%"}
+:::
+
+## Sorting the Results
+
+- An ORDER BY clause sorts the tuples in the result of the query by one or more attributes.
+- example:
+
+```sql
+SELECT name, capacity
+FROM Room
+WHERE capacity >= 500
+ORDER BY capacity;
+```
+
+::: {.r-stack}
+![](images/L03-RA-SQL/sort-unsorted.png){width="40%"}
+
+![](images/L03-RA-SQL/sort-asc.png){.fragment width="40%" fragment-index=1}
+:::
+
+::: {.fragment fragment-index=1}
+- ascending order by default[, use DESC to get descending]{.fragment fragment-index=2}
+:::
+
+## Sorting the Results (cont.)
+
+:::: {.columns}
+::: {.column width="55%"}
+```sql
+SELECT name, capacity
+FROM Room
+WHERE capacity >= 500
+ORDER BY capacity DESC;
+```
+:::
+
+::: {.column width="45%"}
+![](images/L03-RA-SQL/sort-desc.png){width="90%"}
+:::
+::::
+
+::: {.fragment}
+- attributes after the first one are used to break ties
+
+:::: {.columns}
+::: {.column width="55%"}
+```sql
+SELECT name, capacity
+FROM Room
+WHERE capacity >= 500
+ORDER BY capacity DESC, name;
+```
+:::
+
+::: {.column width="45%"}
+![](images/L03-RA-SQL/sort-desc-name.png){width="90%"}
+:::
+::::
+:::

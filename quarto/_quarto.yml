@@ -1,0 +1,86 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - L01-Intro-ER.qmd
+    - L02-Relational.qmd
+    - L03-RA-SQL.qmd
+    - L04-Patterns-Aggregates.qmd
+    - L05-Normalization-Practice.qmd
+    - L06-Storage.qmd
+    - L07-Indexing.qmd
+    - L08-Dynamic-Hashing.qmd
+    - L09-QueryProcessing-Optimization.qmd   # stub deck ("content coming soon")
+    - L10-Txns1.qmd
+    - L11-Txns2.qmd
+    - L12-Locking.qmd
+    - L13-Locking2.qmd
+    - L14-Timestamp.qmd
+    - L15-Logging1.qmd
+    - L16-Logging2.qmd
+    - L17-OLAP.qmd
+    - L18-OLAP2.qmd
+    - L19-Distributed.qmd
+    - L20-Distributed2.qmd
+    - L21-MapReduce.qmd
+    - L22-NoSQL1.qmd
+    - L23-NoSQL2.qmd
+    - L24-Distributed-Atomicity.qmd
+
+website:
+  title: "DS310"
+  navbar:
+    background: primary
+    left:
+      - href: index.qmd
+        text: Home
+      - text: "Data Modeling & SQL"
+        menu:
+          - { href: L01-Intro-ER.qmd,               text: "Course Overview — ER Models" }
+          - { href: L02-Relational.qmd,             text: "The Relational Model" }
+          - { href: L03-RA-SQL.qmd,                 text: "Relational Algebra & a First Look at SQL" }
+          - { href: L04-Patterns-Aggregates.qmd,    text: "SQL: Aggregates, Subqueries, Joins" }
+          - { href: L05-Normalization-Practice.qmd, text: "Normalization & SQL Practice" }
+      - text: "Storage & Query Processing"
+        menu:
+          - { href: L06-Storage.qmd,                        text: "Storage Fundamentals" }
+          - { href: L07-Indexing.qmd,                       text: "Indexing" }
+          - { href: L08-Dynamic-Hashing.qmd,                text: "Dynamic Linear Hashing" }
+          - { href: L09-QueryProcessing-Optimization.qmd,   text: "Query Processing & Optimization" }
+      - text: "Transactions & Concurrency"
+        menu:
+          - { href: L10-Txns1.qmd,     text: "A First Look at Transactions" }
+          - { href: L11-Txns2.qmd,     text: "Transactions & Schedules II" }
+          - { href: L12-Locking.qmd,   text: "Concurrency Control: Locking" }
+          - { href: L13-Locking2.qmd,  text: "Locking II: Deadlocks & Lock Upgrades" }
+          - { href: L14-Timestamp.qmd, text: "Timestamp-Based Concurrency Control" }
+      - text: "Recovery"
+        menu:
+          - { href: L15-Logging1.qmd, text: "Recovery & Logging I" }
+          - { href: L16-Logging2.qmd, text: "Recovery & Logging II" }
+      - text: "Warehousing & OLAP"
+        menu:
+          - { href: L17-OLAP.qmd,  text: "Data Warehousing & OLAP I" }
+          - { href: L18-OLAP2.qmd, text: "Data Warehousing & OLAP II" }
+      - text: "Distributed & NoSQL"
+        menu:
+          - { href: L19-Distributed.qmd,           text: "Distributed Databases & Replication I" }
+          - { href: L20-Distributed2.qmd,          text: "Distributed Databases & Replication II" }
+          - { href: L21-MapReduce.qmd,             text: "Processing Distributed Data with MapReduce" }
+          - { href: L22-NoSQL1.qmd,                text: "NoSQL Overview & a First Look at MongoDB" }
+          - { href: L23-NoSQL2.qmd,                text: "NoSQL II: MongoDB Queries" }
+          - { href: L24-Distributed-Atomicity.qmd, text: "Distributed Atomicity & Group Commit" }
+    right:
+      - icon: github
+        href: https://github.com/mcrovella/ds310-instructor-materials
+
+# Project-level format is revealjs ONLY. Listing html here too would make every
+# deck render to both formats, colliding on the same .html output. HTML pages
+# (the landing page) opt in via `format: html` in their own front matter.
+# Per-deck options (theme, size, chalkboard, ...) stay in each deck's front
+# matter and are merged with the settings below.
+format:
+  revealjs:
+    footer: "[DS310 — Data Mechanics](index.html)"
+    scrollable: true

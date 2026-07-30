@@ -1,0 +1,443 @@
+---
+title: "Recovery and Logging II"
+author: "Data Science 310 &mdash; Boston University"
+institute: Based on notes by David G. Sullivan
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    width: 1280
+    height: 960
+    incremental: false
+    transition: none
+    code-overflow: wrap
+    chalkboard: true
+---
+
+## Review: Caching
+
+- Recently accessed database pages are *cached* in memory so that subsequent accesses to them don't require disk I/O.
+- There may be more than one cache:
+    - the DBMS's own cache (called the memory pool in BDB)
+    - the operating system's buffer cache
+
+![](images/L16-Logging2/caching-diagram.png){width="55%" fig-align="center"}
+
+## Review: What Is Recovery?
+
+- During recovery, the DBMS takes the steps needed to:
+    - *redo* changes made by any committed txn, if there's a chance the changes didn't make it to disk
+        - durability: the txn's changes are still there after the crash
+        - atomicity: *all* of its changes take effect
+    - *undo* changes made by any txn that didn't commit, if there's a chance the changes made it to disk
+        - atomicity: *none* of its changes take effect
+        - also used when a transaction is rolled back
+- In order for recovery to work, need to maintain enough state about txns to be able to redo or undo them.
+
+## Review: Write-Ahead Logging (WAL)
+
+- The write-ahead logging (WAL) policy:
+    - [before a modified database page is written to disk, all update log records describing changes on that page must be forced to disk]{style="color:#3a5fcd;"}
+        - the log records are "written ahead" of the database page
+- This ensures that the recovery system can restore the database to a consistent state.
+
+## Review: Undo-Redo Logging
+
+- Here's how it would work on our earlier example:
+
+::: {.r-stack}
+![](images/L16-Logging2/undo-redo-01.png){width="90%"}
+
+![](images/L16-Logging2/undo-redo-02.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-03.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-04.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-05.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-06.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-07.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-08.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-09.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-10.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-11.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-12.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-13.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-14.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-15.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-16.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-17.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-18.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-19.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-20.png){.fragment width="90%"}
+
+![](images/L16-Logging2/undo-redo-21.png){.fragment width="90%"}
+:::
+
+## Review: Logical Logging
+
+- We've assumed that update records store the old + new values of the changed data element.
+- It's also possible to use *logical logging*, which stores a logical description of the update operation.
+    - example: increment D1 by 1
+- Logical logging is especially useful when we use pages or blocks as data elements, rather than records.
+    - storing the old and new contents of a page or block would take up a lot of space
+    - instead, store a logical description
+        - for example: "add record r somewhere on D1"
+
+## Review: Logical Logging (cont.)
+
+- When we store old and new data values, the associated undo/redo operations are *idempotent*.
+    - can be performed multiple times without changing the result
+- Problem: logical update operations *may not be* idempotent.
+    - example: if "increment D1 by 1" has already been performed, we don't want to redo it
+    - example: if "increment D1 by 1" has [not]{.underline} been performed, we don't want to undo it
+    - example: if "add record r to page D1" has already been performed, we don't want to redo it
+- To ensure that only the necessary undo/redos are made, the DBMS makes use of the *log sequence numbers* (*LSNs*) associated with the update log records.
+
+## Review: Storing LSNs with Data Elements
+
+- When a data element is updated, the DBMS:
+    - stores the LSN of the update log record with the data element
+        - known as the *datum LSN*
+    - stores the old LSN of the data element in the log record
+
+![](images/L16-Logging2/datum-lsn-table.png){width="88%" fig-align="center"}
+
+## Review: Recovery Using LSNs
+
+:::: {.columns}
+::: {.column width="55%"}
+- During recovery, there are three LSNs to consider for each update record:
+    - the **record LSN**: the one for the update record itself
+    - the on-disk **datum LSN** for the data item
+        - the one associated with it in the database file
+    - the **olsn**: the old datum LSN for the data item
+        - the one associated with it when the update was originally requested
+:::
+
+::: {.column width="45%"}
+![](images/L16-Logging2/lsn-log-undo.png){width="100%"}
+:::
+::::
+
+## The Backward Pass Using LSNs
+
+:::: {.columns}
+::: {.column width="55%"}
+- During the backward pass, we undo an update if:
+    - the txn did *not* commit
+    - **datum LSN** == **record LSN**
+- When we undo, we also set: datum LSN = olsn
+:::
+
+::: {.column width="45%"}
+![](images/L16-Logging2/lsn-log-undo.png){width="100%"}
+:::
+::::
+
+## Which updates will be undone?
+
+::: {.r-stack}
+![](images/L16-Logging2/undone-01.png){width="88%"}
+
+![](images/L16-Logging2/undone-02.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-03.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-04.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-05.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-06.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-07.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-08.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-09.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-10.png){.fragment width="88%"}
+
+![](images/L16-Logging2/undone-11.png){.fragment width="88%"}
+:::
+
+## The Forward Pass Using LSNs
+
+:::: {.columns}
+::: {.column width="55%"}
+- During the forward pass, we redo an update if:
+    - the txn *did* commit
+    - **datum LSN** == **olsn**
+- When we redo, we also set: datum LSN = record LSN
+:::
+
+::: {.column width="45%"}
+![](images/L16-Logging2/lsn-log-redo.png){width="100%"}
+:::
+::::
+
+## Which updates will be redone?
+
+::: {.r-stack}
+![](images/L16-Logging2/redone-01.png){width="88%"}
+
+![](images/L16-Logging2/redone-02.png){.fragment width="88%"}
+
+![](images/L16-Logging2/redone-03.png){.fragment width="88%"}
+
+![](images/L16-Logging2/redone-04.png){.fragment width="88%"}
+
+![](images/L16-Logging2/redone-05.png){.fragment width="88%"}
+
+![](images/L16-Logging2/redone-06.png){.fragment width="88%"}
+:::
+
+## Undo-Only Logging
+
+- Only store the info. needed to undo txns.
+    - update records include only the old value
+
+::: {.fragment}
+- Like undo-redo logging, undo-only logging follows WAL.
+- In addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit.  Why? [so that no redo operations will be needed]{.fragment style="color:#3a5fcd;"}
+:::
+
+::: {.fragment}
+- At transaction commit:
+:::
+
+::: {.fragment .sub}
+1. force all dirty log records to disk
+:::
+
+::: {.fragment .sub}
+2. force database pages changed by the txn to disk
+:::
+
+::: {.fragment .sub}
+3. write the commit log record
+:::
+
+::: {.fragment .sub}
+4. force the commit log record to disk
+:::
+
+::: {.fragment}
+- During recovery, the system only performs the backward pass.
+:::
+
+## Redo-Only Logging
+
+- Only store the info. needed to redo txns.
+    - update records include only the new value
+
+::: {.fragment fragment-index=1}
+- Like the other two schemes, redo-only logging follows WAL.
+- In addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.
+:::
+
+::: {.fragment fragment-index=2}
+- At transaction commit:
+    - write the commit log record
+:::
+
+::: {.fragment .sub fragment-index=3}
+- force all dirty log records to disk
+:::
+
+::: {.fragment fragment-index=3}
+- (changed database pages are allowed to go to disk anytime after this)
+:::
+
+::: {.fragment fragment-index=4}
+- If a transaction aborts, none of its changes can be on disk.
+- During recovery, perform the backward pass to build the commit list (no undos).  Then perform the forward pass as in undo-redo.
+:::
+
+## Comparing the Three Logging Schemes
+
+- Factors to consider in the comparison:
+    - complexity/efficiency of recovery
+    - size of the log files
+    - what needs to happen when a txn commits
+    - other restrictions that a logging scheme imposes on the system
+- We'll list advantages and disadvantages of each scheme.
+
+::: {.fragment .plus-minus}
+- Undo-only:
+    - \+ smaller logs than undo-redo
+    - \+ simple and quick recovery procedure (only one pass)
+    - &ndash; forces log and data to disk at commit; have to wait for the I/Os
+:::
+
+## Comparing the Three Logging Schemes (cont.)
+
+::: {.plus-minus}
+- Redo-only:
+    - \+ smaller logs than undo-redo
+    - +/&ndash; recovery: more complex than undo-only, less than undo-redo
+    - &ndash; must be able to cache all changes until the txn commits
+        - limits the size of transactions
+        - constrains the replacement policy of the cache
+    - \+ forces only log records to disk at commit
+:::
+
+::: {.fragment .plus-minus}
+- Undo-redo:
+    - &ndash; larger logs
+    - &ndash; more complex recovery
+    - \+ forces only log records to disk at commit
+    - \+ don't need to retain all data in the cache until commit
+:::
+
+## Checkpoints
+
+- As a DBMS runs, the log gets longer and longer.
+    - thus, recovery could end up taking a very long time!
+
+::: {.fragment}
+- To avoid long recoveries, periodically perform a *checkpoint*.
+    - force data and log records to disk to create a consistent on-disk database state
+:::
+
+::: {.fragment .sub}
+- during recovery, don't need to consider operations that preceded this consistent state
+:::
+
+## Static Checkpoints
+
+- Stop activity and wait for a consistent state.
+
+1) prohibit new transactions from starting and wait until all current transactions have aborted or committed.
+
+::: {.fragment}
+- Once there is a consistent state:
+
+2) force all dirty log records to disk (dirty = not yet written to disk)
+:::
+
+::: {.fragment .sub}
+3) force all dirty database pages to disk
+:::
+
+::: {.fragment .sub}
+4) write a *checkpoint record* to the log
+:::
+
+::: {.fragment}
+These steps must be performed in the specified order!
+:::
+
+::: {.fragment}
+- When performing recovery, go back to the most recent checkpoint record.
+- Problem with this approach? [stopping all activity can significantly reduce performance!]{.fragment style="color:#3a5fcd;"}
+:::
+
+## Dynamic Checkpoints
+
+Don't stop and wait for a consistent state. Steps:
+
+1) prevent all update operations
+
+::: {.fragment .sub}
+2) force all dirty log records to disk
+:::
+
+::: {.fragment .sub}
+3) force all dirty database pages to disk
+:::
+
+::: {.fragment .sub}
+4) write a *checkpoint record* to the log
+    - include a list of all active txns
+:::
+
+::: {.fragment}
+- When performing recovery:
+:::
+
+::: {.fragment .sub}
+- backward pass: go back until you've seen the start records of all uncommitted txns in the most recent checkpoint record
+::: 
+
+::: {.fragment .sub}
+- forward pass: begin from the log record that comes after the most recent checkpoint record.  why?
+:::
+
+::: {.fragment .sub style="margin-left: 1.2em;"}
+- [all earlier changes were forced to disk by the checkpoint]{style="color:#3a5fcd;"}
+:::
+
+::: {.fragment }
+**Note**: if all txns in the checkpoint record are on the commit list, we stop the backward pass at the checkpoint record
+:::
+
+## Example of Recovery with Dynamic Checkpoints
+
+::: {.r-stack}
+![](images/L16-Logging2/ckpt-01.png){width="85%"}
+
+![](images/L16-Logging2/ckpt-02.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-03.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-04.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-05.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-06.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-07.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-08.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-09.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-10.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-11.png){.fragment width="85%"}
+
+![](images/L16-Logging2/ckpt-12.png){.fragment width="85%"}
+:::
+
+## Example of Recovery with Dynamic Checkpoints (cont.)
+
+![](images/L16-Logging2/ckpt-12.png){width="72%" fig-align="center"}
+
+- Could D4 have a datum LSN of less than 110? [no. the checkpoint forces T1's change (LSN 110) to disk.]{.fragment style="color:#3a5fcd;"}
+
+## Reviewing the Log Record Types
+
+- Why is each type needed?
+    - assume undo-redo logging
+
+::: {.fragment}
+- [update records]{style="color:#3a5fcd;"}: hold the info. needed to undo/redo changes
+:::
+
+::: {.fragment}
+- [commit records]{style="color:#3a5fcd;"}: allow us to determine which changes should be undone and which should be redone
+:::
+
+::: {.fragment}
+- [begin records]{style="color:#3a5fcd;"}: allow us to determine the extent of the backward pass in the presence of dynamic checkpoints
+:::
+
+::: {.fragment}
+- [checkpoint records]{style="color:#3a5fcd;"}: limit the amount of the log that is processed during recovery
+:::

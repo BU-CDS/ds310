@@ -1,0 +1,980 @@
+---
+title: "Recovery and Logging"
+author: "Data Science 310 &mdash; Boston University"
+institute: Based on notes by David G. Sullivan
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    width: 1280
+    height: 960
+    incremental: false
+    transition: none
+    code-overflow: wrap
+    chalkboard: true
+---
+
+## Review: ACID Properties
+
+- A transaction has the following "ACID" properties:
+    - [A]{.underline}tomicity: either all of its changes take effect or none do
+    - [C]{.underline}onsistency preservation: its operations take the database from one consistent state to another
+    - [I]{.underline}solation: it is not affected by and does not affect other concurrent transactions
+    - [D]{.underline}urability: once it completes, its changes survive failures
+
+::: {.fragment}
+- We'll now look at how the DBMS guarantees atomicity and durability.
+    - ensured by the subsystem responsible for *recovery*
+:::
+
+## A Quick Look at Caching
+
+- Recently accessed database pages are *cached* in memory so that subsequent accesses to them don't require disk I/O.
+
+::: {.fragment fragment-index=2}
+- There may be more than one cache:
+    - the DBMS's own cache (called the *memory pool* in BDB)
+:::
+
+::: {.fragment fragment-index=3 .sub}
+- the operating system's buffer cache
+:::
+
+::: {.r-stack}
+![](images/L15-Logging1/cache-1.png){.fragment fragment-index=1 width="60%"}
+
+![](images/L15-Logging1/cache-2.png){.fragment fragment-index=2 width="60%"}
+
+![](images/L15-Logging1/cache-3.png){.fragment fragment-index=3 width="60%"}
+:::
+
+## Caching Example 1
+
+- The user requests the item with the key "horse."
+
+![](images/L15-Logging1/cachex1.png){width="52%" fig-align="center"}
+
+::: {.fragment}
+- The page containing "horse" is already in the database's own cache, so no disk I/O is needed.
+:::
+
+## Caching Example 2
+
+- The user requests the item with the key "cat."
+
+::: {.r-stack}
+![](images/L15-Logging1/cachex2-1.png){width="100%"}
+
+![](images/L15-Logging1/cachex2-2.png){.fragment fragment-index=1 width="100%"}
+:::
+
+::: {.fragment fragment-index=1}
+- The page containing "cat" is in the OS buffer cache, so it just needs to be brought into the database's cache. No disk I/O.
+:::
+
+::: {.fragment fragment-index=2}
+- This produces *double buffering* -- two copies of the same page in memory.
+    - one reason that some DBMSs bypass the filesystem
+:::
+
+## Caching Example 3
+
+- The user requests the item with the key "yak."
+- The page with "yak" is in neither cache, so it is:
+
+::: {.fragment fragment-index=1 .sub}
+- read from disk into the buffer cache
+:::
+
+::: {.fragment fragment-index=2 .sub}
+- read into the database's own cache
+:::
+
+::::: {.columns}
+:::: {.column width="50%"}
+![](images/L15-Logging1/cachex3-a.png){width="96%"}
+::::
+
+:::: {.column width="50%"}
+::: {.r-stack}
+![](images/L15-Logging1/cachex3-b1.png){.fragment fragment-index=1 width="96%"}
+
+![](images/L15-Logging1/cachex3-b2.png){.fragment fragment-index=2 width="96%"}
+:::
+::::
+:::::
+
+## Caching and Disk Writes
+
+- Updates to a page may not make it to disk until the page is evicted from all of the caches.
+
+::: {.fragment fragment-index=1 .sub}
+- initially, only the page in the DBMS's cache is updated
+:::
+
+::: {.fragment fragment-index=2 .sub}
+- when evicted from the DBMS's cache, it is written to the backing file, but it may not go to disk right away
+:::
+
+::: {.r-stack}
+![](images/L15-Logging1/cachewr-1.png){width="60%"}
+
+![](images/L15-Logging1/cachewr-2.png){.fragment fragment-index=1 width="60%"}
+
+![](images/L15-Logging1/cachewr-3.png){.fragment fragment-index=2 width="60%"}
+:::
+
+::: {.fragment fragment-index=3}
+- This complicates recovery, because changes may not be on disk.
+:::
+
+## What Is Recovery?
+
+- Recovery is performed after:
+    - a crash of the DBMS
+    - other non-catastrophic failures (e.g., a reboot)
+    - (for catastrophic failures, need an archive or replication)
+
+::: {.fragment}
+- It makes everything right again.
+    - allows the rest of the DBMS to be built as if failures don't occur
+:::
+
+::: {.fragment}
+- "the scariest code you'll ever write" (Margo Seltzer)
+    - it has to work
+    - it's rarely executed
+    - it can be difficult to test
+:::
+
+## What Is Recovery? (cont.)
+
+- During recovery, the DBMS takes the steps needed to:
+    - *redo* changes made by any committed txn, if there's a chance the changes didn't make it to disk
+
+::: {.fragment .sub}
+- ➔ durability: the txn's changes are still there after the crash
+:::
+
+::: {.fragment .sub}
+- ➔ atomicity: *all* of its changes take effect
+:::
+
+::: {.fragment}
+- *undo* changes made by any txn that didn't commit, if there's a chance the changes made it to disk
+    - ➔ atomicity: *none* of its changes take effect
+:::
+
+::: {.fragment .sub}
+- also used when a transaction is rolled back
+:::
+
+::: {.fragment}
+- In order for recovery to work, need to maintain enough state about txns to be able to redo or undo them.
+:::
+
+## Logging
+
+::::: {.columns}
+:::: {.column width="50%"}
+- The *log* is a file that stores the info. needed for recovery.
+
+::: {.fragment fragment-index=1}
+- It contains:
+    - Log Sequence Number
+    - update records, summarizing a write
+:::
+
+::: {.fragment fragment-index=2 .sub}
+- records for transaction begin and commit
+:::
+
+::: {.fragment fragment-index=3}
+- It does *not* record reads.
+    - don't affect the state of the database
+    - aren't relevant to recovery
+:::
+
+::: {.fragment fragment-index=4}
+- The log is *append-only*: records are added at the end, and blocks of the log file are written to disk sequentially.
+    - more efficient than non-sequential writes to the database files
+:::
+::::
+
+:::: {.column width="50%"}
+::: {.r-stack}
+![](images/L15-Logging1/logtbl-1.png){width="100%"}
+
+![](images/L15-Logging1/logtbl-2.png){.fragment fragment-index=1 width="100%"}
+
+![](images/L15-Logging1/logtbl-3.png){.fragment fragment-index=2 width="100%"}
+:::
+::::
+:::::
+
+## Write-Ahead Logging (WAL)
+
+- Both updated database pages and log records are cached.
+- It's important that they go to disk in a specific order.
+
+::: {.fragment}
+- Example of what can go wrong:
+
+```text
+read balance1
+write(balance1 - 500)
+read balance2
+write(balance2 + 500)
+CRASH
+```
+:::
+
+::: {.fragment .sub}
+Assume that:
+:::
+
+::: {.fragment .sub}
+- `write(balance1 - 500)` made it to disk
+:::
+
+::: {.fragment .sub}
+- `write(balance2 + 500)` didn't make it to disk
+:::
+
+::: {.fragment .sub}
+- neither of the corresponding log records made it to disk
+:::
+
+::: {.fragment}
+- the database is in an inconsistent state
+:::
+
+::: {.fragment}
+- without the log records, the recovery system can't restore it
+:::
+
+## Write-Ahead Logging (WAL) (cont.)
+
+- The write-ahead logging (WAL) policy:
+
+::: {style="color:#3a5fcd; font-style:italic; margin-left:2em; margin-bottom:0.6em;"}
+before a modified database page is written to disk,\
+all update log records describing changes on that page\
+must be forced to disk
+:::
+
+::: {.fragment .sub}
+- the log records are "written ahead" of the database page
+:::
+
+::: {.fragment}
+- This ensures that the recovery system can restore the database to a consistent state.
+:::
+
+## Undo-Redo Logging
+
+::::: {.columns}
+:::: {.column width="48%"}
+- Update log records must include both the old *and* new values of the changed data element.
+- Example log after a crash:
+
+::: {.fragment fragment-index=1 .sub}
+- the database could be in an inconsistent state
+- why?
+:::
+
+::: {.fragment fragment-index=2 .sub}
+- some of T1's changes may not have made it to disk.
+:::
+
+::: {.fragment fragment-index=3 .sub}
+- need to redo
+:::
+
+::: {.fragment fragment-index=4 .sub}
+- some of T2's changes may have made it to disk.
+:::
+
+::: {.fragment fragment-index=5 .sub}
+- need to undo
+:::
+::::
+
+:::: {.column width="52%"}
+::: {.r-stack}
+![](images/L15-Logging1/urlog-1.png){width="95%"}
+
+![](images/L15-Logging1/urlog-2.png){.fragment fragment-index=2 width="95%"}
+
+![](images/L15-Logging1/urlog-3.png){.fragment fragment-index=4 width="95%"}
+:::
+::::
+:::::
+
+## Undo-Redo Logging (cont.)
+
+- To ensure that it can undo/redo txns as needed, undo-redo logging follows the WAL policy.
+
+::: {.fragment}
+- In addition, it does the following when a transaction commits:
+
+1. writes the commit log record to the in-memory log buffer
+:::
+
+::: {.fragment .sub}
+2. forces to disk all dirty log records (dirty = not yet written to disk)
+:::
+
+::: {.fragment}
+- It does *not* force the dirty database pages to disk.
+:::
+
+::: {.fragment}
+- At recovery, it performs two passes:
+:::
+
+::: {.fragment .sub}
+- first, a [*backward pass*]{style="color:#3a5fcd;"} to undo uncommitted transactions
+:::
+
+::: {.fragment .sub}
+- then, a [*forward pass*]{style="color:#3a5fcd;"} to redo committed transactions
+:::
+
+## Recovery Using Undo-Redo Logging
+
+- [Backward pass]{style="color:#3a5fcd;"}: begin at the last log record and scan backward
+
+::: {.fragment .sub}
+- for each commit record, add the txn to a *commit list*
+:::
+
+::: {.fragment .sub}
+- for each update by a txn *not* on the commit list, undo the update (restoring the old value)
+:::
+
+::: {.fragment .sub}
+- for now, we skip:
+    - updates by txns that *are* on the commit list
+    - all begin records
+:::
+
+::: {.fragment}
+- [Forward pass]{style="color:#3a5fcd;"}:
+:::
+
+::: {.fragment .sub}
+- for each update by a txn that *is* on the commit list, redo the update (writing the new value)
+:::
+
+::: {.fragment .sub}
+- skip updates by txns that are *not* on the commit list, because they were handled on the backward pass
+:::
+
+::: {.fragment .sub}
+- skip other records as well
+:::
+
+## Recovery Using Undo-Redo Logging (cont.)
+
+- Here's how it would work on our earlier example:
+
+::: {.r-stack}
+![](images/L15-Logging1/recov-01.png){width="92%"}
+
+![](images/L15-Logging1/recov-02.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-03.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-04.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-05.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-06.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-07.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-08.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-09.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-10.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-11.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-12.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-13.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-14.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-15.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-16.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-17.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-18.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-19.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-20.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-21.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-22.png){.fragment width="92%"}
+
+![](images/L15-Logging1/recov-23.png){.fragment width="92%"}
+:::
+
+::: {.fragment}
+- Recovery restores the database to a consistent state that reflects:
+    - *all* of the updates by txn 1 (which committed before the crash)
+    - *none* of the updates by txn 2 (which did *not* commit)
+:::
+
+## The Details Matter!
+
+![](images/L15-Logging1/details-1.png){width="88%" fig-align="center"}
+
+1) Scanning backward at the start of recovery provides the info needed for undo / redo decisions.
+
+::: {.fragment .sub}
+- when we see an update, we already know whether the txn has committed!
+:::
+
+## The Details Matter!
+
+::: {.r-stack}
+![](images/L15-Logging1/details-2.png){width="88%"}
+
+![](images/L15-Logging1/details-3.png){.fragment fragment-index=1 width="88%"}
+
+![](images/L15-Logging1/details-4.png){.fragment fragment-index=2 width="88%"}
+:::
+
+2) To ensure the correct values are on disk after recovery, we:
+
+::: {.sub}
+- put all redos after all undos (consider D2 above)
+:::
+
+::: {.fragment fragment-index=1 .sub}
+- perform the undos in reverse order (consider D3 above)
+:::
+
+::: {.fragment fragment-index=2 .sub}
+- perform the redos in the same order as the original updates (consider D1 above)
+:::
+
+## What are the LSNs of: (1) the first update undone, and (2) the first update redone?
+
+::: {.r-stack}
+![](images/L15-Logging1/quiz1-01.png){width="88%"}
+
+![](images/L15-Logging1/quiz1-02.png){.fragment fragment-index=1 width="88%"}
+
+![](images/L15-Logging1/quiz1-03.png){.fragment fragment-index=2 width="88%"}
+
+![](images/L15-Logging1/quiz1-04.png){.fragment fragment-index=3 width="88%"}
+
+![](images/L15-Logging1/quiz1-05.png){.fragment fragment-index=4 width="88%"}
+
+![](images/L15-Logging1/quiz1-06.png){.fragment fragment-index=5 width="88%"}
+
+![](images/L15-Logging1/quiz1-07.png){.fragment fragment-index=6 width="88%"}
+
+![](images/L15-Logging1/quiz1-08.png){.fragment fragment-index=7 width="88%"}
+
+![](images/L15-Logging1/quiz1-09.png){.fragment fragment-index=8 width="88%"}
+
+![](images/L15-Logging1/quiz1-10.png){.fragment fragment-index=9 width="88%"}
+
+![](images/L15-Logging1/quiz1-11.png){.fragment fragment-index=10 width="88%"}
+
+![](images/L15-Logging1/quiz1-12.png){.fragment fragment-index=11 width="88%"}
+
+![](images/L15-Logging1/quiz1-13.png){.fragment fragment-index=12 width="88%"}
+
+![](images/L15-Logging1/quiz1-14.png){.fragment fragment-index=13 width="88%"}
+
+![](images/L15-Logging1/quiz1-15.png){.fragment fragment-index=14 width="88%"}
+
+![](images/L15-Logging1/quiz1-16.png){.fragment fragment-index=15 width="88%"}
+
+![](images/L15-Logging1/quiz1-17.png){.fragment fragment-index=16 width="88%"}
+
+![](images/L15-Logging1/quiz1-18.png){.fragment fragment-index=17 width="88%"}
+:::
+
+::: {style="font-size:0.8em; line-height:1.35; margin-left:1.5em;"}
+| &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;undone&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;redone
+| A\. &nbsp;210 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 500
+| B\. &nbsp;210 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 420
+| C\. &nbsp;[570]{.fragment .highlight-blue fragment-index=10} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 500
+| D\. &nbsp;[570]{.fragment .highlight-blue fragment-index=10} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 210
+| E\. &nbsp;[570]{.fragment .highlight-blue fragment-index=10} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [420]{.fragment .highlight-blue fragment-index=18}
+:::
+
+## Logical Logging
+
+- We've assumed that update records store the old + new values of the changed data element.
+
+::: {.fragment}
+- It's also possible to use *logical logging*, which stores a logical description of the update operation.
+    - example: increment D1 by 1
+:::
+
+::: {.fragment}
+- Logical logging is especially useful when we use pages or blocks as data elements, rather than records.
+:::
+
+::: {.fragment .sub}
+- storing the old and new contents of a page or block would take up a lot of space
+:::
+
+::: {.fragment .sub}
+- instead, store a logical description
+    - for example: "add record r somewhere on D1"
+:::
+
+## Logical Logging (cont.)
+
+- When we store old and new data values, the associated undo/redo operations are *idempotent*.
+    - can be performed multiple times without changing the result
+
+::: {.fragment}
+- Problem: logical update operations *may not be* idempotent.
+    - example: if "increment D1 by 1" has already been performed, we don't want to redo it
+:::
+
+::: {.fragment .sub}
+- example: if "increment D1 by 1" has [not]{.underline} been performed, we don't want to undo it
+:::
+
+::: {.fragment .sub}
+- example: if "add record r to page D1" has already been performed, we don't want to redo it
+:::
+
+::: {.fragment}
+- To ensure that only the necessary undo/redos are made, the DBMS makes use of the *log sequence numbers* (*LSNs*) associated with the update log records.
+:::
+
+## Storing LSNs with Data Elements
+
+- When a data element is updated, the DBMS:
+    - stores the LSN of the update log record with the data element
+        - known as the *datum LSN*
+    - stores the old LSN of the data element in the log record
+
+::: {.r-stack}
+![](images/L15-Logging1/storlsn-01.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-02.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-03.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-04.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-05.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-06.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-07.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-08.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-09.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-10.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-11.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-12.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-13.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-14.png){.fragment width="90%"}
+
+![](images/L15-Logging1/storlsn-15.png){.fragment width="90%"}
+:::
+
+## Storing LSNs with Data Elements (cont.)
+
+- Recall: When a crash occurs, we're *not* guaranteed that the most recent value of a given data element made it to disk.
+    - similarly, the *on-disk* datum LSN may not be the most recent one
+
+::: {.r-stack}
+![](images/L15-Logging1/storlsn2.png){width="90%"}
+
+![](images/L15-Logging1/storlsn3.png){.fragment width="90%"}
+:::
+
+## Recovery Using LSNs
+
+::::: {.columns}
+:::: {.column width="55%"}
+- During recovery, there are three LSNs to consider for each update record:
+
+1) the [***record LSN***]{style="color:#3a5fcd;"}: the one for the update record itself
+
+::: {.fragment fragment-index=1}
+2) the on-disk [***datum LSN***]{style="color:#090;"} for the data item
+
+::: {.sub}
+- the one associated with it in the database file
+:::
+:::
+
+::: {.fragment fragment-index=2}
+3) the [***olsn***]{style="color:#c00;"}: the old datum LSN for the data item
+
+::: {.sub}
+- the one associated with it when the update was originally requested
+:::
+:::
+::::
+
+:::: {.column width="45%"}
+::: {.r-stack}
+![](images/L15-Logging1/reclsn-1.png){width="90%"}
+
+![](images/L15-Logging1/reclsn-2.png){.fragment fragment-index=1 width="90%"}
+
+![](images/L15-Logging1/reclsn-3.png){.fragment fragment-index=2 width="90%"}
+:::
+::::
+:::::
+
+## The Backward Pass Using LSNs
+
+::::: {.columns}
+:::: {.column width="55%"}
+- During the backward pass, we undo an update if:
+    - the txn did *not* commit
+
+::: {.fragment .sub}
+- datum LSN == record LSN
+:::
+
+::: {.fragment}
+- When we undo, we also set:\
+  &nbsp;&nbsp;&nbsp;datum LSN = olsn
+:::
+::::
+
+:::: {.column width="45%"}
+![](images/L15-Logging1/bwdlsn.png){width="90%"}
+::::
+:::::
+
+## Which updates will be undone?
+
+::: {.r-stack}
+![](images/L15-Logging1/undone-01.png){width="82%"}
+
+![](images/L15-Logging1/undone-02.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-03.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-04.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-05.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-06.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-07.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-08.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-09.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-10.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-11.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-12.png){.fragment width="82%"}
+
+![](images/L15-Logging1/undone-13.png){.fragment width="82%"}
+:::
+
+## The Forward Pass Using LSNs
+
+::::: {.columns}
+:::: {.column width="55%"}
+- During the forward pass, we redo an update if:
+    - the txn *did* commit
+
+::: {.fragment fragment-index=1 .sub}
+- datum LSN == olsn
+:::
+
+::: {.fragment fragment-index=6}
+- When we redo, we also set:\
+  &nbsp;&nbsp;&nbsp;datum LSN = record LSN
+:::
+::::
+
+:::: {.column width="45%"}
+::: {.r-stack}
+![](images/L15-Logging1/fwdlsn-1.png){width="90%"}
+
+![](images/L15-Logging1/fwdlsn-2.png){.fragment fragment-index=1 width="90%"}
+
+![](images/L15-Logging1/fwdlsn-3.png){.fragment fragment-index=2 width="90%"}
+
+![](images/L15-Logging1/fwdlsn-4.png){.fragment fragment-index=3 width="90%"}
+
+![](images/L15-Logging1/fwdlsn-5.png){.fragment fragment-index=4 width="90%"}
+
+![](images/L15-Logging1/fwdlsn-6.png){.fragment fragment-index=5 width="90%"}
+:::
+::::
+:::::
+
+## Which updates will be redone?
+
+::: {.r-stack}
+![](images/L15-Logging1/redone-01.png){width="82%"}
+
+![](images/L15-Logging1/redone-02.png){.fragment width="82%"}
+
+![](images/L15-Logging1/redone-03.png){.fragment width="82%"}
+
+![](images/L15-Logging1/redone-04.png){.fragment width="82%"}
+
+![](images/L15-Logging1/redone-05.png){.fragment width="82%"}
+
+![](images/L15-Logging1/redone-06.png){.fragment width="82%"}
+
+![](images/L15-Logging1/redone-07.png){.fragment width="82%"}
+:::
+
+## Undo-Only Logging
+
+- Only store the info. needed to undo txns.
+    - update records include only the old value
+
+::: {.fragment}
+- Like undo-redo logging, undo-only logging follows WAL.
+- In addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit. Why? [so that no redo operations will be needed]{.fragment style="color:#3a5fcd;"}
+:::
+
+::: {.fragment}
+- At transaction commit:
+
+1. force all dirty log records to disk
+:::
+
+::: {.fragment .sub}
+2. force database pages changed by the txn to disk
+:::
+
+::: {.fragment .sub}
+3. write the commit log record
+:::
+
+::: {.fragment .sub}
+4. force the commit log record to disk
+:::
+
+::: {.fragment}
+- During recovery, the system only performs the backward pass.
+:::
+
+## Redo-Only Logging
+
+- Only store the info. needed to redo txns.
+    - update records include only the new value
+
+::: {.fragment}
+- Like the other two schemes, redo-only logging follows WAL.
+- In addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.
+:::
+
+::: {.fragment}
+- At transaction commit:
+
+1. write the commit log record
+:::
+
+::: {.fragment .sub}
+2. force all dirty log records to disk
+
+(changed database pages are allowed to go to disk anytime after this)
+:::
+
+::: {.fragment}
+- If a transaction aborts, none of its changes can be on disk.
+- During recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo.
+:::
+
+## Comparing the Three Logging Schemes
+
+- Factors to consider in the comparison:
+    - complexity/efficiency of recovery
+    - size of the log files
+    - what needs to happen when a txn commits
+    - other restrictions that a logging scheme imposes on the system
+- We'll list advantages and disadvantages of each scheme.
+
+::: {.fragment .plus-minus}
+- Undo-only:
+    - \+ smaller logs than undo-redo
+    - \+ simple and quick recovery procedure (only one pass)
+    - -- forces log and data to disk at commit; have to wait for the I/Os
+:::
+
+## Comparing the Three Logging Schemes (cont.)
+
+::: {.plus-minus}
+- Redo-only:
+    - \+ smaller logs than undo-redo
+    - \+/-- recovery: more complex than undo-only, less than undo-redo
+    - -- must be able to cache all changes until the txn commits
+        - limits the size of transactions
+        - constrains the replacement policy of the cache
+    - \+ forces only log records to disk at commit
+:::
+
+::: {.fragment .plus-minus}
+- Undo-redo:
+    - -- larger logs
+    - -- more complex recovery
+    - \+ forces only log records to disk at commit
+    - \+ don't need to retain all data in the cache until commit
+:::
+
+## Checkpoints
+
+- As a DBMS runs, the log gets longer and longer.
+    - thus, recovery could end up taking a very long time!
+
+::: {.fragment}
+- To avoid long recoveries, periodically perform a *checkpoint*.
+    - force data and log records to disk to create a consistent on-disk database state
+:::
+
+::: {.fragment .sub}
+- during recovery, don't need to consider operations that preceded this consistent state
+:::
+
+## Static Checkpoints
+
+- Stop activity and wait for a consistent state.
+
+1) prohibit new transactions from starting and wait until all current transactions have aborted or committed.
+
+::: {.fragment}
+- Once there is a consistent state:
+
+2) force all dirty log records to disk (dirty = not yet written to disk)
+:::
+
+::: {.fragment .sub}
+3) force all dirty database pages to disk
+:::
+
+::: {.fragment .sub}
+4) write a *checkpoint record* to the log
+:::
+
+::: {.fragment .sub}
+- these steps must be performed in the specified order!
+:::
+
+::: {.fragment}
+- When performing recovery, go back to the most recent checkpoint record.
+- Problem with this approach? [stopping all activity can significantly reduce performance!]{.fragment style="color:#3a5fcd;"}
+:::
+
+## Dynamic Checkpoints
+
+- Don't stop and wait for a consistent state. Steps:
+
+1) prevent all update operations
+
+::: {.fragment .sub}
+2) force all dirty log records to disk
+:::
+
+::: {.fragment .sub}
+3) force all dirty database pages to disk
+:::
+
+::: {.fragment .sub}
+4) write a *checkpoint record* to the log
+    - include a list of all active txns
+:::
+
+::: {.fragment}
+- When performing recovery:
+    - backward pass: go back until you've seen the start records of all uncommitted txns in the most recent checkpoint record
+:::
+
+::: {.fragment .sub}
+- forward pass: begin from the log record that comes after the most recent checkpoint record. why?
+:::
+
+::: {.fragment .sub}
+- [all earlier changes were forced to disk by the checkpoint]{style="color:#3a5fcd;"}
+:::
+
+::: {.fragment .sub}
+- note: if all txns in the checkpoint record are on the commit list, we stop the backward pass at the checkpoint record
+:::
+
+## Example of Recovery with Dynamic Checkpoints
+
+::: {.r-stack}
+![](images/L15-Logging1/dynck-01.png){width="78%"}
+
+![](images/L15-Logging1/dynck-02.png){.fragment fragment-index=1 width="78%"}
+
+![](images/L15-Logging1/dynck-03.png){.fragment fragment-index=2 width="78%"}
+
+![](images/L15-Logging1/dynck-04.png){.fragment fragment-index=3 width="78%"}
+
+![](images/L15-Logging1/dynck-05.png){.fragment fragment-index=4 width="78%"}
+
+![](images/L15-Logging1/dynck-06.png){.fragment fragment-index=5 width="78%"}
+
+![](images/L15-Logging1/dynck-07.png){.fragment fragment-index=6 width="78%"}
+
+![](images/L15-Logging1/dynck-08.png){.fragment fragment-index=7 width="78%"}
+
+![](images/L15-Logging1/dynck-09.png){.fragment fragment-index=8 width="78%"}
+
+![](images/L15-Logging1/dynck-10.png){.fragment fragment-index=9 width="78%"}
+
+![](images/L15-Logging1/dynck-11.png){.fragment fragment-index=10 width="78%"}
+
+![](images/L15-Logging1/dynck-12.png){.fragment fragment-index=11 width="78%"}
+
+![](images/L15-Logging1/dynck-13.png){.fragment fragment-index=12 width="78%"}
+:::
+
+::: {.fragment fragment-index=12}
+- Could D4 have a datum LSN of less than 110? [no. the checkpoint forces T1's change (LSN 110) to disk.]{.fragment fragment-index=13 style="color:#3a5fcd;"}
+:::
+
+## Reviewing the Log Record Types
+
+- Why is each type needed?
+    - assume undo-redo logging
+
+::: {.fragment}
+- [update records]{style="color:#3a5fcd;"}: hold the info. needed to undo/redo changes
+:::
+
+::: {.fragment}
+- [commit records]{style="color:#3a5fcd;"}: allow us to determine which changes should be undone and which should be redone
+:::
+
+::: {.fragment}
+- [begin records]{style="color:#3a5fcd;"}: allow us to determine the extent of the backward pass in the presence of dynamic checkpoints
+:::
+
+::: {.fragment}
+- [checkpoint records]{style="color:#3a5fcd;"}: limit the amount of the log that is processed during recovery
+:::

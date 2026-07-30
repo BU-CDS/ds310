@@ -1,0 +1,475 @@
+---
+title: "Timestamp-Based"
+subtitle: "Concurrency Control"
+author: "Data Science 310 &mdash; Boston University"
+institute: Based on notes by David G. Sullivan
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    width: 1280
+    height: 960
+    incremental: false
+    transition: none
+    code-overflow: wrap
+    chalkboard: true
+---
+
+## Optimistic Concurrency Control
+
+- Locking is *pessimistic.*
+    - assumes serializability will be violated
+    - prevents transactions from performing actions that *might* violate serializability
+
+::: {.fragment .sub fragment-index=1}
+- example:
+:::
+
+::: {.r-stack}
+![](images/L14-Timestamp/opt-1.png){.fragment fragment-index=1 width="58%"}
+
+![](images/L14-Timestamp/opt-2.png){.fragment fragment-index=2 width="58%"}
+
+![](images/L14-Timestamp/opt-3.png){.fragment fragment-index=3 width="58%"}
+
+![](images/L14-Timestamp/opt-4.png){.fragment fragment-index=4 width="58%"}
+:::
+
+::: {.fragment fragment-index=4}
+- There are other approaches that are *optimistic.*
+    - assume serializability will be maintained
+    - only interfere with a transaction if it actually does something that violates serializability
+:::
+
+::: {.fragment .sub fragment-index=5}
+- deadlock detection+recovery is one such example
+:::
+
+::: {.fragment fragment-index=6}
+- We'll look at one such approach &ndash; one that uses timestamps.
+:::
+
+## Timestamp-Based Concurrency Control
+
+- In this approach, the DBMS assigns timestamps to txns.
+    - TS(T) = the timestamp of transaction T
+    - the timestamps must be unique
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- TS(T1) < TS(T2) if and only if T1 started *before* T2
+:::
+
+::: {.fragment}
+- The system ensures that all operations are consistent with a *serial* ordering based on the timestamps.
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- if TS(T1) < TS(T2), the DBMS only allows actions that are consistent with the serial schedule T1; T2
+:::
+
+## Timestamp-Based Concurrency Control (cont.)
+
+- Examples of actions that are not allowed:
+    - example 1:
+
+::: {.r-stack}
+![](images/L14-Timestamp/ex1-1.png){width="80%"}
+
+![](images/L14-Timestamp/ex1-2.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex1-3.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex1-4.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex1-5.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex1-6.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex1-7.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex1-8.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex1-9.png){.fragment width="80%"}
+:::
+
+## Timestamp-Based Concurrency Control (cont.)
+
+- Examples of actions that are not allowed:
+    - example 2:
+
+::: {.r-stack}
+![](images/L14-Timestamp/ex2-1.png){width="80%"}
+
+![](images/L14-Timestamp/ex2-2.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex2-3.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex2-4.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex2-5.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex2-6.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex2-7.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex2-8.png){.fragment width="80%"}
+
+![](images/L14-Timestamp/ex2-9.png){.fragment width="80%"}
+:::
+
+## Timestamp-Based Concurrency Control (cont.)
+
+- When a txn attempts to perform an action that is inconsistent with a timestamp ordering:
+    - the offending txn is rolled back
+    - it is restarted with a new, larger timestamp
+
+::: {.fragment}
+- With a larger timestamp, the txn comes later in the equivalent serial ordering.
+    - allows it to perform the offending operation
+:::
+
+::: {.fragment}
+- Rolling back the txn ensures that all of its actions correspond to the new timestamp.
+:::
+
+## Timestamps on Data Elements
+
+- To determine if an action should be allowed, the DBMS associates two timestamps with each data element:
+    - a [*read timestamp*]{style="color:#3a5fcd;"}: RTS(A) = the largest timestamp of any txn that has read A
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- the timestamp of the reader that comes latest in the equivalent serial ordering
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- a [*write timestamp*]{style="color:#3a5fcd;"}: WTS(A) = the largest timestamp of any txn that has written A
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- the timestamp of the writer that comes latest in the equivalent serial ordering
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- [*the timestamp of the txn that wrote A's current value*]{style="color:#3a5fcd;"}
+:::
+
+## Timestamp Rules for Reads
+
+- When T tries to read A:
+    - [if TS(T) < WTS(A)]{style="color:#c00;"}, roll back T and restart it
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- T comes *before* the txn that wrote A, so T shouldn't be able to see A's current value
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- T's read is too late (see our earlier example 1)
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- [else]{style="color:#c00;"} allow the read
+    - T comes *after* the txn that wrote A, so the read is OK
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- the system also updates RTS(A):
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RTS(A) = max(TS(T), RTS(A))
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- why can't we just set RTS(A) to T's timestamp?
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[there may be a previous reader of A that comes *after* T in the timestamp ordering]{style="color:#3a5fcd;"}
+:::
+
+## Timestamp Rules for Reads (cont.)
+
+- Example: assume that T1 wants to read A, and we have the following timestamps:
+
+::: {.r-stack}
+![](images/L14-Timestamp/rts-ex-1.png){width="68%"}
+
+![](images/L14-Timestamp/rts-ex-2.png){.fragment fragment-index=1 width="68%"}
+
+![](images/L14-Timestamp/rts-ex-3.png){.fragment fragment-index=2 width="68%"}
+
+![](images/L14-Timestamp/rts-ex-4.png){.fragment fragment-index=3 width="68%"}
+
+![](images/L14-Timestamp/rts-ex-5.png){.fragment fragment-index=4 width="68%"}
+
+![](images/L14-Timestamp/rts-ex-6.png){.fragment fragment-index=5 width="68%"}
+:::
+
+::: {.fragment fragment-index=1}
+- T1 started before T2 (30 < 50)
+    - thus T1 comes before T2 in the equivalent serial ordering
+:::
+
+::: {.fragment fragment-index=2}
+- T2 has already read A. How do we know? [RTS(A) = TS(T2)]{.fragment fragment-index=3 style="color:#3a5fcd;"}
+:::
+
+::: {.fragment fragment-index=4}
+- Despite that, it's okay for T1 to read A.
+    - reads don't conflict, so we don't care about the equivalent serial ordering of *two readers* of an item
+:::
+
+::: {.fragment .sub fragment-index=5}
+- what matters is that T1 comes after the *writer* of A's current value ([**30 > 10**]{style="color:#3a5fcd;"})
+:::
+
+## Timestamp Rules for Writes
+
+- When T tries to write A:
+    - [if TS(T) < RTS(A)]{style="color:#c00;"}, roll back T and restart it
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- T comes *before* the txn that read A, so that other txn should have read the value T wants to write
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- T's write is too late (see our earlier example 2)
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- [else if TS(T) < WTS(A)]{style="color:#c00;"}, ignore the write and let T continue
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- T comes *before* the txn that wrote A's current value
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- thus, in the equivalent serial schedule, T's write would have been overwritten by A's current value
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- [else]{style="color:#c00;"} allow the write
+    - how should the system update WTS(A)?
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[WTS(A) = TS(T)]{style="color:#3a5fcd;"}
+:::
+
+## Thomas Write Rule
+
+- The policy of ignoring out-of-date writes is known as the *Thomas Write Rule:*
+    - [&hellip;else if TS(T) < WTS(A)]{style="color:#a00;"}, ignore the write and let T continue
+
+::: {.fragment}
+- What if there is a txn that should have read A *between* the two writes? It's still okay to ignore T's write of A.
+:::
+
+::: {.fragment .sub}
+- example:
+    - TS(T) = 80, WTS(A) = 100 &rarr; we ignore T's write of A[<br>what if txn U with TS(U) = 90 is supposed to read A?]{.fragment}
+:::
+
+::: {.fragment .sub}
+- if U had already read A, Thomas write rule wouldn't apply:
+    - RTS(A) = 90
+    - T would be rolled back because TS(T) < RTS(A)
+:::
+
+::: {.fragment .sub}
+- if U tries to read A after we ignore T's write:
+    - U will be rolled back because TS(U) < WTS(A)
+:::
+
+## Example of Using Timestamps
+
+- They prevent our problematic balance-transfer example.
+
+::: {.r-stack}
+![](images/L14-Timestamp/xfer-1.png){width="76%"}
+
+![](images/L14-Timestamp/xfer-2.png){.fragment fragment-index=1 width="76%"}
+
+![](images/L14-Timestamp/xfer-3.png){.fragment fragment-index=2 width="76%"}
+
+![](images/L14-Timestamp/xfer-4.png){.fragment fragment-index=3 width="76%"}
+
+![](images/L14-Timestamp/xfer-5.png){.fragment fragment-index=4 width="76%"}
+
+![](images/L14-Timestamp/xfer-6.png){.fragment fragment-index=5 width="76%"}
+
+![](images/L14-Timestamp/xfer-7.png){.fragment fragment-index=6 width="76%"}
+
+![](images/L14-Timestamp/xfer-8.png){.fragment fragment-index=7 width="76%"}
+
+![](images/L14-Timestamp/xfer-9.png){.fragment fragment-index=8 width="76%"}
+
+![](images/L14-Timestamp/xfer-10.png){.fragment fragment-index=9 width="76%"}
+
+![](images/L14-Timestamp/xfer-11.png){.fragment fragment-index=10 width="76%"}
+:::
+
+::: {.fragment fragment-index=10}
+[T2 performed a dirty read. It would also need to be rolled back. (a cascading rollback!)]{style="color:#3a5fcd;"}
+:::
+
+## Multiversion Timestamp Protocol
+
+- To reduce the number of rollbacks, the DBMS can keep old versions of data elements, along with the associated timestamps.
+
+::: {.fragment fragment-index=4}
+- When a txn T tries to read A, it's given the version of A that it should read, based on the timestamps.
+:::
+
+::: {.fragment .sub fragment-index=12}
+- [*the DBMS never needs to roll back a read-only transaction!*]{style="color:#3a5fcd;"}
+:::
+
+::: {.r-stack}
+![](images/L14-Timestamp/mv-1.png){width="84%"}
+
+![](images/L14-Timestamp/mv-2.png){.fragment fragment-index=1 width="84%"}
+
+![](images/L14-Timestamp/mv-3.png){.fragment fragment-index=2 width="84%"}
+
+![](images/L14-Timestamp/mv-4.png){.fragment fragment-index=3 width="84%"}
+
+![](images/L14-Timestamp/mv-5.png){.fragment fragment-index=5 width="84%"}
+
+![](images/L14-Timestamp/mv-6.png){.fragment fragment-index=6 width="84%"}
+
+![](images/L14-Timestamp/mv-7.png){.fragment fragment-index=7 width="84%"}
+
+![](images/L14-Timestamp/mv-8.png){.fragment fragment-index=8 width="84%"}
+
+![](images/L14-Timestamp/mv-9.png){.fragment fragment-index=9 width="84%"}
+
+![](images/L14-Timestamp/mv-10.png){.fragment fragment-index=10 width="84%"}
+
+![](images/L14-Timestamp/mv-11.png){.fragment fragment-index=11 width="84%"}
+
+![](images/L14-Timestamp/mv-12.png){.fragment fragment-index=12 width="84%"}
+:::
+
+## Multiversion Timestamp Protocol (cont.)
+
+- Because each write creates a new version, the WTS of a given version never changes.
+- The DBMS maintains RTSs and commit bits for each version, and it updates them using the same rules as before.
+
+::: {.fragment fragment-index=1}
+- If txn T attempts to write A:
+    - find the version of A that T should be overwriting (the one with the largest WTS < TS(T))
+    - compare TS(T) with the RTS of that version
+:::
+
+::: {.fragment .sub fragment-index=2}
+- example: txn T (TS = [**50**]{style="color:#c00;"}) wants to write A
+:::
+
+::: {.fragment .sub fragment-index=3}
+- it should be overwriting A(0)
+:::
+
+::: {.fragment .sub fragment-index=4}
+- should we allow its write and create A(50)?
+:::
+
+::: {.fragment .sub fragment-index=5}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[no.]{style="color:#3a5fcd;"} [50 < 75]{style="color:#c00;"}[, so T's write is too late]{style="color:#3a5fcd;"}
+:::
+
+::: {.r-stack}
+![](images/L14-Timestamp/wver-1.png){.fragment fragment-index=2 width="80%"}
+
+![](images/L14-Timestamp/wver-2.png){.fragment fragment-index=3 width="80%"}
+
+![](images/L14-Timestamp/wver-3.png){.fragment fragment-index=5 width="80%"}
+:::
+
+## Multiversion Timestamp Protocol (cont.)
+
+- If T's write of A is *not* too late:
+    - create a new version of A with WTS = TS(T)
+
+::: {.fragment}
+- Writes are never ignored.
+    - there may be active txns that should read that version
+:::
+
+::: {.fragment}
+- Versions can be discarded as soon as there are no active transactions that could read them.
+:::
+
+::: {.fragment .sub}
+- can discard A(t1) if:
+    - there is another, later version, A(t2), with t2 > t1
+:::
+
+::: {.fragment .sub fragment-index=4}
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*and*
+
+- there is no active transaction with a TS < t2
+:::
+
+::: {.fragment .sub fragment-index=5}
+- example: we can discard A(0) as soon as there are no remaining txns with TS < [105]{style="color:#c00;"}
+:::
+
+![](images/L14-Timestamp/wver-4.png){.fragment fragment-index=5 width="38%" fig-align="center"}
+
+## Locking vs. Timestamps
+
+- Advantages of timestamps:
+    - txns spend less time waiting
+    - no deadlocks
+
+::: {.fragment}
+- Disadvantages of timestamps:
+    - can get more rollbacks, which are expensive
+    - may use somewhat more space to keep track of timestamps
+:::
+
+::: {.fragment}
+- Advantages of locks:
+    - only deadlocked txns are rolled back
+:::
+
+::: {.fragment}
+- Disadvantages of locks:
+    - unnecessary waits may occur
+:::
+
+## The Best of Both Worlds
+
+- Combine 2PL and multiversion timestamping!
+
+::: {.fragment}
+- Transactions that perform writes use 2PL.
+    - their actions are governed by locks, not timestamps
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- thus, only deadlocked txns are rolled back
+:::
+
+::: {.fragment}
+- Multiple versions of data elements are maintained.
+    - each write creates a new version
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- the WTS of a version is based on when the writer *commits,* not when it started
+:::
+
+::: {.fragment}
+- Read-only transactions do *not* use 2PL.
+    - they are assigned timestamps when they start
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- when T reads A, it gets the version from right before T started
+    - will only get a version whose writer has committed
+:::
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- read-only txns never need to wait or be rolled back!
+:::

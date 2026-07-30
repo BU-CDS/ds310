@@ -1,0 +1,67 @@
+---
+title: "DS310 — Data Mechanics"
+author: "Mark Crovella"
+format:
+  html:
+    theme: cosmo
+    toc: false
+    page-layout: full
+---
+
+## Preface {.unnumbered}
+
+Welcome to DS310, _Data Mechanics_!
+
+These are the course lecture notes for DS310, covering the foundations of
+data management: database design, the relational model and SQL, storage and
+indexing, transactions and recovery, data warehousing, and distributed and
+NoSQL systems.
+
+
+## Format {.unnumbered}
+
+This course notes site is built using [Quarto](https://quarto.org/) and all
+the source pages are in Quarto markdown files. Each link below opens a
+reveal.js deck.
+
+## Data Modeling & SQL
+
+- [Course Overview — Database Design and ER Models](L01-Intro-ER.html)
+- [The Relational Model](L02-Relational.html)
+- [Relational Algebra and a First Look at SQL](L03-RA-SQL.html)
+- [SQL: Aggregates, Subqueries, Joins, and Outer Joins](L04-Patterns-Aggregates.html)
+- [Normalization in Relational Databases; SQL Practices](L05-Normalization-Practice.html)
+
+## Storage & Query Processing
+
+- [Storage Fundamentals](L06-Storage.html)
+- [Indexing](L07-Indexing.html)
+- [Dynamic Linear Hashing](L08-Dynamic-Hashing.html)
+- [Query Processing and Optimization](L09-QueryProcessing-Optimization.html)
+
+## Transactions & Concurrency
+
+- [A First Look at Transactions](L10-Txns1.html)
+- [Transactions and Schedules, Part II](L11-Txns2.html)
+- [Concurrency Control: Locking](L12-Locking.html)
+- [Locking II: Strict/Rigorous Locks, Lock Upgrades, Deadlocks](L13-Locking2.html)
+- [Timestamp-Based Concurrency Control](L14-Timestamp.html)
+
+## Recovery
+
+- [Recovery and Logging](L15-Logging1.html)
+- [Recovery and Logging II](L16-Logging2.html)
+
+## Warehousing & OLAP
+
+- [Data Warehousing and OLAP](L17-OLAP.html)
+- [Data Warehousing and OLAP, Part II](L18-OLAP2.html)
+
+## Distributed & NoSQL
+
+- [Distributed Databases and Replication, Part I](L19-Distributed.html)
+- [Distributed Databases and Replication, Part II](L20-Distributed2.html)
+- [Processing Distributed Data Using MapReduce](L21-MapReduce.html)
+- [NoSQL: Overview and a First Look at MongoDB](L22-NoSQL1.html)
+- [NoSQL II: MongoDB Queries](L23-NoSQL2.html)
+- [Distributed Atomicity and Group Commit](L24-Distributed-Atomicity.html)

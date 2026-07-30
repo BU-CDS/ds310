@@ -1,0 +1,360 @@
+---
+title: "Locking II"
+subtitle: "Strict/Rigorous Locks, Lock Upgrades, Deadlocks"
+author: "Data Science 310 &mdash; Boston University"
+institute: Based on notes by David G. Sullivan
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    width: 1280
+    height: 960
+    incremental: false
+    transition: none
+    code-overflow: wrap
+    chalkboard: true
+---
+
+## Recall: Exclusive vs. Shared Locks
+
+- An *exclusive lock* allows a transaction to write or read an item.
+    - gives the txn exclusive access to that item
+    - only one txn can hold it at a given time
+    - xl~i~(A) = transaction T~i~ requests an exclusive lock for A
+        - if another txn holds *any* lock for A, T~i~ must wait until that lock is released
+
+- A *shared lock* only allows a transaction to read an item.
+    - multiple txns can hold a shared lock for the same data item at the same time
+    - sl~i~(A) = transaction T~i~ requests a shared lock for A
+        - if another txn holds an *exclusive* lock for A, T~i~ must wait until that lock is released
+
+## Recall: Two-phase Locking
+
+- 2PL guarantees serializability.
+- Recoverable? Cascadeless?
+    - 2PL alone does *not* guarantee either of them.
+- Example: &nbsp;&nbsp; [2PL? yes]{style="color:#3a5fcd;"}
+
+::::: {.columns}
+
+:::: {.column width="40%"}
+![](images/L13-Locking2/twophase.png){width="95%"}
+::::
+
+:::: {.column width="60%"}
+not recoverable. why not?
+
+::: {.fragment}
+[r~1~(A) is a dirty read, and reader commits *before* writer.]{style="color:#3a5fcd;"}
+:::
+
+not cascadeless. why not?
+
+::: {.fragment}
+[the dirty read. if T2 is rolled back after that read, T1 must be, too.]{style="color:#3a5fcd;"}
+:::
+::::
+
+:::::
+
+## Strict Locking
+
+- *Strict locking* makes txns hold all *exclusive* locks until they commit or abort.
+
+::: {.fragment .sub}
+- doing so prevents dirty reads, which means schedules will be recoverable and cascadeless
+:::
+
+::: {.r-stack}
+![](images/L13-Locking2/strict-1.png){.fragment width="80%"}
+
+![](images/L13-Locking2/strict-3.png){.fragment width="80%"}
+
+![](images/L13-Locking2/strict-4.png){.fragment width="80%"}
+
+![](images/L13-Locking2/strict-5.png){.fragment width="80%"}
+
+![](images/L13-Locking2/strict-6.png){.fragment width="80%"}
+
+![](images/L13-Locking2/strict-7.png){.fragment width="80%"}
+
+![](images/L13-Locking2/strict-8.png){.fragment width="80%"}
+:::
+
+::: {.fragment}
+- strict + 2PL = **strict 2PL**
+:::
+
+## Rigorous Locking
+
+- Under strict locking, it's possible to get something like this:
+
+::: {.r-stack}
+![](images/L13-Locking2/rigorous-1.png){width="88%"}
+
+![](images/L13-Locking2/rigorous-4.png){.fragment width="88%"}
+
+![](images/L13-Locking2/rigorous-5.png){.fragment width="88%"}
+
+![](images/L13-Locking2/rigorous-6.png){.fragment width="88%"}
+:::
+
+::: {.fragment}
+- *Rigorous locking* requires txns to hold *all* locks until commit/abort.
+:::
+
+::: {.fragment}
+- It guarantees that transactions commit in the same order as they would in the equivalent serial schedule.
+:::
+
+::: {.fragment}
+- rigorous + 2PL = **rigorous 2PL**
+:::
+
+## Deadlock
+
+- Consider the following schedule:
+
+::: {.r-stack}
+![](images/L13-Locking2/deadlock-1.png){width="82%"}
+
+![](images/L13-Locking2/deadlock-2.png){.fragment width="82%"}
+
+![](images/L13-Locking2/deadlock-3.png){.fragment width="82%"}
+
+![](images/L13-Locking2/deadlock-4.png){.fragment width="82%"}
+
+![](images/L13-Locking2/deadlock-5.png){.fragment width="82%"}
+
+![](images/L13-Locking2/deadlock-6.png){.fragment width="82%"}
+:::
+
+::: {.fragment}
+- This schedule produces *deadlock*.
+    - T1 is waiting for T2 to unlock A
+    - T2 is waiting for T1 to unlock B
+    - neither can make progress!
+:::
+
+::: {.fragment}
+- We'll see later how to deal with this.
+:::
+
+## Lock Upgrades
+
+::::: {.columns}
+
+:::: {.column width="47%"}
+- It can be problematic to acquire an exclusive lock earlier than necessary.
+
+::: {.fragment fragment-index=4}
+- Instead:
+    - acquire a shared lock to read the item
+:::
+
+::: {.fragment .sub fragment-index=5}
+- upgrade to an exclusive lock when you need to write
+:::
+
+::: {.fragment .sub fragment-index=7}
+- may need to wait to upgrade if others hold shared locks
+:::
+
+::: {.fragment fragment-index=8}
+- Note: we're *not* releasing the shared lock before acquiring the exclusive one. why not?
+:::
+
+::: {.fragment .sub fragment-index=9}
+- [doing so would violate 2PL!]{style="color:#3a5fcd;"}
+:::
+::::
+
+:::: {.column width="53%"}
+::: {.r-stack}
+![](images/L13-Locking2/upgrade-a-1.png){width="72%"}
+
+![](images/L13-Locking2/upgrade-a-3.png){.fragment fragment-index=1 width="72%"}
+
+![](images/L13-Locking2/upgrade-a-4.png){.fragment fragment-index=2 width="72%"}
+
+![](images/L13-Locking2/upgrade-a-6.png){.fragment fragment-index=3 width="72%"}
+:::
+
+::: {.r-stack}
+![](images/L13-Locking2/upgrade-b-1.png){.fragment fragment-index=4 width="72%"}
+
+![](images/L13-Locking2/upgrade-b-3.png){.fragment fragment-index=6 width="72%"}
+:::
+::::
+
+:::::
+
+## A Possible Problem with Lock Upgrades
+
+- Upgrades can lead to deadlock:
+    - two txns each hold a shared lock for an item
+    - both txns attempt to upgrade their locks
+    - each txn waits for the other to release its shared lock
+    - deadlock!
+- Example:
+
+::: {.r-stack}
+![](images/L13-Locking2/upgprob-1.png){width="80%"}
+
+![](images/L13-Locking2/upgprob-2.png){.fragment width="80%"}
+
+![](images/L13-Locking2/upgprob-3.png){.fragment width="80%"}
+
+![](images/L13-Locking2/upgprob-4.png){.fragment width="80%"}
+
+![](images/L13-Locking2/upgprob-5.png){.fragment width="80%"}
+:::
+
+## Update Locks
+
+- To avoid deadlocks from lock upgrades, some systems take the following approach:
+    - don't allow the upgrading of shared locks
+    - provide a third lock mode known as an *update lock*
+        - like a shared lock, it allows a txn to read an item
+        - it *can* be upgraded to an exclusive lock
+
+::: {.fragment .sub style="margin-left: 1em;"}
+- [only one txn can hold an update lock for a given item]{style="color:#c00;"}
+:::
+
+::: {.fragment .sub style="margin-left: 2.4em;"}
+- [thus, we won't get deadlocks from upgrades]{style="color:#c00;"}
+- [see next slide for more details]{style="color:#c00;"}
+:::
+
+::: {.fragment}
+- if read-only &rarr; acquire a shared lock
+- if read-modify-write (RMW) &rarr; acquire an update lock for the read, and upgrade it to exclusive for the write
+:::
+
+## Update Locks (cont.)
+
+- To avoid deadlocks from lock upgrades, some systems provide two different lock modes for reading:
+    - *shared locks* &ndash; used if you *only* want to read an item
+    - *update locks* &ndash; used if you want to read an item *and later update it*
+
+::: {.r-stack}
+![](images/L13-Locking2/updtable-1.png){width="88%"}
+
+![](images/L13-Locking2/updtable-2.png){.fragment width="88%"}
+
+![](images/L13-Locking2/updtable-3.png){.fragment width="88%"}
+
+![](images/L13-Locking2/updtable-4.png){.fragment width="88%"}
+
+![](images/L13-Locking2/updtable-5.png){.fragment width="88%"}
+
+![](images/L13-Locking2/updtable-6.png){.fragment width="88%"}
+
+![](images/L13-Locking2/updtable-7.png){.fragment width="88%"}
+
+![](images/L13-Locking2/updtable-8.png){.fragment width="88%"}
+
+![](images/L13-Locking2/updtable-9.png){.fragment width="88%"}
+:::
+
+## Different Locks for Different Purposes
+
+- If you only need to read an item, acquire a shared lock.
+
+::: {.fragment}
+- If you only need to write an item, acquire an exclusive lock.
+:::
+
+::: {.fragment}
+- If you need to read and then write an item:
+    - acquire an update lock for the read
+    - upgrade it to an exclusive lock for the write
+:::
+
+::: {.fragment .sub}
+- this sequence of operations is sometimes called *read-modify-write* (RMW)
+:::
+
+## Compatibility Matrix with Update Locks
+
+![](images/L13-Locking2/compat-1.png){width="75%" fig-align="center"}
+
+::: {.fragment}
+- When there are one or more shared locks on an item, a txn can still acquire an update lock for that item.
+    - allows for concurrency on the read portion of RMW txns
+:::
+
+::: {.fragment}
+- There can't be more than one update lock on an item.
+    - prevents deadlocks when upgrading from update to exclusive
+:::
+
+::: {.fragment}
+- If a txn holds an update lock on an item, other txns *can't* acquire any *new* locks on that item.
+    - prevents the RMW txn from waiting indefinitely to upgrade
+:::
+
+## Example of Using Update Locks
+
+::: {.r-stack}
+![](images/L13-Locking2/ulex-1.png){width="95%"}
+
+![](images/L13-Locking2/ulex-2.png){.fragment width="95%"}
+
+![](images/L13-Locking2/ulex-3.png){.fragment width="95%"}
+
+![](images/L13-Locking2/ulex-4.png){.fragment width="95%"}
+
+![](images/L13-Locking2/ulex-5.png){.fragment width="95%"}
+:::
+
+## Detecting and Handling Deadlocks
+
+- When DBMS detects a deadlock, it rolls back one of the deadlocked transactions.
+
+::: {.fragment fragment-index=1}
+- How does it know when there is a deadlock?
+:::
+
+::: {.fragment fragment-index=2}
+- Can use a *waits-for graph* to detect the deadlock.
+:::
+
+::: {.fragment .sub fragment-index=3}
+- the vertices are the transactions
+:::
+
+::: {.fragment .sub fragment-index=4}
+- an edge from T1 &rarr; T2 means T1 is waiting for T2 to release a lock
+:::
+
+::: {.fragment .sub fragment-index=5}
+- a cycle indicates a deadlock
+:::
+
+::: {.fragment fragment-index=6}
+- Example:
+:::
+
+::: {.r-stack}
+![](images/L13-Locking2/wfg-0.png){.fragment fragment-index=3 width="80%"}
+
+![](images/L13-Locking2/wfg-1.png){.fragment fragment-index=6 width="80%"}
+
+![](images/L13-Locking2/wfg-2.png){.fragment fragment-index=7 width="80%"}
+
+![](images/L13-Locking2/wfg-3.png){.fragment fragment-index=8 width="80%"}
+
+![](images/L13-Locking2/wfg-4.png){.fragment fragment-index=9 width="80%"}
+
+![](images/L13-Locking2/wfg-5.png){.fragment fragment-index=10 width="80%"}
+
+![](images/L13-Locking2/wfg-6.png){.fragment fragment-index=11 width="80%"}
+
+![](images/L13-Locking2/wfg-7.png){.fragment fragment-index=12 width="80%"}
+
+![](images/L13-Locking2/wfg-8.png){.fragment fragment-index=13 width="80%"}
+
+![](images/L13-Locking2/wfg-9.png){.fragment fragment-index=14 width="80%"}
+:::

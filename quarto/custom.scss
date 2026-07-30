@@ -1,0 +1,93 @@
+/*-- scss:defaults --*/
+
+// Match the original PowerPoint look:
+//   - dark-red title color (eyeballed from the rendered PNGs ~ #7c1717)
+//   - black body text on white background
+//   - sans-serif (Helvetica / Arial-style) for body
+$body-bg: #ffffff;
+$body-color: #000000;
+$presentation-heading-color: #7c1717;
+$link-color: #1a5fb4;
+$presentation-heading-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-family-sans-serif: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$presentation-font-size-root: 32px;
+$presentation-h2-font-size: 1.6em;
+
+/*-- scss:rules --*/
+
+.reveal h1, .reveal h2, .reveal h3 {
+  text-transform: none;
+  text-align: center;
+  font-weight: 400;
+}
+
+.reveal section img {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+// Bulleted lists: keep the dash/disc bullets close to the PPT look.
+.reveal ul {
+  list-style-type: disc;
+}
+.reveal ul ul {
+  list-style-type: "– ";
+}
+.reveal ul ul ul {
+  list-style-type: disc;
+}
+
+// Title slide tweaks
+.reveal #title-slide .title {
+  color: #7c1717;
+}
+.reveal #title-slide .subtitle {
+  color: #7c1717;
+  font-style: normal;
+}
+
+// Credit line on title slide (stored in metadata as institute)
+.reveal #title-slide .institute {
+  font-size: 0.65em;
+  color: #555;
+  text-align: center;
+  margin-top: 2.2em;
+}
+
+// Set colors for Cartesian product examples
+.reveal .set-a { color: #c00; }      // A — red
+.reveal .set-b { color: #3a5fcd; }   // B — blue
+.reveal .set-c { color: #1a8a1a; }   // C — green
+.reveal .set-d { color: #7b2fbf; }   // D — purple
+.reveal .set-e { color: #cc6600; }   // E — orange
+
+.reveal .fragment.highlight-blue.visible { color: #3a5fcd; }
+// Sub-bullet continuation revealed as its own fragment: keep the
+// second-level indent and bullet style at normal font size
+// (used by L03-RA-SQL.qmd; additive, no effect on other decks).
+.reveal .sub ul,
+.reveal .sub ol {
+  margin-left: 1.2em;
+}
+.reveal .sub ul {
+  list-style-type: "– ";
+}
+
+// Large code block that should fill the slide rather than sit in a
+// small scrolling box: bigger type, and pairs with the deck's
+// code-block-height setting so all lines are visible
+// (used by L21-MapReduce.qmd, "Example 2: Chaining Jobs (cont.)").
+.reveal .big-code pre {
+  font-size: 0.75em;
+}
+
+// Pluses-and-minuses lists: the +/− written in the text serves as the
+// bullet, so hide the second-level "–" marker (used by L15-Logging1.qmd,
+// L16-Logging2.qmd, and L22-NoSQL1.qmd).
+.reveal .plus-minus ul ul {
+  list-style-type: none;
+}
+.reveal .plus-minus ul ul ul {
+  list-style-type: disc;
+}

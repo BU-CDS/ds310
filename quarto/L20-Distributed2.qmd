@@ -1,0 +1,358 @@
+---
+title: "Distributed Databases and Replication"
+subtitle: "Part II"
+author: "Data Science 310 &mdash; Boston University"
+institute: Based on notes by David G. Sullivan
+format:
+  revealjs:
+    theme: [default, custom.scss]
+    slide-number: true
+    width: 1280
+    height: 960
+    incremental: false
+    transition: none
+    code-overflow: wrap
+    chalkboard: true
+---
+
+## Recall: Fragmentation / Sharding
+
+- Here's a relation from a centralized bank database:
+
+![](images/L20-Distributed2/frag-central.png){width="60%" fig-align="center"}
+
+- Here's one way of fragmenting it:
+
+![](images/L20-Distributed2/frag-sharded.png){width="78%" fig-align="center"}
+
+## Recall: Replication
+
+- Replication involves putting copies of the same collection of records at different sites.
+
+![](images/L20-Distributed2/repl-diagram.png){width="75%" fig-align="center"}
+
+## Recall: Distributed Concurrency Control (cont.)
+
+- Example of why special steps are needed:
+    - voting-based synchronous replication with 6 replicas
+    - let's say that we configure the voting as before:
+        - each write updates 3 copies
+        - each read accesses 4 copies
+    - can end up with schedules that are not conflict serializable
+    - example:
+
+![](images/L20-Distributed2/badsched.png){width="80%" fig-align="center"}
+
+## What Do We Need?
+
+- We need shared and exclusive locks for a *logical item*, not just for individual copies of that item.
+
+::: {.fragment .sub}
+- referred to as *global locks*
+:::
+
+::: {.fragment .sub}
+- doesn't necessarily mean locking every copy
+:::
+
+::: {.fragment}
+- Requirements for global locks:
+    - no two txns can hold a global exclusive lock for the same item
+:::
+
+::: {.fragment .sub}
+- any number of txns can hold a global shared lock for an item
+:::
+
+::: {.fragment .sub}
+- a txn cannot acquire a global exclusive lock on an item if another txn holds a global shared lock on that item, and vice versa
+:::
+
+## What Do We Need? (cont.)
+
+- In addition, we need to ensure the correct ordering of operations *within* each distributed transaction.
+    - don't want a subtxn to get ahead of where it should be in the context of the txn as a whole
+
+::: {.fragment .sub}
+- relevant even in the absence of replication
+:::
+
+::: {.fragment .sub}
+- one option: have the coordinator of the txn acquire the necessary locks before sending operations to a site
+:::
+
+## Option 1: Centralized Locking
+
+- One site manages the lock requests for *all* items in the distributed database.
+    - even items that don't have copies stored at that site
+
+::: {.fragment .sub}
+- since there's only one place to acquire locks, these locks are obviously global locks!
+:::
+
+::: {.fragment}
+- Problems with this approach?
+:::
+
+::: {.fragment .sub}
+- [the lock site can become a bottleneck]{style="color:#00c;"}
+:::
+
+::: {.fragment .sub}
+- [if the lock site crashes, operations at all sites are blocked]{style="color:#00c;"}
+:::
+
+## Option 2: Primary-Copy Locking
+
+- One copy of an item is designated the *primary copy*.
+- The site holding the primary copy handles all lock requests for that item.
+
+::: {.fragment .sub}
+- acquiring a shared lock for the primary copy gives you a global shared lock for the item
+:::
+
+::: {.fragment .sub}
+- acquiring an exclusive lock for the primary copy gives you a global exclusive lock for the item
+:::
+
+::: {.fragment}
+- To prevent one site from becoming a bottleneck, distribute the primary copies among the sites.
+:::
+
+::: {.fragment}
+- Problem: If a site goes down, operations are blocked on all items for which it holds the primary copy.
+:::
+
+## Option 3: Fully Distributed Locking
+
+- No one site is responsible for managing lock requests for a given item.
+
+::: {.fragment}
+- A transaction acquires a global lock for an item by locking a sufficient number of the item's copies.
+:::
+
+::: {.fragment .sub}
+- these local locks combine to form the global lock
+:::
+
+::: {.fragment}
+- To acquire a global shared lock, acquire local shared locks for a sufficient number of copies (see next slide).
+:::
+
+::: {.fragment}
+- To acquire a global exclusive lock, acquire local exclusive locks for a sufficient number of copies (see next slide).
+:::
+
+## Option 3: Fully Distributed Locking (cont.)
+
+- How many copies must be locked?
+    - let: &nbsp; n = the total number of copies <br>
+    &emsp;&emsp;&nbsp; x = the number of copies that must be locked to acquire a global exclusive lock
+
+::: {.fragment .sub}
+&emsp;&emsp;&emsp;&emsp;&emsp; s = the number of copies that must be locked to acquire a global shared lock
+:::
+
+::: {.fragment .sub}
+- we need x > n/2
+    - guarantees that no two txns can both acquire a global exclusive lock at the same time
+:::
+
+::: {.fragment .sub}
+- we need s > n &ndash; x &emsp;(i.e., s + x > n)
+:::
+
+::: {.fragment .sub}
+- if there's a global exclusive lock on an item, there aren't enough unlocked copies for a global shared lock
+:::
+
+::: {.fragment .sub}
+- if there's a global shared lock on an item, there aren't enough unlocked copies for a global excl. lock
+:::
+
+## Option 3: Fully Distributed Locking (cont.)
+
+- Our earlier example would no longer be possible:
+
+::: {.r-stack}
+![](images/L20-Distributed2/ffd-ex-1.png){width="75%"}
+
+![](images/L20-Distributed2/ffd-ex-2.png){.fragment width="75%"}
+
+![](images/L20-Distributed2/ffd-ex-3.png){.fragment width="75%"}
+
+![](images/L20-Distributed2/ffd-ex-4.png){.fragment width="75%"}
+
+![](images/L20-Distributed2/ffd-ex-5.png){.fragment width="75%"}
+
+![](images/L20-Distributed2/ffd-ex-6.png){.fragment width="75%"}
+
+![](images/L20-Distributed2/ffd-ex-7.png){.fragment width="75%"}
+:::
+
+## Synchronous Replication and Fully Distributed Locking
+
+- Read-any write-all:
+    - when writing an item, a txn must update all of the replicas
+
+::: {.fragment .sub fragment-index=1}
+- this gives it x = n exclusive locks, so x > n/2
+:::
+
+::: {.sub}
+- when reading an item, a txn can access any of the replicas
+:::
+
+::: {.fragment .sub fragment-index=2}
+- this gives it s = 1 shared lock, and 1 > n &ndash; n
+:::
+
+::: {.fragment fragment-index=3}
+- Voting:
+    - when writing, a txn updates [*a majority of the copies*]{style="color:#c00;"} &ndash; i.e., w copies, where [w > n/2]{style="color:#c00;"}.
+:::
+
+::: {.fragment .sub fragment-index=4}
+- this gives it x > n/2 exclusive locks as required
+:::
+
+::: {.fragment .sub fragment-index=3}
+- when reading, a txn reads r > n &ndash; w copies
+:::
+
+::: {.fragment .sub fragment-index=5}
+- this gives it s > n &ndash; x shared locks as required
+:::
+
+## Which of these would work?
+
+- 9 replicas &ndash; i.e., 9 copies of each item
+- fully distributed locking
+- voting-based approach with the following requirements (number of copies):
+
+|        | read | written |
+|:------:|:----:|:-------:|
+| A\.    |  5   |    5    |
+| B\.    |  6   |    4    |
+| C\.    |  7   |    3    |
+| D\.    |  4   |    5    |
+
+*(select all that work)*
+
+---
+
+::: {.r-stack}
+![](images/L20-Distributed2/quiz-A1.png){width="95%"}
+
+![](images/L20-Distributed2/quiz-A2.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-A3.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-A4.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L20-Distributed2/quiz-B1.png){width="95%"}
+
+![](images/L20-Distributed2/quiz-B2.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-B3.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-B4.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-B5.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L20-Distributed2/quiz-C1.png){width="95%"}
+
+![](images/L20-Distributed2/quiz-C2.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L20-Distributed2/quiz-D1.png){width="95%"}
+
+![](images/L20-Distributed2/quiz-D2.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-D3.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-D4.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-D5.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L20-Distributed2/quiz-S1.png){width="95%"}
+
+![](images/L20-Distributed2/quiz-S2.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-S3.png){.fragment width="95%"}
+:::
+
+---
+
+::: {.r-stack}
+![](images/L20-Distributed2/quiz-P1.png){width="95%"}
+
+![](images/L20-Distributed2/quiz-P2.png){.fragment width="95%"}
+
+![](images/L20-Distributed2/quiz-P3.png){.fragment width="95%"}
+:::
+
+## Distributed Deadlock Handling
+
+- Under centralized locking, we can just use [the waits-for graphs]{style="color:#c00;"} that we studied earlier in the semester.
+- Under the other two locking schemes, *deadlock detection* becomes more difficult.
+
+::: {.fragment .sub}
+- local waits-for graphs alone will not necessarily detect a deadlock
+    - example:
+
+![](images/L20-Distributed2/wfg.png){width="65%" fig-align="center"}
+:::
+
+::: {.fragment .sub}
+- one option: periodically send local waits-for graphs to one site that checks for deadlocks
+:::
+
+::: {.fragment}
+- Instead of using deadlock detection, it's often easier to use a timeout-based scheme.
+    - if a txn waits too long, presume deadlock and roll it back!
+:::
+
+## Recall: Types of Replication
+
+- In *synchronous replication*, transactions are guaranteed to see the most up-to-date value of an item.
+- In *asynchronous replication*, transactions are *not* guaranteed to see the most up-to-date value.
+
+## Asynchronous Replication I: Primary Site
+
+- In *primary-site replication*, one replica is designated the *primary* or *master* replica.
+
+::: {.fragment}
+- All writes go to the primary.
+    - propagated asynchronously to the other replicas (the *secondaries*)
+:::
+
+::: {.fragment}
+- The secondaries can only be read.
+    - no locks are acquired when accessing them
+    - thus, we only use them when performing read-only txns
+:::
+
+::: {.fragment}
+- Drawbacks of this approach?
+:::
+
+## Asynchronous Replication II: Peer-to-Peer
+
+- In *peer-to-peer replication*, more than one replica can be updated.
+- Problem: need to somehow resolve conflicting updates!
