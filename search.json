@@ -2265,7 +2265,7 @@
     "href": "L02-Relational.html#design-issue-attribute-or-entity-set",
     "title": "The Relational Model",
     "section": "Design Issue: Attribute or Entity Set?",
-    "text": "Design Issue: Attribute or Entity Set?\n\nIt can sometimes be hard to decide if something should be treated as an attribute or an entity set.\n\n\nIndications that you should use an entity set:\n\n\nif it has attributes of its own that you wish to capture\nif, as an attribute, it could have multiple values\n\nmulti-valued attributes are problematic in some data models"
+    "text": "Design Issue: Attribute or Entity Set?\n\nIt can sometimes be hard to decide if something should be treated as an attribute or an entity set.\n\n\nIndications that you should use an entity set:\n\nif it has attributes of its own that you wish to capture\nif, as an attribute, it could have multiple values\n\nmulti-valued attributes are problematic in some data models"
   },
   {
     "objectID": "L02-Relational.html#relational-algebra",
@@ -2580,7 +2580,7 @@
     "href": "L01-Intro-ER.html#sample-domain-a-university",
     "title": "Data Mechanics",
     "section": "Sample Domain: A University",
-    "text": "Sample Domain: A University\n\nWant to store data about:\n\nemployees\nstudents\ncourses\ndepartments\n\nHow many tables do you think we’ll need?\n\n\n\nThis can be hard to tell before doing the design!\nIn particular, hard to determine which tables are needed to encode relationships between data items"
+    "text": "Sample Domain: A University\n\nWant to store data about:\n\nemployees\nstudents\ncourses\ndepartments\n\nHow many tables do you think we’ll need?\n\n\nThis can be hard to tell before doing the design!\nIn particular, hard to determine which tables are needed to encode relationships between data items"
   },
   {
     "objectID": "L01-Intro-ER.html#entities-the-things",
@@ -2657,7 +2657,7 @@
     "href": "L01-Intro-ER.html#relationships-between-entities-cont.",
     "title": "Data Mechanics",
     "section": "Relationships Between Entities (cont.)",
-    "text": "Relationships Between Entities (cont.)\n\nStrictly speaking, each diamond represents a relationship set, which is a collection of relationships between individual entities.\n\n\n\n\nIn a given set of relationships:\n\nan individual entity may appear 0, 1, or multiple times (e.g. CDS 164)\n\na given combination of entities may appear at most once\n\nexample: the combination (DS 110, CAS 315) may appear at most once"
+    "text": "Relationships Between Entities (cont.)\n\nStrictly speaking, each diamond represents a relationship set, which is a collection of relationships between individual entities.\n\n\n\nIn a given set of relationships:\n\nan individual entity may appear 0, 1, or multiple times (e.g. CDS 164)\n\na given combination of entities may appear at most once\n\nexample: the combination (DS 110, CAS 315) may appear at most once"
   },
   {
     "objectID": "L01-Intro-ER.html#attributes-of-relationships",
@@ -2692,7 +2692,7 @@
     "href": "L01-Intro-ER.html#cardinality-or-key-constraints",
     "title": "Data Mechanics",
     "section": "Cardinality (or Key) Constraints",
-    "text": "Cardinality (or Key) Constraints\n\nA cardinality constraint (or key constraint) limits the number of times that a given entity can appear in a relationship set.\n\nExample: each course meets in at most one room\n\n\n\nA key constraint specifies a functional mapping from one entity set to another.\n\neach course is mapped to at most one room (course → room)\n\nAs a result, each course appears in at most one relationship in the meets in relationship set.\nThe arrow in the ER diagram has same direction as the mapping."
+    "text": "Cardinality (or Key) Constraints\n\nA cardinality constraint (or key constraint) limits the number of times that a given entity can appear in a relationship set.\n\nExample: each course meets in at most one room\n\n\nA key constraint specifies a functional mapping from one entity set to another.\n\neach course is mapped to at most one room (course → room)\n\nAs a result, each course appears in at most one relationship in the meets in relationship set.\nThe arrow in the ER diagram has same direction as the mapping."
   },
   {
     "objectID": "L01-Intro-ER.html#cardinality-constraints-cont.",
@@ -2713,7 +2713,7 @@
     "href": "L01-Intro-ER.html#many-to-one-relationships-cont.",
     "title": "Data Mechanics",
     "section": "Many-to-One Relationships (cont.)",
-    "text": "Many-to-One Relationships (cont.)\nIn general, in a many-to-one relationship from A to B:\n\n\n\nan entity in A can be related to at most one entity in B\nan entity in B can be related to an arbitrary number of entities in A (0 or more)"
+    "text": "Many-to-One Relationships (cont.)\nIn general, in a many-to-one relationship from A to B:\n\n\nan entity in A can be related to at most one entity in B\nan entity in B can be related to an arbitrary number of entities in A (0 or more)"
   },
   {
     "objectID": "L01-Intro-ER.html#another-example-of-a-many-to-one-relationship",
@@ -2748,21 +2748,21 @@
     "href": "L01-Intro-ER.html#what-type-of-relationship-is-majors-in",
     "title": "Data Mechanics",
     "section": "What type of relationship is Majors In?",
-    "text": "What type of relationship is Majors In?\n\nA. many-to-many\nB. many-to-one from Person to Department\nC. many-to-one from Department to Person\nD. one-to-one\n\n\nAnswer: B. many-to-one from Person to Department\n\n\n\n\nA given person can major in at most one department.\nA given department can have an arbitrary number of people majoring in it."
+    "text": "What type of relationship is Majors In?\n\nA. many-to-many\nB. many-to-one from Person to Department\nC. many-to-one from Department to Person\nD. one-to-one\n\n\nAnswer: B. many-to-one from Person to Department\n\n\n\nA given person can major in at most one department.\nA given department can have an arbitrary number of people majoring in it."
   },
   {
     "objectID": "L01-Intro-ER.html#what-if-each-student-can-have-more-than-one-major",
     "href": "L01-Intro-ER.html#what-if-each-student-can-have-more-than-one-major",
     "title": "Data Mechanics",
     "section": "What if each student can have more than one major?",
-    "text": "What if each student can have more than one major?\n\n\n\nObserve that there are no arrows.\nMajors In is what type of relationship in this case?\n\nmany-to-many"
+    "text": "What if each student can have more than one major?\n\n\nObserve that there are no arrows.\nMajors In is what type of relationship in this case?\n\nmany-to-many"
   },
   {
     "objectID": "L01-Intro-ER.html#cardinality-constraints-and-ternary-relationship-sets",
     "href": "L01-Intro-ER.html#cardinality-constraints-and-ternary-relationship-sets",
     "title": "Data Mechanics",
     "section": "Cardinality Constraints and Ternary Relationship Sets",
-    "text": "Cardinality Constraints and Ternary Relationship Sets\n\n\n\nThe arrow into “study group” encodes the following constraint: “a person studies in at most one study group for a given course.”\nIn other words, a given (person, course) combination is mapped to at most one study group.\na given person or course can itself appear in multiple studies-in relationships\nFor relationship sets of degree &gt;= 3, we use at most one arrow, since otherwise the meaning can be ambiguous."
+    "text": "Cardinality Constraints and Ternary Relationship Sets\n\n\nThe arrow into “study group” encodes the following constraint: “a person studies in at most one study group for a given course.”\nIn other words, a given (person, course) combination is mapped to at most one study group.\na given person or course can itself appear in multiple studies-in relationships\nFor relationship sets of degree &gt;= 3, we use at most one arrow, since otherwise the meaning can be ambiguous."
   },
   {
     "objectID": "L01-Intro-ER.html#participation-constraints",
@@ -2776,7 +2776,7 @@
     "href": "L01-Intro-ER.html#participation-constraints-cont.",
     "title": "Data Mechanics",
     "section": "Participation Constraints (cont.)",
-    "text": "Participation Constraints (cont.)\nWe can combine cardinality and participation constraints.\n\n\na person chairs at most one department\n\nspecified by which arrow?   the one into Department\n\n\n\n\na department has exactly one person as a chair\n\narrow into Person specifies at most one\nthick line from Dept to Chairs specifies at least one\nat most one + at least one = exactly one"
+    "text": "Participation Constraints (cont.)\nWe can combine cardinality and participation constraints.\n\n\na person chairs at most one department\n\nspecified by which arrow?   the one into Department\n\n\n\na department has exactly one person as a chair\n\narrow into Person specifies at most one\nthick line from Dept to Chairs specifies at least one\nat most one + at least one = exactly one"
   },
   {
     "objectID": "L03-RA-SQL.html#recall-cartesian-product",

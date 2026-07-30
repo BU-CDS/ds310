@@ -6,8 +6,8 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.6.37">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
 
   <meta name="author" content="Data Science 310 — Boston University">
   <title>DS310 – NoSQL II: Mongo DB Queries</title>
@@ -17,10 +17,16 @@
   <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
   <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
   <style>
-    code{white-space: pre-wrap;}
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
     span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
     ul.task-list li input[type="checkbox"] {
@@ -29,8 +35,9 @@
       vertical-align: middle;
     }
     /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
     pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
     pre > code.sourceCode > span:empty { height: 1.2em; }
     .sourceCode { overflow: visible; }
     code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -41,7 +48,7 @@
     }
     @media print {
     pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
     }
     pre.numberSource code
       { counter-reset: source-line 0; }
@@ -94,7 +101,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-91e0fad9facfa472f0527723fdbe8b3d.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-6fc56f21b4422d7997316abafc9e26c3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -200,7 +207,7 @@
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
 <div class="quarto-title-author-name">
-Data Science 310 — Boston University 
+Data Science 310 — Boston University
 </div>
         <p class="quarto-title-affiliation">
             Based on notes by David G. Sullivan
@@ -235,7 +242,7 @@ Data Science 310 — Boston University
 <li>Each query can only access a single collection of documents.</li>
 <li>Use a method called db.<em>collection</em>.find()</li>
 </ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a></a>db.collection.find(&lt;selection&gt;, &lt;projection&gt;)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a aria-label="1"></a>db.collection.find(&lt;selection&gt;, &lt;projection&gt;)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment sub">
 <ul>
 <li><em>collection</em> is the name of the collection</li>
@@ -265,7 +272,7 @@ Data Science 310 — Boston University
 <ul>
 <li>Example: find the names of all R-rated movies:</li>
 </ul>
-<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a></a>db.movies.find({ rating: "R" }, { name: 1 })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb2-1"><a aria-label="1"></a>db.movies.find({ rating: "R" }, { name: 1 })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="comparison-with-sql" class="slide level2">
@@ -281,12 +288,12 @@ Data Science 310 — Boston University
 </section>
 <section id="query-selection-criteria" class="slide level2">
 <h2>Query Selection Criteria</h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a></a>db.collection.find(&lt;selection&gt;, &lt;projection&gt;)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a aria-label="1"></a>db.collection.find(&lt;selection&gt;, &lt;projection&gt;)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>To find documents that match a set of field values, use a selection document consisting of those name/value pairs (see previous example).</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a></a>db.movies.find({ rating: "R", year: 2000 },</span>
-<span id="cb4-2"><a></a>               { name: 1, runtime: 1 })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a aria-label="1"></a>db.movies.find({ rating: "R", year: 2000 },</span>
+<span id="cb4-2"><a aria-label="2"></a>               { name: 1, runtime: 1 })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment">
 <ul>
 <li>Operators for other types of comparisons:</li>
@@ -316,7 +323,7 @@ Data Science 310 — Boston University
 <ul>
 <li>Example: find all movies with an earnings rank &lt;= 200</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a></a>db.movies.find({ earnings_rank: { $lte: 200 }})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb5-1"><a aria-label="1"></a>db.movies.find({ earnings_rank: { $lte: 200 }})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>Note that the operator is the field name of a subdocument.</li>
 </ul>
@@ -331,18 +338,18 @@ Data Science 310 — Boston University
 <li>example: find all movies rated R or PG-13:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a></a>db.movies.find({ $or: [ { rating: "R" },</span>
-<span id="cb6-2"><a></a>                        { rating: "PG-13" }</span>
-<span id="cb6-3"><a></a>                      ]</span>
-<span id="cb6-4"><a></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb6-1"><a aria-label="1"></a>db.movies.find({ $or: [ { rating: "R" },</span>
+<span id="cb6-2"><a aria-label="2"></a>                        { rating: "PG-13" }</span>
+<span id="cb6-3"><a aria-label="3"></a>                      ]</span>
+<span id="cb6-4"><a aria-label="4"></a>               })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment sub">
 <ul>
 <li>example: find all movies <em>except</em> those rated R or PG-13:</li>
 </ul>
-<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb7-1"><a></a>db.movies.find({ $nor: [ { rating: "R" },</span>
-<span id="cb7-2"><a></a>                         { rating: "PG-13" }</span>
-<span id="cb7-3"><a></a>                       ]</span>
-<span id="cb7-4"><a></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb7-1"><a aria-label="1"></a>db.movies.find({ $nor: [ { rating: "R" },</span>
+<span id="cb7-2"><a aria-label="2"></a>                         { rating: "PG-13" }</span>
+<span id="cb7-3"><a aria-label="3"></a>                       ]</span>
+<span id="cb7-4"><a aria-label="4"></a>               })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="query-selection-criteria-cont.-1" class="slide level2">
@@ -353,15 +360,15 @@ Data Science 310 — Boston University
 <li>example: find all movies rated R or PG-13:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb8-1"><a></a>db.movies.find({ rating: { $in: ["R", "PG-13"] }</span>
-<span id="cb8-2"><a></a>              })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb8-1"><a aria-label="1"></a>db.movies.find({ rating: { $in: ["R", "PG-13"] }</span>
+<span id="cb8-2"><a aria-label="2"></a>              })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li>example: find all movies <em>except</em> those rated R or PG-13:</li>
 </ul>
 </div>
-<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb9-1"><a></a>db.movies.find({ rating: { $nin: ["R", "PG-13"] }</span>
-<span id="cb9-2"><a></a>              })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb9-1"><a aria-label="1"></a>db.movies.find({ rating: { $nin: ["R", "PG-13"] }</span>
+<span id="cb9-2"><a aria-label="2"></a>              })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li><strong><em>note:</em></strong> <code>$in</code>/<code>$nin</code> is generally more efficient than <code>$or</code>/<code>$nor</code></li>
@@ -374,13 +381,13 @@ Data Science 310 — Boston University
 <li>example: find all movies with an earnings rank:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb10-1"><a></a>db.movies.find({ earnings_rank: { $exists: true }})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb10-1"><a aria-label="1"></a>db.movies.find({ earnings_rank: { $exists: true }})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment sub">
 <ul>
 <li>example: find all movies <em>without</em> an earnings rank:</li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a></a>db.movies.find({ earnings_rank: { $exists: false }})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a aria-label="1"></a>db.movies.find({ earnings_rank: { $exists: false }})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="logical-and" class="slide level2">
@@ -391,15 +398,15 @@ Data Science 310 — Boston University
 <li>recall our previous example:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb12-1"><a></a>db.movies.find({ rating: "R", year: 2000 })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb12-1"><a aria-label="1"></a>db.movies.find({ rating: "R", year: 2000 })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li>example: find all R-rated movies shorter than 90 minutes:</li>
 </ul>
 </div>
-<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb13-1"><a></a>db.movies.find({ rating: "R",</span>
-<span id="cb13-2"><a></a>                 runtime: { $lt: 90 }</span>
-<span id="cb13-3"><a></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb13-1"><a aria-label="1"></a>db.movies.find({ rating: "R",</span>
+<span id="cb13-2"><a aria-label="2"></a>                 runtime: { $lt: 90 }</span>
+<span id="cb13-3"><a aria-label="3"></a>               })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="logical-and-cont." class="slide level2">
 <h2>Logical AND (cont.)</h2>
@@ -413,24 +420,24 @@ Data Science 310 — Boston University
 <li>the following would <em>not</em> work:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a></a>db.oscars.find({ year: { $gte: 1990 },</span>
-<span id="cb14-2"><a></a>                 year: { $lte: 1999 }</span>
-<span id="cb14-3"><a></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb14-1"><a aria-label="1"></a>db.oscars.find({ year: { $gte: 1990 },</span>
+<span id="cb14-2"><a aria-label="2"></a>                 year: { $lte: 1999 }</span>
+<span id="cb14-3"><a aria-label="3"></a>               })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li>one option that would work:</li>
 </ul>
 </div>
-<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a></a>db.oscars.find({ $and: [ { year: { $gte: 1990 } },</span>
-<span id="cb15-2"><a></a>                         { year: { $lte: 1999 } } ]</span>
-<span id="cb15-3"><a></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a aria-label="1"></a>db.oscars.find({ $and: [ { year: { $gte: 1990 } },</span>
+<span id="cb15-2"><a aria-label="2"></a>                         { year: { $lte: 1999 } } ]</span>
+<span id="cb15-3"><a aria-label="3"></a>               })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li>another option: use an implicit AND on the operator subdocs:</li>
 </ul>
 </div>
-<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb16-1"><a></a>db.oscars.find({ year: { $gte: 1990, $lte: 1999 }</span>
-<span id="cb16-2"><a></a>               })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb16-1"><a aria-label="1"></a>db.oscars.find({ year: { $gte: 1990, $lte: 1999 }</span>
+<span id="cb16-2"><a aria-label="2"></a>               })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="pattern-matching" class="slide level2">
 <h2>Pattern Matching</h2>
@@ -440,7 +447,7 @@ Data Science 310 — Boston University
 <li>example: find all people born in Boston</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb17-1"><a></a>db.people.find({ pob: /Boston,/ })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb17-1"><a aria-label="1"></a>db.people.find({ pob: /Boston,/ })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>Can use a <code>*</code> wildcard character to indicate 0 or more characters.
 <ul>
@@ -462,24 +469,24 @@ Data Science 310 — Boston University
 <ul>
 <li>If a field has an array type</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb18-1"><a></a>db.collection.find( { arrayField: val } )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb18"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb18-1"><a aria-label="1"></a>db.collection.find( { arrayField: val } )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>finds all documents in which <code>val</code> is at least one of the elements in the array associated with <code>arrayField</code></p>
 <ul>
 <li>Example: suppose that we stored a movie’s genres as an array:</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb19-1"><a></a>{ _id: "0317219", name: "Cars", year: 2006,</span>
-<span id="cb19-2"><a></a>  rating: "G", runtime: 124, earnings_rank: 80,</span>
-<span id="cb19-3"><a></a>  genre: ["N", "C", "F"], ...}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb19-1"><a aria-label="1"></a>{ _id: "0317219", name: "Cars", year: 2006,</span>
+<span id="cb19-2"><a aria-label="2"></a>  rating: "G", runtime: 124, earnings_rank: 80,</span>
+<span id="cb19-3"><a aria-label="3"></a>  genre: ["N", "C", "F"], ...}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li>to find all animated movies – ones with a genre of “N”:</li>
 </ul>
 </div>
-<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb20-1"><a></a>db.movies.find( { genre: "N"} )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb20"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb20-1"><a aria-label="1"></a>db.movies.find( { genre: "N"} )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>Given that we actually store the genres as a single string (e.g., “NCF”), how would we find animated movies?</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb21-1"><a></a>db.movies.find( { genre: /N/ } )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb21"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb21-1"><a aria-label="1"></a>db.movies.find( { genre: /N/ } )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="queries-on-arrayssubdocuments-cont." class="slide level2">
 <h2>Queries on Arrays/Subdocuments (cont.)</h2>
@@ -489,17 +496,17 @@ Data Science 310 — Boston University
 <li>example: find all Oscars won by the movie <em>Gladiator</em>:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb22-1"><a></a>&gt; db.oscars.find( { "movie.name": "Gladiator" } )</span>
-<span id="cb22-2"><a></a>{ _id: &lt;ObjectID1&gt;, year: 2001,</span>
-<span id="cb22-3"><a></a>  type: "BEST-PICTURE",</span>
-<span id="cb22-4"><a></a>  movie: { id: "0172495",</span>
-<span id="cb22-5"><a></a>           name: "Gladiator" }}</span>
-<span id="cb22-6"><a></a>{ _id: &lt;ObjectID2&gt;, year: 2001,</span>
-<span id="cb22-7"><a></a>  type: "BEST-ACTOR",</span>
-<span id="cb22-8"><a></a>  movie: { id: "0172495",</span>
-<span id="cb22-9"><a></a>           name: "Gladiator" },</span>
-<span id="cb22-10"><a></a>  person: { id: "0000128",</span>
-<span id="cb22-11"><a></a>            name: "Russell Crowe" }}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb22"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb22-1"><a aria-label="1"></a>&gt; db.oscars.find( { "movie.name": "Gladiator" } )</span>
+<span id="cb22-2"><a aria-label="2"></a>{ _id: &lt;ObjectID1&gt;, year: 2001,</span>
+<span id="cb22-3"><a aria-label="3"></a>  type: "BEST-PICTURE",</span>
+<span id="cb22-4"><a aria-label="4"></a>  movie: { id: "0172495",</span>
+<span id="cb22-5"><a aria-label="5"></a>           name: "Gladiator" }}</span>
+<span id="cb22-6"><a aria-label="6"></a>{ _id: &lt;ObjectID2&gt;, year: 2001,</span>
+<span id="cb22-7"><a aria-label="7"></a>  type: "BEST-ACTOR",</span>
+<span id="cb22-8"><a aria-label="8"></a>  movie: { id: "0172495",</span>
+<span id="cb22-9"><a aria-label="9"></a>           name: "Gladiator" },</span>
+<span id="cb22-10"><a aria-label="10"></a>  person: { id: "0000128",</span>
+<span id="cb22-11"><a aria-label="11"></a>            name: "Russell Crowe" }}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li><em><strong>Note</strong>:</em> When using dot notation, the field name must be surrounded by quotes.</li>
 </ul>
@@ -509,27 +516,27 @@ Data Science 310 — Boston University
 <ul>
 <li>example: find all movies in which Tom Hanks has acted:</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb23-1"><a></a>&gt; db.movies.find( { "actors.name": "Tom Hanks"} )</span>
-<span id="cb23-2"><a></a>{ _id: "0107818", name: "Philadelphia", year: 1993,</span>
-<span id="cb23-3"><a></a>  rating: "PG-13", runtime: 125, genre: "D"</span>
-<span id="cb23-4"><a></a>  actors: [ { id: "0000158",</span>
-<span id="cb23-5"><a></a>              name: "Tom Hanks" },</span>
-<span id="cb23-6"><a></a>            { id: "0000243",</span>
-<span id="cb23-7"><a></a>              name: "Denzel Washington" },</span>
-<span id="cb23-8"><a></a>            ...</span>
-<span id="cb23-9"><a></a>          ],</span>
-<span id="cb23-10"><a></a>  directors: [ { id: "0001129",</span>
-<span id="cb23-11"><a></a>                 name: "Jonathan Demme" } ]</span>
-<span id="cb23-12"><a></a>}</span>
-<span id="cb23-13"><a></a>{ _id: "0109830", name: "Forrest Gump", year: 1994,</span>
-<span id="cb23-14"><a></a>  rating: "PG-13", runtime: 142, genre: "CD"</span>
-<span id="cb23-15"><a></a>  actors: [ { id: "0000158",</span>
-<span id="cb23-16"><a></a>              name: "Tom Hanks" },</span>
-<span id="cb23-17"><a></a>            ...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb23"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb23-1"><a aria-label="1"></a>&gt; db.movies.find( { "actors.name": "Tom Hanks"} )</span>
+<span id="cb23-2"><a aria-label="2"></a>{ _id: "0107818", name: "Philadelphia", year: 1993,</span>
+<span id="cb23-3"><a aria-label="3"></a>  rating: "PG-13", runtime: 125, genre: "D"</span>
+<span id="cb23-4"><a aria-label="4"></a>  actors: [ { id: "0000158",</span>
+<span id="cb23-5"><a aria-label="5"></a>              name: "Tom Hanks" },</span>
+<span id="cb23-6"><a aria-label="6"></a>            { id: "0000243",</span>
+<span id="cb23-7"><a aria-label="7"></a>              name: "Denzel Washington" },</span>
+<span id="cb23-8"><a aria-label="8"></a>            ...</span>
+<span id="cb23-9"><a aria-label="9"></a>          ],</span>
+<span id="cb23-10"><a aria-label="10"></a>  directors: [ { id: "0001129",</span>
+<span id="cb23-11"><a aria-label="11"></a>                 name: "Jonathan Demme" } ]</span>
+<span id="cb23-12"><a aria-label="12"></a>}</span>
+<span id="cb23-13"><a aria-label="13"></a>{ _id: "0109830", name: "Forrest Gump", year: 1994,</span>
+<span id="cb23-14"><a aria-label="14"></a>  rating: "PG-13", runtime: 142, genre: "CD"</span>
+<span id="cb23-15"><a aria-label="15"></a>  actors: [ { id: "0000158",</span>
+<span id="cb23-16"><a aria-label="16"></a>              name: "Tom Hanks" },</span>
+<span id="cb23-17"><a aria-label="17"></a>            ...</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="projections" class="slide level2">
 <h2>Projections</h2>
-<div class="sourceCode" id="cb24"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb24-1"><a></a>db.collection.find(&lt;selection&gt;, &lt;projection&gt;)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb24-1"><a aria-label="1"></a>db.collection.find(&lt;selection&gt;, &lt;projection&gt;)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>The projection document is a list of <code>fieldname:value</code> pairs:
 <ul>
@@ -538,29 +545,29 @@ Data Science 310 — Boston University
 </ul></li>
 <li>Recall our previous example:</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb25-1"><a></a>db.movies.find({ rating: "R", year: 2000 },</span>
-<span id="cb25-2"><a></a>               { name: 1, runtime: 1 })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb25"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb25-1"><a aria-label="1"></a>db.movies.find({ rating: "R", year: 2000 },</span>
+<span id="cb25-2"><a aria-label="2"></a>               { name: 1, runtime: 1 })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>Example: find all info. about R-rated movies except their genres:</li>
 </ul>
-<div class="sourceCode" id="cb26"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb26-1"><a></a>db.movies.find({ rating: "R" }, { genre: 0 })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb26"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb26-1"><a aria-label="1"></a>db.movies.find({ rating: "R" }, { genre: 0 })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="projections-cont." class="slide level2">
 <h2>Projections (cont.)</h2>
 <ul>
 <li>The <code>_id</code> field is returned unless you explicitly exclude it.</li>
 </ul>
-<div class="sourceCode" id="cb27"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb27-1"><a></a>&gt; db.movies.find({ rating: "R", year: 2011 },</span>
-<span id="cb27-2"><a></a>                 { name: 1 })</span>
-<span id="cb27-3"><a></a>{ "_id" : "1411697", "name" : "The Hangover Part II" }</span>
-<span id="cb27-4"><a></a>{ "_id" : "1478338", "name" : "Bridesmaids" }</span>
-<span id="cb27-5"><a></a>{ "_id" : "1532503", "name" : "Beginners" }</span>
-<span id="cb27-6"><a></a></span>
-<span id="cb27-7"><a></a>&gt; db.movies.find({ rating: "R", year: 2011 },</span>
-<span id="cb27-8"><a></a>                 { name: 1, _id: 0 })</span>
-<span id="cb27-9"><a></a>{ "name" : "The Hangover Part II" }</span>
-<span id="cb27-10"><a></a>{ "name" : "Bridesmaids" }</span>
-<span id="cb27-11"><a></a>{ "name" : "Beginners" }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb27"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb27-1"><a aria-label="1"></a>&gt; db.movies.find({ rating: "R", year: 2011 },</span>
+<span id="cb27-2"><a aria-label="2"></a>                 { name: 1 })</span>
+<span id="cb27-3"><a aria-label="3"></a>{ "_id" : "1411697", "name" : "The Hangover Part II" }</span>
+<span id="cb27-4"><a aria-label="4"></a>{ "_id" : "1478338", "name" : "Bridesmaids" }</span>
+<span id="cb27-5"><a aria-label="5"></a>{ "_id" : "1532503", "name" : "Beginners" }</span>
+<span id="cb27-6"><a aria-label="6"></a></span>
+<span id="cb27-7"><a aria-label="7"></a>&gt; db.movies.find({ rating: "R", year: 2011 },</span>
+<span id="cb27-8"><a aria-label="8"></a>                 { name: 1, _id: 0 })</span>
+<span id="cb27-9"><a aria-label="9"></a>{ "name" : "The Hangover Part II" }</span>
+<span id="cb27-10"><a aria-label="10"></a>{ "name" : "Bridesmaids" }</span>
+<span id="cb27-11"><a aria-label="11"></a>{ "name" : "Beginners" }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>A given projection should either have:
 <ul>
@@ -583,13 +590,13 @@ Data Science 310 — Boston University
 <li>assign the cursor to a variable:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb28-1"><a></a>var cursor = db.movies.find({ year: 2000 })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb28-1"><a aria-label="1"></a>var cursor = db.movies.find({ year: 2000 })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li>use the following method call to print each result document in JSON:</li>
 </ul>
 </div>
-<div class="sourceCode" id="cb29"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb29-1"><a></a>cursor.forEach(printjson)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb29"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb29-1"><a aria-label="1"></a>cursor.forEach(printjson)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="aggregation" class="slide level2">
 <h2>Aggregation</h2>
@@ -613,8 +620,8 @@ Data Science 310 — Boston University
 <li>ex: how many R-rated movies are shorter than 90 minutes?</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb30"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb30-1"><a></a>db.movies.count({ rating: "R",</span>
-<span id="cb30-2"><a></a>                  runtime: { $lt: 90 }})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb30"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb30-1"><a aria-label="1"></a>db.movies.count({ rating: "R",</span>
+<span id="cb30-2"><a aria-label="2"></a>                  runtime: { $lt: 90 }})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ul>
 <li>db.<em>collection</em>.distinct(<code>&lt;field&gt;</code>, <code>&lt;selection&gt;</code>)
 <ul>
@@ -623,9 +630,9 @@ Data Science 310 — Boston University
 <li>ex: which actors have been in one or more of the top 10 grossing movies?</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb31"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb31-1"><a></a>db.movies.distinct("actors.name",</span>
-<span id="cb31-2"><a></a>                   { earnings_rank: { $lte: 10 }}</span>
-<span id="cb31-3"><a></a>                  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb31"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb31-1"><a aria-label="1"></a>db.movies.distinct("actors.name",</span>
+<span id="cb31-2"><a aria-label="2"></a>                   { earnings_rank: { $lte: 10 }}</span>
+<span id="cb31-3"><a aria-label="3"></a>                  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 <section id="aggregation-pipeline" class="slide level2">
 <h2>Aggregation Pipeline</h2>
@@ -638,11 +645,11 @@ Data Science 310 — Boston University
 <li>produces a new set of documents as output</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb32"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb32-1"><a></a>db.collection.aggregate(</span>
-<span id="cb32-2"><a></a>  { &lt;pipeline-op1&gt;: &lt;pipeline-expression1&gt; },</span>
-<span id="cb32-3"><a></a>  { &lt;pipeline-op2&gt;: &lt;pipeline-expression2&gt; },</span>
-<span id="cb32-4"><a></a>  ...,</span>
-<span id="cb32-5"><a></a>  { &lt;pipeline-opN&gt;: &lt;pipeline-expressionN&gt; })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb32"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb32-1"><a aria-label="1"></a>db.collection.aggregate(</span>
+<span id="cb32-2"><a aria-label="2"></a>  { &lt;pipeline-op1&gt;: &lt;pipeline-expression1&gt; },</span>
+<span id="cb32-3"><a aria-label="3"></a>  { &lt;pipeline-op2&gt;: &lt;pipeline-expression2&gt; },</span>
+<span id="cb32-4"><a aria-label="4"></a>  ...,</span>
+<span id="cb32-5"><a aria-label="5"></a>  { &lt;pipeline-opN&gt;: &lt;pipeline-expressionN&gt; })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="r-stack">
 <p><img data-src="images/L23-NoSQL2/pipeline-diagram-1.png" class="fragment" style="width:100.0%"></p>
 <p><img data-src="images/L23-NoSQL2/pipeline-diagram-2.png" class="fragment" style="width:100.0%"></p>
@@ -653,10 +660,10 @@ Data Science 310 — Boston University
 </section>
 <section id="aggregation-pipeline-example" class="slide level2">
 <h2>Aggregation Pipeline Example</h2>
-<div class="sourceCode" id="cb33"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb33-1"><a></a>db.orders.aggregate(</span>
-<span id="cb33-2"><a></a> { $match: { status: "A" } },</span>
-<span id="cb33-3"><a></a> { $group: { _id: "$cust_id", total: { $sum: "$amount"} } }</span>
-<span id="cb33-4"><a></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb33"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb33-1"><a aria-label="1"></a>db.orders.aggregate(</span>
+<span id="cb33-2"><a aria-label="2"></a> { $match: { status: "A" } },</span>
+<span id="cb33-3"><a aria-label="3"></a> { $group: { _id: "$cust_id", total: { $sum: "$amount"} } }</span>
+<span id="cb33-4"><a aria-label="4"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="r-stack">
 <p><img data-src="images/L23-NoSQL2/agg-example-1.png" style="width:85.0%"></p>
 <p><img data-src="images/L23-NoSQL2/agg-example-2.png" class="fragment" style="width:85.0%"></p>
@@ -671,13 +678,13 @@ Data Science 310 — Boston University
 <li>Example of a single-stage pipeline using $project:</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb34"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb34-1"><a></a>db.people.aggregate(</span>
-<span id="cb34-2"><a></a>    { $project: {</span>
-<span id="cb34-3"><a></a>          name: 1,</span>
-<span id="cb34-4"><a></a>          whereBorn: "$pob",</span>
-<span id="cb34-5"><a></a>          yearBorn: { $substr: ["$dob", 0, 4] }</span>
-<span id="cb34-6"><a></a>      }</span>
-<span id="cb34-7"><a></a>    })</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb34"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb34-1"><a aria-label="1"></a>db.people.aggregate(</span>
+<span id="cb34-2"><a aria-label="2"></a>    { $project: {</span>
+<span id="cb34-3"><a aria-label="3"></a>          name: 1,</span>
+<span id="cb34-4"><a aria-label="4"></a>          whereBorn: "$pob",</span>
+<span id="cb34-5"><a aria-label="5"></a>          yearBorn: { $substr: ["$dob", 0, 4] }</span>
+<span id="cb34-6"><a aria-label="6"></a>      }</span>
+<span id="cb34-7"><a aria-label="7"></a>    })</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment sub" data-fragment-index="1">
 <ul>
 <li>for each document in the people collection, extracts:</li>
@@ -714,17 +721,17 @@ Data Science 310 — Boston University
 <ul>
 <li><code>$group</code> – like GROUP BY in SQL</li>
 </ul>
-<div class="sourceCode" id="cb35"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb35-1"><a></a>$group: { _id: &lt;field or fields to group by&gt;,</span>
-<span id="cb35-2"><a></a>          &lt;computed-field-1&gt;,</span>
-<span id="cb35-3"><a></a>          ..., &lt;computed-field-N&gt; }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb35"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb35-1"><a aria-label="1"></a>$group: { _id: &lt;field or fields to group by&gt;,</span>
+<span id="cb35-2"><a aria-label="2"></a>          &lt;computed-field-1&gt;,</span>
+<span id="cb35-3"><a aria-label="3"></a>          ..., &lt;computed-field-N&gt; }</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="fragment sub">
 <ul>
 <li>example: compute the number of movies with each rating</li>
 </ul>
-<div class="sourceCode" id="cb36"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb36-1"><a></a>db.movies.aggregate(</span>
-<span id="cb36-2"><a></a>    { $group: { _id: "$rating",</span>
-<span id="cb36-3"><a></a>                numMovies: { $sum: 1 }</span>
-<span id="cb36-4"><a></a>              } } )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb36"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb36-1"><a aria-label="1"></a>db.movies.aggregate(</span>
+<span id="cb36-2"><a aria-label="2"></a>    { $group: { _id: "$rating",</span>
+<span id="cb36-3"><a aria-label="3"></a>                numMovies: { $sum: 1 }</span>
+<span id="cb36-4"><a aria-label="4"></a>              } } )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment sub">
 <ul>
@@ -751,7 +758,7 @@ Data Science 310 — Boston University
 <ul>
 <li><code>$match</code> – selects documents according to some criteria</li>
 </ul>
-<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb37-1"><a></a>$match: &lt;selection&gt;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb37"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb37-1"><a aria-label="1"></a>$match: &lt;selection&gt;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="sub">
 <ul>
 <li>where <code>&lt;selection&gt;</code> has identical syntax to the selection documents used by db.<em>collection</em>.find()</li>
@@ -768,7 +775,7 @@ Data Science 310 — Boston University
 </ul></li>
 <li>See the MongoDB manual for more detail:</li>
 </ul>
-<div class="sourceCode" id="cb38"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb38-1"><a></a>docs.mongodb.org/manual/reference/operator/aggregation</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb38"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb38-1"><a aria-label="1"></a>docs.mongodb.org/manual/reference/operator/aggregation</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="example-of-a-three-stage-pipeline" class="slide level2">
@@ -1139,7 +1146,7 @@ Data Science 310 — Boston University
         margin: 0.1,
 
         math: {
-          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           tex2jax: {
             inlineMath: [['\\(','\\)']],
@@ -1166,190 +1173,173 @@ Data Science 310 — Boston University
       });
     </script>
     <script id="quarto-html-after-body" type="application/javascript">
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-      const toggleBodyColorMode = (bsSheetEl) => {
-        const mode = bsSheetEl.getAttribute("data-mode");
-        const bodyEl = window.document.querySelector("body");
-        if (mode === "dark") {
-          bodyEl.classList.add("quarto-dark");
-          bodyEl.classList.remove("quarto-light");
-        } else {
-          bodyEl.classList.add("quarto-light");
-          bodyEl.classList.remove("quarto-dark");
-        }
-      }
-      const toggleBodyColorPrimary = () => {
-        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
-        if (bsSheetEl) {
-          toggleBodyColorMode(bsSheetEl);
-        }
-      }
-      toggleBodyColorPrimary();  
-      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
-      tabsets.forEach(function(tabset) {
-        const tabby = new Tabby('#' + tabset.id);
-      });
-      const isCodeAnnotation = (el) => {
-        for (const clz of el.classList) {
-          if (clz.startsWith('code-annotation-')) {                     
-            return true;
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
           }
+          return false;
         }
-        return false;
-      }
-      const onCopySuccess = function(e) {
-        // button target
-        const button = e.trigger;
-        // don't keep focus
-        button.blur();
-        // flash "checked"
-        button.classList.add('code-copy-button-checked');
-        var currentTitle = button.getAttribute("title");
-        button.setAttribute("title", "Copied!");
-        let tooltip;
-        if (window.bootstrap) {
-          button.setAttribute("data-bs-toggle", "tooltip");
-          button.setAttribute("data-bs-placement", "left");
-          button.setAttribute("data-bs-title", "Copied!");
-          tooltip = new bootstrap.Tooltip(button, 
-            { trigger: "manual", 
-              customClass: "code-copy-button-tooltip",
-              offset: [0, -8]});
-          tooltip.show();    
-        }
-        setTimeout(function() {
-          if (tooltip) {
-            tooltip.hide();
-            button.removeAttribute("data-bs-title");
-            button.removeAttribute("data-bs-toggle");
-            button.removeAttribute("data-bs-placement");
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
           }
-          button.setAttribute("title", currentTitle);
-          button.classList.remove('code-copy-button-checked');
-        }, 1000);
-        // clear code selection
-        e.clearSelection();
-      }
-      const getTextToCopy = function(trigger) {
-          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
           for (const childEl of codeEl.children) {
             if (isCodeAnnotation(childEl)) {
               childEl.remove();
             }
           }
           return codeEl.innerText;
-      }
-      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
-        text: getTextToCopy
-      });
-      clipboard.on('success', onCopySuccess);
-      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
-        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
-          text: getTextToCopy,
-          container: window.document.getElementById('quarto-embedded-source-code-modal')
-        });
-        clipboardModal.on('success', onCopySuccess);
-      }
-        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
-        var mailtoRegex = new RegExp(/^mailto:/);
-          var filterRegex = new RegExp('/' + window.location.host + '/');
-        var isInternal = (href) => {
-            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
         }
-        // Inspect non-navigation links and adorn them if external
-     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
-        for (var i=0; i<links.length; i++) {
-          const link = links[i];
-          if (!isInternal(link.href)) {
-            // undo the damage that might have been done by quarto-nav.js in the case of
-            // links that we want to consider external
-            if (link.dataset.originalHref !== undefined) {
-              link.href = link.dataset.originalHref;
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/BU-CDS\.github\.io\/ds310\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
             }
           }
-        }
-      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
-        const config = {
-          allowHTML: true,
-          maxWidth: 500,
-          delay: 100,
-          arrow: false,
-          appendTo: function(el) {
-              return el.closest('section.slide') || el.parentElement;
-          },
-          interactive: true,
-          interactiveBorder: 10,
-          theme: 'light-border',
-          placement: 'bottom-start',
-        };
-        if (contentFn) {
-          config.content = contentFn;
-        }
-        if (onTriggerFn) {
-          config.onTrigger = onTriggerFn;
-        }
-        if (onUntriggerFn) {
-          config.onUntrigger = onUntriggerFn;
-        }
-          config['offset'] = [0,0];
-          config['maxWidth'] = 700;
-        window.tippy(el, config); 
-      }
-      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
-      for (var i=0; i<noterefs.length; i++) {
-        const ref = noterefs[i];
-        tippyHover(ref, function() {
-          // use id or data attribute instead here
-          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
-          try { href = new URL(href).hash; } catch {}
-          const id = href.replace(/^#\/?/, "");
-          const note = window.document.getElementById(id);
-          if (note) {
-            return note.innerHTML;
-          } else {
-            return "";
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
           }
-        });
-      }
-      const findCites = (el) => {
-        const parentEl = el.parentElement;
-        if (parentEl) {
-          const cites = parentEl.dataset.cites;
-          if (cites) {
-            return {
-              el,
-              cites: cites.split(' ')
-            };
-          } else {
-            return findCites(el.parentElement)
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
           }
-        } else {
-          return undefined;
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
         }
-      };
-      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
-      for (var i=0; i<bibliorefs.length; i++) {
-        const ref = bibliorefs[i];
-        const citeInfo = findCites(ref);
-        if (citeInfo) {
-          tippyHover(citeInfo.el, function() {
-            var popup = window.document.createElement('div');
-            citeInfo.cites.forEach(function(cite) {
-              var citeDiv = window.document.createElement('div');
-              citeDiv.classList.add('hanging-indent');
-              citeDiv.classList.add('csl-entry');
-              var biblioDiv = window.document.getElementById('ref-' + cite);
-              if (biblioDiv) {
-                citeDiv.innerHTML = biblioDiv.innerHTML;
-              }
-              popup.appendChild(citeDiv);
-            });
-            return popup.innerHTML;
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
           });
         }
-      }
-    });
-    </script>
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
     
 
 </body></html>
