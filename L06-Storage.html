@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.37">
+
+  <meta name="author" content="Data Science 310 — Boston University">
+  <title>DS310 – Storage Fundamentals</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-91e0fad9facfa472f0527723fdbe8b3d.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Storage Fundamentals</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Data Science 310 — Boston University 
+</div>
+        <p class="quarto-title-affiliation">
+            Based on notes by David G. Sullivan
+          </p>
+    </div>
+</div>
+
+</section>
+<section id="trouble-with-db-browser-installation" class="slide level2">
+<h2>Trouble with DB Browser installation?</h2>
+<ul>
+<li>Go to John’s Office Hour on Friday: 2:00–4:00PM on the 14th floor of CDS</li>
+</ul>
+</section>
+<section id="storage" class="slide level2">
+<h2>Storage</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<ul>
+<li>Today we’ll start to discuss aspects of how data is physically stored.</li>
+<li>We’ll use as our model for storage the hard disk.</li>
+<li>A hard disk is <em>persistent</em> storage, which means that the data is preserved when the power is turned off.</li>
+<li>The disk surface consists of many small magnetic domains that can be oriented either “up” or “down” to represent a single bit.</li>
+<li>The head moves across the spinning platter and reads and writes the magnetic domains.</li>
+</ul>
+</div><div class="column" style="width:45%;">
+<p><img data-src="images/L06-Storage/storage-disks.png" style="width:100.0%"></p>
+</div></div>
+</section>
+<section id="organization-of-a-disk" class="slide level2">
+<h2>Organization of a Disk</h2>
+<div class="columns">
+<div class="column" style="width:38%;">
+<ul>
+<li>The surfaces of the platters are divided into tracks and blocks.</li>
+<li>A track is a complete ring at a given radial distance, on a single platter.</li>
+<li>The track is divided into blocks, which are the smallest unit that can be read or written.</li>
+<li>Typically tracks are 4K or 8K blocks.</li>
+</ul>
+</div><div class="column" style="width:62%;">
+<p><img data-src="images/L06-Storage/disk-organization.png" style="width:100.0%"></p>
+</div></div>
+</section>
+<section id="using-a-hard-disk" class="slide level2">
+<h2>Using a Hard Disk</h2>
+<ul>
+<li>A disk drive responds only to very simple commands</li>
+<li>For example:
+<ul>
+<li>“read block 17”</li>
+<li>“write these bytes: &lt;xxxxxxxxx&gt; to block 23”</li>
+<li>“read blocks 35 through 43”</li>
+</ul></li>
+<li>A disk drive does not know anything about
+<ul>
+<li>Files</li>
+<li>Tables or Relations</li>
+<li>Records</li>
+</ul></li>
+</ul>
+</section>
+<section id="logical-to-physical" class="slide level2">
+<h2>Logical to Physical</h2>
+<ul>
+<li>The database creates a logical view of the data, which we call the <em>logical layer</em> (eg: tables, records, fields)</li>
+<li>The disk provides low-level access to the data, which we call the <em>physical layer</em> (eg: disk blocks)</li>
+<li>In order to store something like a database table on a disk drive, we need a <em>logical to physical</em> mapping
+<ul>
+<li>For example, how are tables “laid out” on a disk?</li>
+<li>How are the table’s data objects arranged when written to disk blocks?</li>
+</ul></li>
+<li>Note that a file system solves a similar problem
+<ul>
+<li>File system logical layer = files</li>
+<li>Similar problem: how to lay out files on a disk…</li>
+</ul></li>
+</ul>
+</section>
+<section id="accessing-the-disk" class="slide level2">
+<h2>Accessing the Disk</h2>
+<ul>
+<li>Data is arranged on disk in units called <em>blocks</em>.
+<ul>
+<li>typically fairly large (e.g., 4K or 8K)</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Relatively speaking, disk I/O is very expensive.
+<ul>
+<li>in the time it takes to read a single disk block, the processor could be executing millions of instructions!</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>The DBMS tries to minimize the number of disk accesses.</li>
+</ul>
+</div>
+</section>
+<section id="review-dbms-architecture" class="slide level2">
+<h2>Review: DBMS Architecture</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li>A DBMS can be viewed as a composition of two layers.</li>
+<li>At the bottom is the <em>storage layer</em> or <em>storage engine</em>, which takes care of storing and retrieving the data.</li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Above that is the <em>logical layer</em>, which provides an abstract representation of the data.</li>
+</ul>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="r-stack">
+<p><img data-src="images/L06-Storage/arch-1.png" style="width:80.0%"></p>
+<p><img data-src="images/L06-Storage/arch-2.png" class="fragment" style="width:80.0%" data-fragment-index="1"></p>
+</div>
+</div></div>
+</section>
+<section id="logical-to-physical-mapping" class="slide level2">
+<h2>Logical-to-Physical Mapping</h2>
+<div class="columns">
+<div class="column" style="width:62%;">
+<ul>
+<li>The logical layer implements a mapping between:
+<ul>
+<li>the <em>logical schema</em> of a database</li>
+<li>its <em>physical representation</em></li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>In the relational model, the schema includes:
+<ul>
+<li>attributes/columns, including their types</li>
+<li>tuples/rows</li>
+<li>relations/tables</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>To be model-neutral, we’ll use these terms instead:
+<ul>
+<li><em>field</em> for an individual data value</li>
+<li><em>record</em> for a group of fields</li>
+<li><em>collection</em> for a group of records</li>
+</ul></li>
+</ul>
+</div>
+</div><div class="column" style="width:38%;">
+<p><img data-src="images/L06-Storage/l2p-arch.png" style="width:85.0%"></p>
+</div></div>
+</section>
+<section id="logical-to-physical-mapping-cont." class="slide level2">
+<h2>Logical-to-Physical Mapping (cont.)</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li>A DBMS may use the filesystem, or it may bypass it and use its own disk manager.</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>In either case, a DBMS may use units called <em>pages</em> that have a different size than the block size.
+<ul>
+<li>can be helpful in performance tuning</li>
+</ul></li>
+</ul>
+</div>
+</div><div class="column" style="width:40%;">
+<p><img data-src="images/L06-Storage/l2p-arch-bypass.png" style="width:90.0%"></p>
+</div></div>
+</section>
+<section id="logical-to-physical-mapping-cont.-1" class="slide level2">
+<h2>Logical-to-Physical Mapping (cont.)</h2>
+<ul>
+<li>We’ll consider:
+<ul>
+<li>how to map logical records to their physical representation</li>
+<li>how to organize the records in a given collection
+<ul>
+<li>including the use of index structures</li>
+</ul></li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Different approaches require different amounts of <em>metadata</em> – data about the data.
+<ul>
+<li>example: the types and lengths of the fields</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li><em>per-record</em> metadata – stored within each record</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li><em>per-collection</em> metadata – stored once for the entire collection</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Assumptions about data in the rest of this set of slides:
+<ul>
+<li>each character is stored using 1 byte</li>
+<li>Integer data values are stored using 4 bytes – upto 4 billion</li>
+<li>Integer metadata (e.g., offsets) are stored using 2 bytes – upto 65k</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="fixed--or-variable-length-records" class="slide level2">
+<h2>Fixed- or Variable-Length Records?</h2>
+<ul>
+<li>This choice depends on:
+<ul>
+<li>the types of fields that the records contain</li>
+<li>the number of fields per record, and whether it can vary</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Simple case: use fixed-length records when
+<ul>
+<li>all fields are fixed-length (e.g., CHAR or INTEGER)</li>
+<li>there is a fixed number of fields per record</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="fixed--or-variable-length-records-cont." class="slide level2 scrollable">
+<h2>Fixed- or Variable-Length Records? (cont.)</h2>
+<ul>
+<li>The choice is less straightforward when you have either:
+<ul>
+<li>variable-length fields (e.g., VARCHAR)</li>
+<li>a variable number of fields per record (e.g., in XML)</li>
+</ul></li>
+</ul>
+<p><u>Two options:</u></p>
+<div class="columns">
+<div class="column" style="width:62%;">
+<ol type="1">
+<li><em>fixed-length records</em>: always allocate the maximum possible length</li>
+</ol>
+</div><div class="column" style="width:38%;">
+<p><img data-src="images/L06-Storage/fixedmax-tbl.png" style="width:95.0%"></p>
+</div></div>
+<div class="fragment sub" style="margin-left: 2em">
+<ul>
+<li>plusses and minuses:
+<ul>
+<li>+ less metadata is needed, because:
+<ul>
+<li>every record has the same length</li>
+<li>a given field is in a consistent position within all records</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub" style="margin-left: 3em">
+<ul>
+<li>+ changing a field’s value doesn’t change the record’s length
+<ul>
+<li>thus, changes never necessitate moving the record</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub" style="margin-left: 3em">
+<ul>
+<li>– we waste space when a record has fields shorter than their max length, or is missing fields</li>
+</ul>
+</div>
+</section>
+<section id="fixed--or-variable-length-records-cont.-1" class="slide level2 scrollable">
+<h2>Fixed- or Variable-Length Records? (cont.)</h2>
+<div class="columns">
+<div class="column" style="width:62%;">
+<ol start="2" type="1">
+<li><em>variable-length records</em>: only allocate the space that each record actually needs</li>
+</ol>
+</div><div class="column" style="width:38%;">
+<p><img data-src="images/L06-Storage/varalloc-tbl.png" style="width:95.0%"></p>
+</div></div>
+<div class="fragment sub" style="margin-left: 2em">
+<ul>
+<li>plusses and minuses:
+<ul>
+<li>– more metadata is needed in order to:
+<ul>
+<li>determine the boundaries between records</li>
+<li>determine the locations of the fields in a given record</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub" style="margin-left: 3em">
+<ul>
+<li>– changing a field’s value can change the record’s length
+<ul>
+<li>thus, we may need to move the record</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub" style="margin-left: 3em">
+<ul>
+<li>+ we <em>don’t</em> waste space when a record has fields shorter than their max length, or is missing fields</li>
+</ul>
+</div>
+</section>
+<section id="format-of-fixed-length-records" class="slide level2">
+<h2>Format of Fixed-Length Records</h2>
+<ul>
+<li>With fixed-length records, we store the fields one after the other.</li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>If a fixed-length record contains a variable-length field:
+<ul>
+<li>allocate the max. length of the field</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="2">
+<ul>
+<li>use a delimiter (<span style="color:#c00;">#</span> below) if the value is shorter than the max.</li>
+</ul>
+</div>
+<ul>
+<li>Example: <code>Dept(id CHAR(7), name VARCHAR(20), num_majors INT)</code></li>
+</ul>
+<div class="r-stack">
+<p><img data-src="images/L06-Storage/flr-1.png" style="width:78.0%"></p>
+<p><img data-src="images/L06-Storage/flr-2.png" class="fragment" style="width:78.0%" data-fragment-index="2"></p>
+</div>
+<div class="fragment sub" data-fragment-index="3">
+<ul>
+<li>why doesn’t <code>'history &amp; literature'</code> need a delimiter? <span class="fragment" data-fragment-index="4" style="color:#3a5fcd;">its length is the max. length for its field</span></li>
+</ul>
+</div>
+</section>
+<section id="format-of-fixed-length-records-cont." class="slide level2">
+<h2>Format of Fixed-Length Records (cont.)</h2>
+<ul>
+<li>To find the position of a field, use <em>per-collection</em> metadata.</li>
+</ul>
+<div class="fragment sub" data-fragment-index="1">
+<ul>
+<li>typically store the <em>offset</em> of each field (<em>O<sub>1</sub></em> and <em>O<sub>2</sub></em> below) – how many bytes the field is from the start of the record</li>
+</ul>
+</div>
+<div class="r-stack">
+<p><img data-src="images/L06-Storage/flroff-1.png" style="width:72.0%"></p>
+<p><img data-src="images/L06-Storage/flroff-2.png" class="fragment" style="width:72.0%" data-fragment-index="1"></p>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Notes:
+<ul>
+<li>the delimiters are the only <em>per-record</em> metadata</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="3">
+<ul>
+<li>the records are indeed fixed-length <span class="fragment" data-fragment-index="7">– 31 bytes each!</span>
+<ul>
+<li><span class="fragment" data-fragment-index="4">7 bytes for <code>id</code>, which is a <code>CHAR(7)</code></span></li>
+<li><span class="fragment" data-fragment-index="5">20 bytes for <code>name</code>, which is a <code>VARCHAR(20)</code></span></li>
+<li><span class="fragment" data-fragment-index="6">4 bytes for <code>num_majors</code>, which is an <code>INT</code></span></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="7" style="text-align: right; color:#3a5fcd;">
+<p>7 + 20 + 4 = 31</p>
+</div>
+</section>
+<section id="format-of-variable-length-records" class="slide level2 scrollable">
+<h2>Format of Variable-Length Records</h2>
+<ul>
+<li>With variable-length records, we need <em>per-record</em> metadata to determine the locations of the fields.</li>
+<li>For simplicity, we’ll assume all records in a given collection have the same # of fields.</li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>We’ll look at how the following record would be stored:</li>
+</ul>
+<p><img data-src="images/L06-Storage/vlr-rec.png" style="width:52.0%"></p>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>We’ll consider two types of operations:</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="2">
+<ol type="1">
+<li>finding/extracting the value of a single field</li>
+</ol>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a></a><span class="kw">SELECT</span> num_majors</span>
+<span id="cb1-2"><a></a><span class="kw">FROM</span> Dept</span>
+<span id="cb1-3"><a></a><span class="kw">WHERE</span> name <span class="op">=</span> <span class="st">'data sci'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment sub" data-fragment-index="3">
+<ol start="2" type="1">
+<li>updating the value of a single field
+<ul>
+<li>its length may become smaller or larger</li>
+</ul></li>
+</ol>
+</div>
+</section>
+<section id="format-of-variable-length-records-cont." class="slide level2 scrollable">
+<h2>Format of Variable-Length Records (cont.)</h2>
+<ul>
+<li>Option 1: Terminate field values with a special <em>delimiter</em> character.</li>
+</ul>
+
+<img data-src="images/L06-Storage/vlr-opt1.png" class="quarto-figure quarto-figure-center r-stretch" style="width:52.0%"><ol type="1">
+<li><u>finding/extracting the value of a single field</u><br>
+this is very inefficient<span class="fragment" data-fragment-index="1">; need to scan byte-by-byte to:</span></li>
+</ol>
+<div class="fragment sub" data-fragment-index="1">
+<ul>
+<li>find the start of the field we’re looking for</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="2">
+<ul>
+<li>determine the length of its value (if it is variable-length)</li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="3">
+<ol start="2" type="1">
+<li><u>updating the value of a single field</u><br>
+if it changes in size, we need to shift the values after it, but we don’t need to change their metadata</li>
+</ol>
+</div>
+</section>
+<section id="format-of-variable-length-records-cont.-1" class="slide level2 scrollable">
+<h2>Format of Variable-Length Records (cont.)</h2>
+<ul>
+<li>Option 2: Precede each field by its <em>length</em>.</li>
+</ul>
+
+<img data-src="images/L06-Storage/vlr-opt2.png" class="quarto-figure quarto-figure-center r-stretch" style="width:50.0%"><div class="fragment" data-fragment-index="1">
+<ol type="1">
+<li><u>finding/extracting the value of a single field</u><br>
+this is more efficient</li>
+</ol>
+</div>
+<div class="fragment sub" data-fragment-index="1">
+<ul>
+<li>can jump over fields, rather than scanning byte-by-byte (but may need to perform multiple jumps)</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="2">
+<ul>
+<li>never need to scan to determine the length of a value</li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="3">
+<ol start="2" type="1">
+<li><u>updating the value of a single field</u><br>
+same as option 1</li>
+</ol>
+</div>
+</section>
+<section id="format-of-variable-length-records-cont.-2" class="slide level2">
+<h2>Format of Variable-Length Records (cont.)</h2>
+<ul>
+<li>Option 3: Put offsets and other metadata in a record header.</li>
+</ul>
+<div class="r-stack">
+<p><img data-src="images/L06-Storage/opt3-1.png" style="width:82.0%"></p>
+<p><img data-src="images/L06-Storage/opt3-2.png" class="fragment" style="width:82.0%" data-fragment-index="3"></p>
+<p><img data-src="images/L06-Storage/opt3-3.png" class="fragment" style="width:82.0%" data-fragment-index="4"></p>
+<p><img data-src="images/L06-Storage/opt3-4.png" class="fragment" style="width:82.0%" data-fragment-index="5"></p>
+<p><img data-src="images/L06-Storage/opt3-5.png" class="fragment" style="width:82.0%" data-fragment-index="6"></p>
+<p><img data-src="images/L06-Storage/opt3-6.png" class="fragment" style="width:82.0%" data-fragment-index="7"></p>
+</div>
+<div class="fragment sub" data-fragment-index="1">
+<ul>
+<li><u>computing the offsets</u></li>
+<li>3 fields in record → 4 offsets, each of which is a 2-byte int</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="2">
+<ul>
+<li>thus, the offsets take up 4*2 = 8 bytes</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="4">
+<ul>
+<li>offset<sub>0</sub> = 8, because field<sub>0</sub> comes right after the header</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="5">
+<ul>
+<li>offset<sub>1</sub> = 8 + len(‘1234567’) = 8 + 7 = 15</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="6">
+<ul>
+<li>offset<sub>2</sub> = 15 + len(‘data sci’) = 15 + 8 = 23</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="7">
+<ul>
+<li>offset<sub>3</sub> = <em>offset of the end of the record</em> = 23 + 4 (since 200 an int) = 27</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="8">
+<ul>
+<li><span style="color:#3a5fcd;"><em>We store this offset because it may be needed to compute the length of a field’s value!</em></span></li>
+</ul>
+</div>
+</section>
+<section id="format-of-variable-length-records-cont.-3" class="slide level2 scrollable">
+<h2>Format of Variable-Length Records (cont.)</h2>
+<ul>
+<li>Option 3 (cont.)</li>
+</ul>
+
+<img data-src="images/L06-Storage/opt3b.png" class="quarto-figure quarto-figure-center r-stretch" style="width:62.0%"><ol type="1">
+<li><u>finding/extracting the value of a single field</u><br>
+<span class="fragment" data-fragment-index="1">this representation is the most efficient. it allows us to:</span></li>
+</ol>
+<div class="fragment sub" data-fragment-index="1">
+<ul>
+<li>jump directly to the field we’re interested in</li>
+<li>compute its length without scanning through its value</li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ol start="2" type="1">
+<li><u>updating the value of a single field</u><br>
+less efficient than options 1 and 2 if the length changes. why? <span class="fragment" data-fragment-index="3" style="color:#3a5fcd;">in addition to shifting subsequent values, need to recompute their offsets</span></li>
+</ol>
+</div>
+</section>
+<section id="representing-null-values" class="slide level2">
+<h2>Representing Null Values</h2>
+<ul>
+<li>Option 1: add an “out-of-band” value for every data type
+<ul>
+<li>con: need to increase the size of most data types, or reduce the range of possible values</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Option 2: use per-record metadata
+<ul>
+<li>example: use a special offset (e.g., -1)</li>
+</ul></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L06-Storage/null-rec.png" class="quarto-figure quarto-figure-center" style="width:58.0%"></p>
+</figure>
+</div>
+</div>
+</section>
+<section id="which-is-the-correct-record-header" class="slide level2">
+<h2>Which is the correct record header?</h2>
+<div class="r-stack">
+<p><img data-src="images/L06-Storage/quiz-1.png" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-2.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-3.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-4.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-5.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-6.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-7.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-8.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L06-Storage/quiz-9.png" class="fragment" style="width:100.0%"></p>
+</div>
+
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p><a href="index.html">DS310 — Data Mechanics</a></p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 960,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

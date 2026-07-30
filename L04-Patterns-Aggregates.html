@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-html/tabby.min.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-29e2c20b02301cfff04dc8050bf30c7e.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.6.37">
+
+  <meta name="author" content="Data Science 310 — Boston University">
+  <title>DS310 – SQL: Aggregates, Subqueries,</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-91e0fad9facfa472f0527723fdbe8b3d.css">
+  <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">SQL: Aggregates, Subqueries,</h1>
+  <p class="subtitle">Joins, Outer Joins</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Data Science 310 — Boston University 
+</div>
+        <p class="quarto-title-affiliation">
+            Based on notes by David G. Sullivan
+          </p>
+    </div>
+</div>
+
+</section>
+<section id="aggregate-functions" class="slide level2">
+<h2>Aggregate Functions</h2>
+<ul>
+<li>The SELECT clause can include an <em>aggregate function</em>, which performs a computation on a collection of values of an attribute.</li>
+<li>Example: find the average capacity of rooms in the Sci Ctr:</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(capacity)</span>
+<span id="cb1-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb1-3"><a></a><span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sci Ctr%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/agg-1.png" style="width:80.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/agg-2.png" class="fragment" style="width:80.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/agg-3.png" class="fragment" style="width:80.0%"></p>
+</div>
+</section>
+<section id="aggregate-functions-cont." class="slide level2">
+<h2>Aggregate Functions (cont.)</h2>
+<ul>
+<li>Possible functions include:
+<ul>
+<li>MIN, MAX: find the minimum/maximum of a value</li>
+<li>AVG, SUM: compute the average/sum of numeric values</li>
+<li>COUNT: count the number of values</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>For AVG, SUM, and COUNT, we can add the keyword DISTINCT to perform the computation on all distinct values.
+<ul>
+<li>example: find the number of students enrolled for courses:</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> student)</span>
+<span id="cb2-2"><a></a><span class="kw">FROM</span> Enrolled;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="aggregate-functions-cont.-1" class="slide level2">
+<h2>Aggregate Functions (cont.)</h2>
+<ul>
+<li>SELECT COUNT(*) will count the number of tuples in the result of the select command.
+<ul>
+<li>example: find the number of DS courses</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb3-1"><a></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb3-2"><a></a><span class="kw">FROM</span> Course</span>
+<span id="cb3-3"><a></a><span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'ds%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment sub">
+<ul>
+<li>COUNT(attribute) counts the number of non-NULL values of attribute, so it won’t always be equivalent to COUNT(*)</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Aggregate functions cannot be used in the WHERE clause.</li>
+<li>Practice with aggregate functions: write a query to find the largest capacity of any room in the Science Center:</li>
+</ul>
+</div>
+<div class="fragment">
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb4-1"><a></a><span class="kw">SELECT</span> <span class="fu">MAX</span>(capacity)</span>
+<span id="cb4-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb4-3"><a></a><span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sci Ctr%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="aggregate-functions-cont.-2" class="slide level2">
+<h2>Aggregate Functions (cont.)</h2>
+<ul>
+<li>What if we wanted the name of the room with the max. capacity?</li>
+<li>The following will <em>not</em> work!</li>
+</ul>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb5-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">MAX</span>(capacity)</span>
+<span id="cb5-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb5-3"><a></a><span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sci Ctr%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/aggmix.png" class="quarto-figure quarto-figure-center" style="width:80.0%"></p>
+</figure>
+</div>
+</div>
+<div class="fragment">
+<ul>
+<li>In general, you can’t mix aggregate functions with column names in the SELECT clause.</li>
+</ul>
+</div>
+</section>
+<section id="subqueries" class="slide level2">
+<h2>Subqueries</h2>
+<ul>
+<li>A subquery allows us to use the result of one query in the evaluation of another query.
+<ul>
+<li>the queries can involve the same table or different tables</li>
+</ul></li>
+<li>We can use a subquery to solve the previous problem:</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb6-1"><a></a><span class="kw">SELECT</span> name, capacity</span>
+<span id="cb6-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb6-3"><a></a><span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sci Ctr%'</span></span>
+<span id="cb6-4"><a></a>  <span class="kw">AND</span> capacity <span class="op">=</span> (<span class="kw">SELECT</span> <span class="fu">MAX</span>(capacity)      <span class="co">-- the subquery</span></span>
+<span id="cb6-5"><a></a>                  <span class="kw">FROM</span> Room</span>
+<span id="cb6-6"><a></a>                  <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sci Ctr%'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>Since the subquery evaluates to 500, this is equivalent to:</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb7-1"><a></a><span class="kw">SELECT</span> name, capacity</span>
+<span id="cb7-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb7-3"><a></a><span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sci Ctr%'</span></span>
+<span id="cb7-4"><a></a>  <span class="kw">AND</span> capacity <span class="op">=</span> <span class="dv">500</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="how-could-we-find-the-shortest-pg-13-movie-in-the-database" class="slide level2">
+<h2>How could we find the shortest PG-13 movie in the database?</h2>
+
+<img data-src="images/L04-Patterns-Aggregates/movie-short.png" class="quarto-figure quarto-figure-center r-stretch" style="width:60.0%"><p>A. &nbsp;<code>SELECT name, MIN(runtime) FROM Movie WHERE rating = 'PG-13';</code></p>
+<p>B. &nbsp;<code>SELECT name, runtime FROM Movie WHERE runtime = (SELECT MIN(runtime) FROM Movie WHERE rating = 'PG-13');</code></p>
+<p>C. &nbsp;<code>SELECT name, runtime FROM Movie WHERE rating = 'PG-13' AND runtime = (SELECT MIN(runtime) FROM Movie WHERE rating = 'PG-13');</code></p>
+<p>D. &nbsp;two of these would work</p>
+<p>E. &nbsp;all three would work</p>
+</section>
+<section id="how-could-we-find-the-shortest-pg-13-movie-in-the-database-answer" class="slide level2">
+<h2>How could we find the shortest PG-13 movie in the database? (answer)</h2>
+<p>A. &nbsp;<code>SELECT name, MIN(runtime) FROM Movie WHERE rating = 'PG-13';</code> <span class="fragment" data-fragment-index="2" style="color:#c00;">← no: can’t combine an aggregate with a “plain” column unless you are grouping by the column</span></p>
+<p>B. &nbsp;<code>SELECT name, runtime FROM Movie WHERE runtime = (SELECT MIN(runtime) FROM Movie WHERE rating = 'PG-13');</code> <span class="fragment" data-fragment-index="3" style="color:#c00;">← could also get non-PG-13 movies with the same runtime</span></p>
+<p>C. &nbsp;<code>SELECT name, runtime FROM Movie WHERE rating = 'PG-13' AND runtime = (SELECT MIN(runtime) FROM Movie WHERE rating = 'PG-13');</code> <span class="fragment" data-fragment-index="1" style="color:#3a5fcd;">← correct!</span></p>
+<div class="fragment" data-fragment-index="3">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/movie-short.png" class="quarto-figure quarto-figure-center" style="width:55.0%"></p>
+</figure>
+</div>
+</div>
+</section>
+<section id="a-restriction-on-aggregate-functions" class="slide level2">
+<h2>A Restriction on Aggregate Functions</h2>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb8-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">MIN</span>(runtime)</span>
+<span id="cb8-2"><a></a><span class="kw">FROM</span> Movie</span>
+<span id="cb8-3"><a></a><span class="kw">WHERE</span> rating <span class="op">=</span> <span class="st">'PG-13'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><span style="color:#c00; font-weight:bold;">This does not work in standard SQL!</span></p>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/restrict-1.png" style="width:80.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/restrict-2.png" class="fragment" style="width:80.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/restrict-3.png" class="fragment" style="width:80.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/restrict-4.png" class="fragment" style="width:80.0%"></p>
+</div>
+</section>
+<section id="a-restriction-on-aggregate-functions-cont." class="slide level2">
+<h2>A Restriction on Aggregate Functions (cont.)</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb9-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">MIN</span>(runtime)</span>
+<span id="cb9-2"><a></a><span class="kw">FROM</span> Movie</span>
+<span id="cb9-3"><a></a><span class="kw">WHERE</span> rating <span class="op">=</span> <span class="st">'PG-13'</span>;    <span class="co">-- does not work in standard SQL!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>In general, a SELECT clause cannot combine:
+<ul>
+<li>an aggregate function</li>
+<li>a column name that is on its own (and is not being operated on by an aggregate function)</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>We’ll see an important exception to this soon.</li>
+<li>Warning: SQLite lets you violate this rule, but…</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>doing so is not standard SQL</li>
+<li>you should not do this in your work for this class!</li>
+</ul>
+</div>
+</section>
+<section id="subqueries-and-set-membership" class="slide level2">
+<h2>Subqueries and Set Membership</h2>
+<ul>
+<li>Subqueries can be used to test for set membership in conjunction with the IN and NOT IN operators.
+<ul>
+<li>example: find all students who are not enrolled in CSCI E-268</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb10-1"><a></a><span class="kw">SELECT</span> name</span>
+<span id="cb10-2"><a></a><span class="kw">FROM</span> Student</span>
+<span id="cb10-3"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="kw">NOT</span> <span class="kw">IN</span> (<span class="kw">SELECT</span> student</span>
+<span id="cb10-4"><a></a>                 <span class="kw">FROM</span> Enrolled</span>
+<span id="cb10-5"><a></a>                 <span class="kw">WHERE</span> course <span class="op">=</span> <span class="st">'cscie268'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/setmem-1.png" style="width:75.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/setmem-2.png" class="fragment" style="width:75.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/setmem-3.png" class="fragment" style="width:75.0%"></p>
+</div>
+</section>
+<section id="subqueries-and-set-comparisons" class="slide level2">
+<h2>Subqueries and Set Comparisons</h2>
+<ul>
+<li>Subqueries also enable comparisons with elements of a set using the ALL and SOME operators.
+<ul>
+<li>example: find rooms larger than all rooms in Sever Hall</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb11-1"><a></a><span class="kw">SELECT</span> name, capacity</span>
+<span id="cb11-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb11-3"><a></a><span class="kw">WHERE</span> capacity <span class="op">&gt;</span> <span class="kw">ALL</span> (<span class="kw">SELECT</span> capacity</span>
+<span id="cb11-4"><a></a>                      <span class="kw">FROM</span> Room</span>
+<span id="cb11-5"><a></a>                      <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sever%'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment sub">
+<ul>
+<li>example: find rooms larger than at least one room in Sever</li>
+</ul>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb12-1"><a></a><span class="kw">SELECT</span> name, capacity</span>
+<span id="cb12-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb12-3"><a></a><span class="kw">WHERE</span> capacity <span class="op">&gt;</span> <span class="kw">SOME</span> (<span class="kw">SELECT</span> capacity</span>
+<span id="cb12-4"><a></a>                       <span class="kw">FROM</span> Room</span>
+<span id="cb12-5"><a></a>                       <span class="kw">WHERE</span> name <span class="kw">LIKE</span> <span class="st">'Sever%'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="applying-an-aggregate-function-to-subgroups" class="slide level2">
+<h2>Applying an Aggregate Function to Subgroups</h2>
+<ul>
+<li>A GROUP BY clause allows us to:
+<ul>
+<li>group together tuples that have a common value</li>
+<li>apply an aggregate function to the tuples in each subgroup</li>
+</ul></li>
+<li>Example: find the enrollment of each course:</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb13-1"><a></a><span class="kw">SELECT</span> course, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb13-2"><a></a><span class="kw">FROM</span> Enrolled</span>
+<span id="cb13-3"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> course;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>When you group by an attribute, you <u>can</u> include it in the SELECT clause with an aggregate function.</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>because we’re grouping by that attribute, every tuple in a given group will have the same value for it</li>
+</ul>
+</div>
+</section>
+<section id="evaluating-a-query-with-group-by" class="slide level2">
+<h2>Evaluating a query with GROUP BY</h2>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb14-1"><a></a><span class="kw">SELECT</span> course, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb14-2"><a></a><span class="kw">FROM</span> Enrolled</span>
+<span id="cb14-3"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> course;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/groupby-1.png" style="width:70.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/groupby-2.png" class="fragment" style="width:70.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/groupby-3.png" class="fragment" style="width:70.0%"></p>
+</div>
+</section>
+<section id="applying-a-condition-to-subgroups" class="slide level2">
+<h2>Applying a Condition to Subgroups</h2>
+<ul>
+<li>A HAVING clause allows us to apply a selection condition to the subgroups produced by a GROUP BY clause.
+<ul>
+<li>example: find enrollments of courses with at least 2 students</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb15-1"><a></a><span class="kw">SELECT</span> course, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb15-2"><a></a><span class="kw">FROM</span> Enrolled</span>
+<span id="cb15-3"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> course</span>
+<span id="cb15-4"><a></a><span class="kw">HAVING</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="op">&gt;</span> <span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/having-1.png" class="fragment" style="width:80.0%" data-fragment-index="1"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/having-2.png" class="fragment" style="width:80.0%" data-fragment-index="2"></p>
+</div>
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li>Important difference:
+<ul>
+<li>a WHERE clause is applied <em>before</em> grouping</li>
+<li>a HAVING clause is applied <em>after</em> grouping</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="subqueries-in-from-clauses" class="slide level2">
+<h2>Subqueries in FROM clauses</h2>
+<ul>
+<li>A subquery can also appear in a FROM clause.</li>
+<li>Useful when you need to perform a computation on values obtained by applying an aggregate.
+<ul>
+<li>example: find the average enrollment in a DS course</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb16-1"><a></a><span class="kw">SELECT</span> <span class="fu">AVG</span>(<span class="fu">count</span>)</span>
+<span id="cb16-2"><a></a><span class="kw">FROM</span> (<span class="kw">SELECT</span> course, <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">as</span> <span class="fu">count</span></span>
+<span id="cb16-3"><a></a>      <span class="kw">FROM</span> Enrolled</span>
+<span id="cb16-4"><a></a>      <span class="kw">GROUP</span> <span class="kw">BY</span> course) <span class="kw">AS</span> enrollCounts</span>
+<span id="cb16-5"><a></a><span class="kw">WHERE</span> course <span class="kw">LIKE</span> <span class="st">'ds%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Some systems require that you assign a FROM-clause subquery a name (e.g., <code>enrollCounts</code> above).</li>
+</ul>
+</section>
+<section id="sorting-the-results" class="slide level2">
+<h2>Sorting the Results</h2>
+<ul>
+<li>An ORDER BY clause sorts the tuples in the result of the query by one or more attributes.
+<ul>
+<li>ascending order by default, use DESC to get descending</li>
+<li>example:</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb17-1"><a></a><span class="kw">SELECT</span> name, capacity</span>
+<span id="cb17-2"><a></a><span class="kw">FROM</span> Room</span>
+<span id="cb17-3"><a></a><span class="kw">WHERE</span> capacity <span class="op">&gt;</span> <span class="dv">100</span></span>
+<span id="cb17-4"><a></a><span class="kw">ORDER</span> <span class="kw">BY</span> capacity <span class="kw">DESC</span>, name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="images/L04-Patterns-Aggregates/sort-result.png" class="quarto-figure quarto-figure-center r-stretch" style="width:40.0%"></section>
+<section id="set-operations" class="slide level2">
+<h2>Set Operations</h2>
+<ul>
+<li>UNION, INTERSECTION, EXCEPT (set difference)</li>
+<li>Example: find the IDs of students and advisors</li>
+</ul>
+<div class="sourceCode" id="cb18"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb18-1"><a></a><span class="kw">SELECT</span> student</span>
+<span id="cb18-2"><a></a><span class="kw">FROM</span> Enrolled</span>
+<span id="cb18-3"><a></a><span class="kw">UNION</span></span>
+<span id="cb18-4"><a></a><span class="kw">SELECT</span> advisor</span>
+<span id="cb18-5"><a></a><span class="kw">FROM</span> Advises;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="outer-joins" class="slide level2">
+<h2>Outer Joins</h2>
+<ul>
+<li>Syntax for left outer join:</li>
+</ul>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb19-1"><a></a><span class="kw">SELECT</span> …</span>
+<span id="cb19-2"><a></a><span class="kw">FROM</span> T1 <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> T2 <span class="kw">ON</span> <span class="kw">join</span> condition</span>
+<span id="cb19-3"><a></a><span class="kw">WHERE</span> …</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>The result is equivalent to:
+<ul>
+<li>forming the Cartesian product <code>T1 x T2</code></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>selecting the tuples in the Cartesian product that satisfy the join condition in the ON clause</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>including an extra tuple for each row from T1 that does not have a match with a row from T2 based on the ON clause
+<ul>
+<li>the T2 attributes in the extra tuples are given null values</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>applying the remaining clauses as before</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Also available: RIGHT OUTER JOIN, FULL OUTER JOIN</li>
+</ul>
+</div>
+</section>
+<section id="outer-joins-cont." class="slide level2">
+<h2>Outer Joins (cont.)</h2>
+<ul>
+<li>Example: get the IDs and majors of all enrolled students.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/outerex-tables.png" class="quarto-figure quarto-figure-center" style="width:70.0%"></p>
+</figure>
+</div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb20-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> Enrolled.student, dept</span>
+<span id="cb20-2"><a></a><span class="kw">FROM</span> Enrolled <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb20-3"><a></a><span class="kw">ON</span> Enrolled.student <span class="op">=</span> MajorsIn.student;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/outerex-result.png" class="quarto-figure quarto-figure-center" style="width:32.0%"></p>
+</figure>
+</div>
+</div>
+</section>
+<section id="outer-joins-cont.-1" class="slide level2">
+<h2>Outer Joins (cont.)</h2>
+<ul>
+<li>Another example: find the IDs and majors of all students enrolled in cscie268 (including those with no major):</li>
+</ul>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb21-1"><a></a><span class="kw">SELECT</span> Enrolled.student, dept</span>
+<span id="cb21-2"><a></a><span class="kw">FROM</span> Enrolled <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb21-3"><a></a>     <span class="kw">ON</span> Enrolled.student <span class="op">=</span> MajorsIn.student</span>
+<span id="cb21-4"><a></a><span class="kw">WHERE</span> course <span class="op">=</span> <span class="st">'cscie268'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment sub">
+<ul>
+<li>in this case, there is a WHERE clause with an additional selection condition</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>the additional condition belongs in the WHERE clause because it’s not a join condition – i.e., it isn’t used to match up tuples from the two tables</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Note: when there is no additional condition, we don’t need a WHERE clause – the join condition is in the ON clause.</li>
+</ul>
+</div>
+</section>
+<section id="evaluating-a-select-command" class="slide level2">
+<h2>Evaluating a SELECT command</h2>
+<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb22-1"><a></a><span class="kw">SELECT</span> column1, column2, …</span>
+<span id="cb22-2"><a></a><span class="kw">FROM</span> table1, table2, <span class="op">..</span>.</span>
+<span id="cb22-3"><a></a><span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>The result is equivalent to:
+<ul>
+<li>evaluating any subqueries in the FROM clause</li>
+<li>forming the Cartesian product of the tables in the FROM clause: <code>table1 x table2 x …</code></li>
+<li>if there is an OUTER JOIN, applying its join condition and adding extra tuples as needed</li>
+<li>applying the remaining clauses in the following order:</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb23-1"><a></a>WHERE (including any subqueries)   GROUP BY   HAVING   SELECT   ORDER BY</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="create-table" class="slide level2">
+<h2>CREATE TABLE</h2>
+<ul>
+<li>What it does: creates a relation with the specified schema</li>
+<li>Basic syntax:</li>
+</ul>
+<div class="sourceCode" id="cb24"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb24-1"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> relation_name(</span>
+<span id="cb24-2"><a></a>    attribute1_name attribute1_type,</span>
+<span id="cb24-3"><a></a>    attribute2_name attribute2_type,</span>
+<span id="cb24-4"><a></a>    …</span>
+<span id="cb24-5"><a></a>    attributeN_name attributeN_type );</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Examples:</li>
+</ul>
+<div class="sourceCode" id="cb25"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb25-1"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> Student(<span class="kw">id</span> <span class="dt">CHAR</span>(<span class="dv">8</span>), name <span class="dt">VARCHAR</span>(<span class="dv">30</span>));</span>
+<span id="cb25-2"><a></a></span>
+<span id="cb25-3"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> Room(<span class="kw">id</span> <span class="dt">CHAR</span>(<span class="dv">4</span>), name <span class="dt">VARCHAR</span>(<span class="dv">30</span>),</span>
+<span id="cb25-4"><a></a>                  capacity <span class="dt">INTEGER</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="data-types" class="slide level2">
+<h2>Data Types</h2>
+<ul>
+<li>An attribute’s type specifies the domain of the attribute.</li>
+<li>The set of possible types depends on the DBMS.</li>
+<li>Standard SQL types include:
+<ul>
+<li>INTEGER: a four-byte integer (-2147483648 to +2147483647)</li>
+<li>CHAR(n): a fixed-length string of n characters</li>
+<li>VARCHAR(n): a variable-length string of up to n characters</li>
+<li>REAL: a real number (i.e., one that may have a fractional part)</li>
+<li>NUMERIC(n, d): a numeric value with at most n digits, exactly d of which are after the decimal point</li>
+<li>DATE: a date of the form yyyy-mm-dd</li>
+<li>TIME: a time of the form hh:mm:ss</li>
+</ul></li>
+<li>When specifying a non-numeric value, you should surround it with single quotes (e.g., ‘Jill Jones’ or ‘2007-01-26’).</li>
+</ul>
+</section>
+<section id="char-vs.-varchar" class="slide level2">
+<h2>CHAR vs.&nbsp;VARCHAR</h2>
+<ul>
+<li>CHAR(n): a fixed-length string of <em>exactly</em> n characters
+<ul>
+<li>the DBMS will pad with spaces as needed</li>
+<li>example: with <code>id CHAR(6)</code>, ‘12345’ will be stored as ‘12345&nbsp;’</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>VARCHAR(n): a variable-length string of <em>up to</em> n characters
+<ul>
+<li>the DBMS does not pad the value</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>In both cases, values will be truncated if they’re too long.</li>
+<li>If a string attribute can have a wide range of possible lengths, it’s usually better to use VARCHAR.</li>
+</ul>
+</div>
+</section>
+<section id="types-in-sqlite" class="slide level2">
+<h2>Types in SQLite</h2>
+<ul>
+<li>SQLite has its own types, including:
+<ul>
+<li>INTEGER</li>
+<li>REAL</li>
+<li>TEXT</li>
+</ul></li>
+<li>It also allows you to use the typical SQL types, but it converts them to one of its own types.</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>As a result, the length restrictions indicated for CHAR and VARCHAR are not observed.</li>
+<li>It is also more lax in type checking than typical DBMSs.</li>
+</ul>
+</div>
+</section>
+<section id="string-comparisons" class="slide level2">
+<h2>String Comparisons</h2>
+<ul>
+<li>String comparisons ignore any trailing spaces added for padding.
+<ul>
+<li>ex: an attribute named id of type CHAR(5)</li>
+<li>insert a tuple with the value ‘abc’ for id</li>
+<li>value is stored as ‘abc&nbsp;&nbsp;’ (with 2 spaces of padding)</li>
+<li>the comparison <code>id = 'abc'</code> is true for that tuple</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>In standard SQL, string comparisons using both <code>=</code> and LIKE are case sensitive.
+<ul>
+<li>some DBMSs provide a case-insensitive version of LIKE</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>In SQLite:
+<ul>
+<li>there are no real CHARs, so padding isn’t added</li>
+<li>string comparisons using <code>=</code> are case sensitive</li>
+<li>string comparisons using LIKE are case insensitive
+<ul>
+<li><code>'abc' = 'ABC'</code> is false</li>
+<li><code>'abc' LIKE 'ABC'</code> is true</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="terms-used-to-express-constraints" class="slide level2">
+<h2>Terms Used to Express Constraints</h2>
+<ul>
+<li>primary key:</li>
+</ul>
+<div class="sourceCode" id="cb26"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb26-1"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> Student(<span class="kw">id</span> <span class="dt">char</span>(<span class="dv">8</span>) <span class="kw">primary</span> <span class="kw">key</span>,</span>
+<span id="cb26-2"><a></a>    name <span class="dt">varchar</span>(<span class="dv">30</span>));</span>
+<span id="cb26-3"><a></a></span>
+<span id="cb26-4"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> Enrolled(student <span class="dt">char</span>(<span class="dv">8</span>),</span>
+<span id="cb26-5"><a></a>    course <span class="dt">varchar</span>(<span class="dv">20</span>), credit_status <span class="dt">varchar</span>(<span class="dv">15</span>),</span>
+<span id="cb26-6"><a></a>    <span class="kw">primary</span> <span class="kw">key</span> (student, course));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment sub">
+<ul>
+<li>no two tuples can have the same combination of values for the primary-key attributes (a uniqueness constraint)</li>
+<li>a primary-key attribute can never have a null value</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>unique: specifies attribute(s) that form a (non-primary) key</li>
+<li>not null: specifies that an attribute can never be null</li>
+</ul>
+<div class="sourceCode" id="cb27"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb27-1"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> Course(name <span class="dt">varchar</span>(<span class="dv">20</span>) <span class="kw">primary</span> <span class="kw">key</span>,</span>
+<span id="cb27-2"><a></a>    start_time <span class="dt">time</span>, end_time <span class="dt">time</span>, room <span class="dt">char</span>(<span class="dv">4</span>),</span>
+<span id="cb27-3"><a></a>    <span class="kw">unique</span> (start_time, end_time, room));</span>
+<span id="cb27-4"><a></a></span>
+<span id="cb27-5"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> Student(<span class="kw">id</span> <span class="dt">char</span>(<span class="dv">8</span>) <span class="kw">primary</span> <span class="kw">key</span>,</span>
+<span id="cb27-6"><a></a>    name <span class="dt">varchar</span>(<span class="dv">30</span>) <span class="kw">not</span> <span class="kw">null</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="terms-used-to-express-constraints-cont." class="slide level2">
+<h2>Terms Used to Express Constraints (cont.)</h2>
+<ul>
+<li>foreign key … references:</li>
+</ul>
+<div class="sourceCode" id="cb28"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb28-1"><a></a><span class="kw">CREATE</span> <span class="kw">TABLE</span> MajorsIn(student <span class="dt">char</span>(<span class="dv">8</span>),</span>
+<span id="cb28-2"><a></a>    dept <span class="dt">varchar</span>(<span class="dv">30</span>),</span>
+<span id="cb28-3"><a></a>    <span class="kw">foreign</span> <span class="kw">key</span> (student) <span class="kw">references</span> Student(<span class="kw">id</span>),</span>
+<span id="cb28-4"><a></a>    <span class="kw">foreign</span> <span class="kw">key</span> (dept) <span class="kw">references</span> Department(name));</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="images/L04-Patterns-Aggregates/fk-diagram.png" class="quarto-figure quarto-figure-center r-stretch" style="width:65.0%"></section>
+<section id="terms-used-to-express-constraints-cont.-1" class="slide level2">
+<h2>Terms Used to Express Constraints (cont.)</h2>
+<ul>
+<li>foreign key / references (cont.):
+<ul>
+<li>all values of a foreign key must match the referenced attribute(s) of some tuple in the other relation (known as a <em>referential integrity</em> constraint)</li>
+</ul></li>
+</ul>
+<div class="fragment sub" style="margin-left: 1em">
+<ul>
+<li>foreign-key attributes may refer to other attributes in the same relation:</li>
+</ul>
+<div class="sourceCode" id="cb29"><pre class="sourceCode numberSource markdown number-lines code-with-copy"><code class="sourceCode markdown"><span id="cb29-1"><a></a><span class="in">```{sql}</span></span>
+<span id="cb29-2"><a></a><span class="in">CREATE TABLE Employee( id char(10) primary key,</span></span>
+<span id="cb29-3"><a></a><span class="in">    name varchar(30), supervisor char(10),</span></span>
+<span id="cb29-4"><a></a><span class="in">    foreign key (supervisor) references Employee(id));</span></span>
+<span id="cb29-5"><a></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment sub" style="margin-left: 1em">
+<ul>
+<li>a foreign-key attribute may have a null value</li>
+</ul>
+</div>
+</section>
+<section id="enforcing-constraints" class="slide level2">
+<h2>Enforcing Constraints</h2>
+<ul>
+<li>Example: assume that the tables below show <em>all</em> of their tuples.</li>
+</ul>
+
+<img data-src="images/L04-Patterns-Aggregates/constraints-tables.png" class="quarto-figure quarto-figure-center r-stretch" style="width:70.0%"><ul>
+<li>Which of the following operations would the DBMS allow?
+<ul>
+<li>adding (12345678, ‘John Smith’, …) to Student <span class="fragment" data-fragment-index="1" style="color:#c00;">← not allowed</span></li>
+<li>adding (33333333, ‘Howdy Doody’, …) to Student <span class="fragment" data-fragment-index="2" style="color:#3a5fcd;">← allowed</span></li>
+<li>adding (12345678, ‘physics’) to MajorsIn <span class="fragment" data-fragment-index="3" style="color:#c00;">← not allowed</span></li>
+<li>adding (25252525, ‘english’) to MajorsIn <span class="fragment" data-fragment-index="4" style="color:#3a5fcd;">← allowed</span></li>
+</ul></li>
+</ul>
+</section>
+<section id="drop-table" class="slide level2 scrollable">
+<h2>DROP TABLE</h2>
+<ul>
+<li>What it does: removes an entire relation from a database
+<ul>
+<li>including all of its existing rows</li>
+</ul></li>
+<li>Syntax:</li>
+</ul>
+<div class="sourceCode" id="cb30"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb30-1"><a></a><span class="kw">DROP</span> <span class="kw">TABLE</span> relation_name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Example:</li>
+</ul>
+<div class="sourceCode" id="cb31"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb31-1"><a></a><span class="kw">DROP</span> <span class="kw">TABLE</span> MajorsIn;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>Note: if a relation is referred to by a foreign key in another relation, it cannot be dropped until either:
+<ol type="1">
+<li>the other relation is dropped first</li>
+<li>the foreign-key constraint is dropped from the other table (we won’t look at how to do this)</li>
+</ol></li>
+</ul>
+</div>
+</section>
+<section id="insert" class="slide level2">
+<h2>INSERT</h2>
+<ul>
+<li>What it does: adds a tuple to a relation</li>
+<li>Syntax:</li>
+</ul>
+<div class="sourceCode" id="cb32"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb32-1"><a></a><span class="kw">INSERT</span> <span class="kw">INTO</span> relation <span class="kw">VALUES</span> (val1, val2, …);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>the values of the attributes must be given in the order in which the attributes were specified when the table was created</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Example:</li>
+</ul>
+<div class="sourceCode" id="cb33"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb33-1"><a></a><span class="kw">INSERT</span> <span class="kw">INTO</span> MajorsIn <span class="kw">VALUES</span> (<span class="st">'10005000'</span>, <span class="st">'math'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>[ Recall the CREATE TABLE command: <code>CREATE TABLE MajorsIn(student char(8), dept varchar(30), …);</code> ]</li>
+</ul>
+</div>
+</section>
+<section id="insert-cont." class="slide level2">
+<h2>INSERT (cont.)</h2>
+<ul>
+<li>Alternate syntax:</li>
+</ul>
+<div class="sourceCode" id="cb34"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb34-1"><a></a><span class="kw">INSERT</span> <span class="kw">INTO</span> relation(attr1, attr2, …)</span>
+<span id="cb34-2"><a></a><span class="kw">VALUES</span> (val1, val2, …);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>allows you to:
+<ul>
+<li>specify values of the attributes in a different order</li>
+<li>specify values for only a subset of the attributes</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Example:</li>
+</ul>
+<div class="sourceCode" id="cb35"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb35-1"><a></a><span class="kw">INSERT</span> <span class="kw">INTO</span> MajorsIn(dept, student)</span>
+<span id="cb35-2"><a></a><span class="kw">VALUES</span> (<span class="st">'math'</span>, <span class="st">'10005000'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<ul>
+<li>If the value of a column is not specified, it is assigned a default value.
+<ul>
+<li>depends on the data type of the column</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="delete" class="slide level2">
+<h2>DELETE</h2>
+<div class="columns">
+<div class="column" style="width:58%;">
+<ul>
+<li>What it does: remove one or more tuples from a relation
+<ul>
+<li>basic syntax:</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb36"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb36-1"><a></a><span class="kw">DELETE</span> <span class="kw">FROM</span> <span class="kw">table</span></span>
+<span id="cb36-2"><a></a><span class="kw">WHERE</span> selection condition;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>example:</li>
+</ul>
+<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb37-1"><a></a><span class="kw">DELETE</span> <span class="kw">FROM</span> Student</span>
+<span id="cb37-2"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> <span class="st">'4567800'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Before deleting a row, we must first remove all references to that row from foreign keys in other tables.</li>
+</ul>
+</div>
+<div class="fragment sub" data-fragment-index="2">
+<ul>
+<li>ex: before deleting from Student, delete the corresponding rows in Enrolled and MajorsIn</li>
+</ul>
+</div>
+</div><div class="column" style="width:42%;">
+<div class="fragment" data-fragment-index="1">
+<p><img data-src="images/L04-Patterns-Aggregates/delete-tables.png" style="width:85.0%"></p>
+</div>
+</div></div>
+</section>
+<section id="update" class="slide level2">
+<h2>UPDATE</h2>
+<ul>
+<li>What it does: modify attributes of one or more tuples in a relation
+<ul>
+<li>basic syntax:</li>
+</ul></li>
+</ul>
+<div class="sourceCode" id="cb38"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb38-1"><a></a><span class="kw">UPDATE</span> <span class="kw">table</span></span>
+<span id="cb38-2"><a></a><span class="kw">SET</span> <span class="kw">list</span> <span class="kw">of</span> assignments</span>
+<span id="cb38-3"><a></a><span class="kw">WHERE</span> selection condition;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment sub">
+<ul>
+<li>examples:</li>
+</ul>
+<div class="sourceCode" id="cb39"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb39-1"><a></a><span class="kw">UPDATE</span> MajorsIn</span>
+<span id="cb39-2"><a></a><span class="kw">SET</span> dept <span class="op">=</span> <span class="st">'physics'</span></span>
+<span id="cb39-3"><a></a><span class="kw">WHERE</span> student <span class="op">=</span> <span class="st">'10005000'</span>;</span>
+<span id="cb39-4"><a></a></span>
+<span id="cb39-5"><a></a><span class="kw">UPDATE</span> Course</span>
+<span id="cb39-6"><a></a><span class="kw">SET</span> start_time <span class="op">=</span> <span class="st">'11:00:00'</span>, end_time <span class="op">=</span> <span class="st">'12:30:00'</span></span>
+<span id="cb39-7"><a></a><span class="kw">WHERE</span> name <span class="op">=</span> <span class="st">'cs165'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="writing-queries-rules-of-thumb" class="slide level2">
+<h2>Writing Queries: Rules of Thumb</h2>
+<ul>
+<li>Start with the FROM clause. Which table(s) do you need?</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>If you need more than one table, determine the necessary join conditions.
+<ul>
+<li>for N tables, you typically need N – 1 join conditions</li>
+<li>is an outer join needed – i.e., do you want unmatched tuples?</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Determine if a GROUP BY clause is needed.
+<ul>
+<li>are you performing computations involving subgroups?</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Determine any other conditions that are needed.
+<ul>
+<li>if they rely on aggregate functions, put in a HAVING clause</li>
+<li>otherwise, add to the WHERE clause</li>
+<li>is a subquery needed?</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Fill in the rest of the query: SELECT, ORDER BY?
+<ul>
+<li>is DISTINCT needed?</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="which-tables-do-i-need" class="slide level2">
+<h2>Which tables do I need?</h2>
+<ul>
+<li>Find the names of all rooms that DS majors have courses in.</li>
+</ul>
+<div class="sourceCode" id="cb40"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb40-1"><a></a><span class="kw">SELECT</span></span>
+<span id="cb40-2"><a></a><span class="kw">FROM</span> ???</span>
+<span id="cb40-3"><a></a><span class="kw">WHERE</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="images/L04-Patterns-Aggregates/rules-tables.png" class="quarto-figure quarto-figure-center r-stretch" style="width:70.0%"><div class="fragment">
+<div class="sourceCode" id="cb41"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb41-1"><a></a><span class="kw">FROM</span> Course, Room, Enrolled, MajorsIn</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="how-many-join-conditions-do-i-need" class="slide level2">
+<h2>How many join conditions do I need?</h2>
+<ul>
+<li>Find the names of all rooms that DS majors have courses in.</li>
+</ul>
+<div class="sourceCode" id="cb42"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb42-1"><a></a><span class="kw">SELECT</span></span>
+<span id="cb42-2"><a></a><span class="kw">FROM</span> Course, Room, Enrolled, MajorsIn</span>
+<span id="cb42-3"><a></a><span class="kw">WHERE</span> ???</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+<img data-src="images/L04-Patterns-Aggregates/join-tables.png" class="quarto-figure quarto-figure-center r-stretch" style="width:72.0%"><div class="fragment">
+<p><span style="color:#3a5fcd;">3 join conditions. For N tables, you need N – 1 join conditions!</span></p>
+</div>
+</section>
+<section id="which-of-these-is-a-correctly-formed-join-condition-for-this-problem" class="slide level2">
+<h2>Which of these is a correctly formed join condition for this problem?</h2>
+
+<img data-src="images/L04-Patterns-Aggregates/join-tables.png" class="quarto-figure quarto-figure-center r-stretch" style="width:72.0%"><p>A. &nbsp;<code>room_id = id</code> <span class="fragment" style="color:#3a5fcd;">← correct!</span></p>
+<p>B. &nbsp;<code>course_name = name</code></p>
+<p>C. &nbsp;<code>student_id = student_id</code></p>
+<p>D. &nbsp;two or more are correct</p>
+</section>
+<section id="how-would-i-fix-the-other-two" class="slide level2">
+<h2>How would I fix the other two?</h2>
+<ul>
+<li>Find the names of all rooms that DS majors have courses in.</li>
+</ul>
+<div class="sourceCode" id="cb43"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb43-1"><a></a><span class="kw">SELECT</span></span>
+<span id="cb43-2"><a></a><span class="kw">FROM</span> Course, Room, Enrolled, MajorsIn</span>
+<span id="cb43-3"><a></a><span class="kw">WHERE</span> room_id <span class="op">=</span> <span class="kw">id</span> <span class="kw">AND</span> <span class="op">..</span>.</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>Qualify the ambiguous names – using aliases for the tables:</li>
+</ul>
+<div class="sourceCode" id="cb44"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb44-1"><a></a><span class="kw">SELECT</span></span>
+<span id="cb44-2"><a></a><span class="kw">FROM</span> Course C, Room R, Enrolled E, MajorsIn M</span>
+<span id="cb44-3"><a></a><span class="kw">WHERE</span> room_id <span class="op">=</span> <span class="kw">id</span></span>
+<span id="cb44-4"><a></a>  <span class="kw">AND</span> course_name <span class="op">=</span> C.name</span>
+<span id="cb44-5"><a></a>  <span class="kw">AND</span> E.student_id <span class="op">=</span> M.student_id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="what-else-do-i-need" class="slide level2">
+<h2>What else do I need?</h2>
+<ul>
+<li>Find the names of all rooms that DS majors have courses in.</li>
+</ul>
+<div class="sourceCode" id="cb45"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb45-1"><a></a><span class="kw">SELECT</span></span>
+<span id="cb45-2"><a></a><span class="kw">FROM</span> Course C, Room R, Enrolled E, MajorsIn M</span>
+<span id="cb45-3"><a></a><span class="kw">WHERE</span> room_id <span class="op">=</span> <span class="kw">id</span></span>
+<span id="cb45-4"><a></a>  <span class="kw">AND</span> course_name <span class="op">=</span> C.name</span>
+<span id="cb45-5"><a></a>  <span class="kw">AND</span> E.student_id <span class="op">=</span> M.student_id</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>The selection condition, plus DISTINCT in the SELECT clause:</li>
+</ul>
+<div class="sourceCode" id="cb46"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb46-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> R.name</span>
+<span id="cb46-2"><a></a><span class="kw">FROM</span> Course C, Room R, Enrolled E, MajorsIn M</span>
+<span id="cb46-3"><a></a><span class="kw">WHERE</span> room_id <span class="op">=</span> <span class="kw">id</span></span>
+<span id="cb46-4"><a></a>  <span class="kw">AND</span> course_name <span class="op">=</span> C.name</span>
+<span id="cb46-5"><a></a>  <span class="kw">AND</span> E.student_id <span class="op">=</span> M.student_id</span>
+<span id="cb46-6"><a></a>  <span class="kw">AND</span> dept_name <span class="op">=</span> <span class="st">'data sci'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="writing-queries-rules-of-thumb-1" class="slide level2">
+<h2>Writing Queries: Rules of Thumb</h2>
+<ul>
+<li>Start with the FROM clause. Which table(s) do you need?</li>
+<li>If you need more than one table, determine the necessary join conditions.
+<ul>
+<li>for N tables, you typically need N – 1 join conditions</li>
+<li>is an outer join needed? – i.e., do you want unmatched tuples?</li>
+</ul></li>
+<li>Determine if a GROUP BY clause is needed.
+<ul>
+<li>are you performing computations involving subgroups?</li>
+</ul></li>
+<li>Determine any other conditions that are needed.
+<ul>
+<li>if they rely on aggregate functions, put in a HAVING clause</li>
+<li>otherwise, add to the WHERE clause</li>
+<li>is a subquery needed?</li>
+</ul></li>
+<li>Fill in the rest of the query: SELECT, ORDER BY?
+<ul>
+<li>is DISTINCT needed?</li>
+</ul></li>
+</ul>
+</section>
+<section id="finding-the-majors-of-enrolled-students" class="slide level2">
+<h2>Finding the Majors of Enrolled Students</h2>
+<ul>
+<li>We want the IDs and majors of every student who is enrolled in a course – including those with no major.</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/majors-tables.png" class="quarto-figure quarto-figure-center" style="width:72.0%"></p>
+</figure>
+</div>
+<div class="columns">
+<div class="column" style="width:42%;">
+<ul>
+<li>Desired result:</li>
+</ul>
+<p><img data-src="images/L04-Patterns-Aggregates/majors-result.png" style="width:72.0%"></p>
+</div><div class="column" style="width:58%;">
+<ul>
+<li>Relational algebra:</li>
+</ul>
+<p>π<sub>student_id, dept_name</sub>(Enrolled ⟕ MajorsIn)</p>
+<div class="fragment">
+<ul>
+<li>SQL:</li>
+</ul>
+<div class="sourceCode" id="cb47"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb47-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> Enrolled.student_id, dept_name</span>
+<span id="cb47-2"><a></a><span class="kw">FROM</span> Enrolled <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb47-3"><a></a>  <span class="kw">ON</span> Enrolled.student_id <span class="op">=</span> MajorsIn.student_id;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div></div>
+</section>
+<section id="left-outer-joins" class="slide level2">
+<h2>Left Outer Joins</h2>
+<div class="columns">
+<div class="column" style="width:44%;">
+<div class="sourceCode" id="cb48"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb48-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span></span>
+<span id="cb48-2"><a></a>    Enrolled.student_id, dept_name</span>
+<span id="cb48-3"><a></a><span class="kw">FROM</span> Enrolled</span>
+<span id="cb48-4"><a></a>    <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb48-5"><a></a>    <span class="kw">ON</span> Enrolled.student_id <span class="op">=</span></span>
+<span id="cb48-6"><a></a>       MajorsIn.student_id;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>The result is equivalent to:
+<ul>
+<li>forming the Cartesian product <code>T1 x T2</code></li>
+<li>selecting the rows in <code>T1 x T2</code> that satisfy the join condition in the ON clause</li>
+<li>including an extra row for each unmatched row from T1 (the “left table”)
+<ul>
+<li>filling the T2 attributes in the extra rows with nulls</li>
+</ul></li>
+<li>applying the other clauses as before</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:56%;">
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/loj-1.png" style="width:82.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/loj-2.png" class="fragment" style="width:82.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/loj-3.png" class="fragment" style="width:82.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/loj-4.png" class="fragment" style="width:82.0%"></p>
+</div>
+</div></div>
+</section>
+<section id="outer-joins-can-have-a-where-clause" class="slide level2">
+<h2>Outer Joins Can Have a WHERE Clause</h2>
+<ul>
+<li>Example: find the IDs and majors of all students enrolled in DS 310 (including those with no major):</li>
+</ul>
+<div class="sourceCode" id="cb49"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb49-1"><a></a><span class="kw">SELECT</span> Enrolled.student_id, dept_name</span>
+<span id="cb49-2"><a></a><span class="kw">FROM</span> Enrolled <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb49-3"><a></a>     <span class="kw">ON</span> Enrolled.student_id <span class="op">=</span> MajorsIn.student_id</span>
+<span id="cb49-4"><a></a><span class="kw">WHERE</span> course_name <span class="op">=</span> <span class="st">'DS 310'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>to limit the results to students in DS 310, we need a WHERE clause with the appropriate condition</li>
+<li>this new condition should <em>not</em> be in the ON clause because it’s not being used to match up rows from the two tables</li>
+</ul>
+</section>
+<section id="outer-joins-can-have-extra-tables" class="slide level2">
+<h2>Outer Joins Can Have Extra Tables</h2>
+<ul>
+<li>Example: find the names and majors of all students enrolled in DS 310 (including those with no major):</li>
+</ul>
+<div class="sourceCode" id="cb50"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb50-1"><a></a><span class="kw">SELECT</span> Student.name, dept_name</span>
+<span id="cb50-2"><a></a><span class="kw">FROM</span> Student, Enrolled <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb50-3"><a></a>     <span class="kw">ON</span> Enrolled.student_id <span class="op">=</span> MajorsIn.student_id</span>
+<span id="cb50-4"><a></a><span class="kw">WHERE</span> Student.<span class="kw">id</span> <span class="op">=</span> Enrolled.student_id</span>
+<span id="cb50-5"><a></a>  <span class="kw">AND</span> course_name <span class="op">=</span> <span class="st">'DS 310'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>we need Student in the FROM clause to get the student’s names</li>
+<li>the extra table requires an additional join condition, which goes in the WHERE clause</li>
+</ul>
+</section>
+<section id="extra-practice-writing-queries" class="slide level2">
+<h2>Extra Practice Writing Queries</h2>
+<div class="sourceCode" id="cb51"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb51-1"><a></a>Person(id, name, dob, pob)</span>
+<span id="cb51-2"><a></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
+<span id="cb51-3"><a></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
+<span id="cb51-4"><a></a>Oscar(movie_id, person_id, type, year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>1) &nbsp;Find all people in the database who acted in Avatar.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb52"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb52-1"><a></a><span class="kw">SELECT</span> P.name</span>
+<span id="cb52-2"><a></a><span class="kw">FROM</span> Person P, Actor A, Movie M</span>
+<span id="cb52-3"><a></a><span class="kw">WHERE</span> P.<span class="kw">id</span> <span class="op">=</span> A.actor_id</span>
+<span id="cb52-4"><a></a>  <span class="kw">AND</span> M.<span class="kw">id</span> <span class="op">=</span> A.movie_id</span>
+<span id="cb52-5"><a></a>  <span class="kw">AND</span> M.name <span class="op">=</span> <span class="st">'Avatar'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="extra-practice-writing-queries-cont." class="slide level2">
+<h2>Extra Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb53"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb53-1"><a></a>Person(id, name, dob, pob)</span>
+<span id="cb53-2"><a></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
+<span id="cb53-3"><a></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
+<span id="cb53-4"><a></a>Oscar(movie_id, person_id, type, year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>2) &nbsp;How many people in the database did <em>not</em> act in Avatar? Will this work?</p>
+<div class="sourceCode" id="cb54"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb54-1"><a></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb54-2"><a></a><span class="kw">FROM</span> Person P, Actor A, Movie M</span>
+<span id="cb54-3"><a></a><span class="kw">WHERE</span> P.<span class="kw">id</span> <span class="op">=</span> A.actor_id <span class="kw">AND</span> M.<span class="kw">id</span> <span class="op">=</span> A.movie_id</span>
+<span id="cb54-4"><a></a>  <span class="kw">AND</span> M.name <span class="op">!=</span> <span class="st">'Avatar'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="fragment">
+<ul>
+<li>If not, what will?</li>
+</ul>
+<div class="sourceCode" id="cb55"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb55-1"><a></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb55-2"><a></a><span class="kw">FROM</span> Person</span>
+<span id="cb55-3"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="kw">NOT</span> <span class="kw">IN</span> (<span class="kw">SELECT</span> actor_id</span>
+<span id="cb55-4"><a></a>                 <span class="kw">FROM</span> Actor A, Movie M</span>
+<span id="cb55-5"><a></a>                 <span class="kw">WHERE</span> A.movie_id <span class="op">=</span> M.<span class="kw">id</span></span>
+<span id="cb55-6"><a></a>                   <span class="kw">AND</span> M.name <span class="op">=</span> <span class="st">'Avatar'</span>);</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="extra-practice-writing-queries-cont.-1" class="slide level2">
+<h2>Extra Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb56"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb56-1"><a></a>Person(id, name, dob, pob)</span>
+<span id="cb56-2"><a></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
+<span id="cb56-3"><a></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
+<span id="cb56-4"><a></a>Oscar(movie_id, person_id, type, year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>4) &nbsp;Which people in the database have acted in a movie directed by James Cameron?</p>
+<div class="fragment">
+<div class="sourceCode" id="cb57"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb57-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> ActP.<span class="kw">id</span>, ActP.name</span>
+<span id="cb57-2"><a></a><span class="kw">FROM</span> Person ActP, Actor A,</span>
+<span id="cb57-3"><a></a>     Director D, Person DirP</span>
+<span id="cb57-4"><a></a><span class="kw">WHERE</span> ActP.<span class="kw">id</span> <span class="op">=</span> A.actor_id</span>
+<span id="cb57-5"><a></a>  <span class="kw">AND</span> A.movie_id <span class="op">=</span> D.movie_id</span>
+<span id="cb57-6"><a></a>  <span class="kw">AND</span> D.director_id <span class="op">=</span> DirP.<span class="kw">id</span></span>
+<span id="cb57-7"><a></a>  <span class="kw">AND</span> DirP.name <span class="op">=</span> <span class="st">'James Cameron'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="extra-practice-writing-queries-cont.-2" class="slide level2">
+<h2>Extra Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb58"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb58-1"><a></a>Person(id, name, dob, pob)</span>
+<span id="cb58-2"><a></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
+<span id="cb58-3"><a></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
+<span id="cb58-4"><a></a>Oscar(movie_id, person_id, type, year)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>6) &nbsp;For each person in the database born in Boston, find the number of movies in the database (possibly 0) in which the person has acted.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb59"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb59-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">COUNT</span>(movie_id)</span>
+<span id="cb59-2"><a></a><span class="kw">FROM</span> Person <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> Actor</span>
+<span id="cb59-3"><a></a>     <span class="kw">ON</span> <span class="kw">id</span> <span class="op">=</span> actor_id</span>
+<span id="cb59-4"><a></a><span class="kw">WHERE</span> pob <span class="kw">LIKE</span> <span class="st">'Boston, Mass%'</span></span>
+<span id="cb59-5"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="what-does-this-give" class="slide level2">
+<h2>What does this give?</h2>
+<div class="sourceCode" id="cb60"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb60-1"><a></a><span class="kw">SELECT</span> name</span>
+<span id="cb60-2"><a></a><span class="kw">FROM</span> Movie, Oscar;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/whatgives-tables.png" class="quarto-figure quarto-figure-center" style="width:80.0%"></p>
+</figure>
+</div>
+<div class="fragment" data-fragment-index="1">
+<p><span style="color:#3a5fcd;">The full Cartesian product!</span></p>
+</div>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/whatgives-1.png" class="fragment" style="width:68.0%" data-fragment-index="1"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/whatgives-2.png" class="fragment" style="width:68.0%" data-fragment-index="2"></p>
+</div>
+</section>
+<section id="how-can-we-get-just-the-movies-that-won-oscars" class="slide level2">
+<h2>How can we get just the movies that won Oscars?</h2>
+<div class="sourceCode" id="cb61"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb61-1"><a></a><span class="kw">SELECT</span> name</span>
+<span id="cb61-2"><a></a><span class="kw">FROM</span> Movie, Oscar</span>
+<span id="cb61-3"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> movie_id;    <span class="co">-- add an appropriate join condition!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/whatgives-tables.png" class="quarto-figure quarto-figure-center" style="width:75.0%"></p>
+</figure>
+</div>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/oscarjoin-1.png" class="fragment" style="width:68.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/oscarjoin-2.png" class="fragment" style="width:68.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/oscarjoin-3.png" class="fragment" style="width:68.0%"></p>
+</div>
+</section>
+<section id="counting-oscars-won-by-movies" class="slide level2">
+<h2>Counting Oscars Won by Movies</h2>
+<div class="sourceCode" id="cb62"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb62-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb62-2"><a></a><span class="kw">FROM</span> Movie, Oscar</span>
+<span id="cb62-3"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> movie_id</span>
+<span id="cb62-4"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/counting-tables.png" class="quarto-figure quarto-figure-center" style="width:72.0%"></p>
+</figure>
+</div>
+<div class="r-stack">
+<p><img data-src="images/L04-Patterns-Aggregates/counting-1.png" class="fragment" style="width:70.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/counting-2.png" class="fragment" style="width:70.0%"></p>
+<p><img data-src="images/L04-Patterns-Aggregates/counting-3.png" class="fragment" style="width:70.0%"></p>
+</div>
+</section>
+<section id="what-if-we-wanted-a-count-for-each-movie" class="slide level2">
+<h2>What if we wanted a count for each movie?</h2>
+<div class="sourceCode" id="cb63"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb63-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb63-2"><a></a><span class="kw">FROM</span> Movie, Oscar</span>
+<span id="cb63-3"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> movie_id</span>
+<span id="cb63-4"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/counting-tables.png" class="quarto-figure quarto-figure-center" style="width:72.0%"></p>
+</figure>
+</div>
+<div class="fragment">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/countper-result.png" class="quarto-figure quarto-figure-center" style="width:70.0%"></p>
+</figure>
+</div>
+</div>
+</section>
+<section id="which-of-these-would-work" class="slide level2">
+<h2>Which of these would work?</h2>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/whichwork-tables.png" class="quarto-figure quarto-figure-center" style="width:70.0%"></p>
+</figure>
+</div>
+<div class="columns">
+<div class="column" style="width:30%;">
+<ul>
+<li>Desired result:</li>
+</ul>
+<p><img data-src="images/L04-Patterns-Aggregates/whichwork-desired.png" style="width:95.0%"></p>
+</div><div class="column" style="width:70%;">
+<p>A.</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb64-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> Movie, Oscar</span>
+<span id="cb64-2"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> movie_id <span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>B.</p>
+<div class="sourceCode" id="cb65"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb65-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">COUNT</span>(<span class="kw">type</span>) <span class="kw">FROM</span> Movie, Oscar</span>
+<span id="cb65-2"><a></a><span class="kw">WHERE</span> <span class="kw">id</span> <span class="op">=</span> movie_id <span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>C.</p>
+<div class="sourceCode" id="cb66"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb66-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">COUNT</span>(<span class="kw">type</span>) <span class="kw">FROM</span> Movie <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> Oscar</span>
+<span id="cb66-2"><a></a><span class="kw">ON</span> <span class="kw">id</span> <span class="op">=</span> movie_id <span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>D.</p>
+<div class="sourceCode" id="cb67"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb67-1"><a></a><span class="kw">SELECT</span> name, <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="kw">FROM</span> Movie <span class="kw">LEFT</span> <span class="kw">OUTER</span> <span class="kw">JOIN</span> Oscar</span>
+<span id="cb67-2"><a></a><span class="kw">ON</span> <span class="kw">id</span> <span class="op">=</span> movie_id <span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div>
+</section>
+<section id="which-of-these-would-work-answer" class="slide level2">
+<h2>Which of these would work? (answer)</h2>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>A and B use a regular join, which <em>loses</em> the movies with no Oscars:</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L04-Patterns-Aggregates/whichwork-loj.png" class="quarto-figure quarto-figure-center" style="width:85.0%"></p>
+</figure>
+</div>
+</div>
+<div class="fragment" data-fragment-index="2">
+<div class="columns">
+<div class="column" style="width:55%;">
+<ul>
+<li>C is <span style="color:#3a5fcd;">correct</span>: COUNT(type) ignores the NULLs, giving 0 for movies with no Oscars.</li>
+</ul>
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li>D does <em>not</em> work: COUNT(*) counts the all-NULL rows, giving 1 instead of 0.</li>
+</ul>
+</div>
+</div><div class="column" style="width:45%;">
+<p><img data-src="images/L04-Patterns-Aggregates/whichwork-results.png" style="width:85.0%"></p>
+</div></div>
+</div>
+</section>
+<section id="extra-practice" class="slide level2">
+<h2>Extra Practice</h2>
+</section>
+<section id="practice-writing-queries" class="slide level2">
+<h2>Practice Writing Queries</h2>
+<div class="sourceCode" id="cb68"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb68-1"><a></a>Student(id, name)    Department(name, office)    Room(id, name, capacity)</span>
+<span id="cb68-2"><a></a>Course(name, start_time, end_time, room_id)      MajorsIn(student_id, dept_name)</span>
+<span id="cb68-3"><a></a>Enrolled(student_id, course_name, credit_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>1) &nbsp;Find the names of all courses taken by data sci majors.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb69"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb69-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> course_name</span>
+<span id="cb69-2"><a></a><span class="kw">FROM</span> Enrolled E, MajorsIn M</span>
+<span id="cb69-3"><a></a><span class="kw">WHERE</span> E.student_id <span class="op">=</span> M.student_id</span>
+<span id="cb69-4"><a></a>  <span class="kw">AND</span> dept_name <span class="op">=</span> <span class="st">'data sci'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>2) &nbsp;Find the number of students majoring in each department. (The result should be tuples of the form (dept name, # students).)</p>
+<div class="fragment">
+<div class="sourceCode" id="cb70"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb70-1"><a></a><span class="kw">SELECT</span> dept_name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb70-2"><a></a><span class="kw">FROM</span> MajorsIn</span>
+<span id="cb70-3"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> dept_name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="practice-writing-queries-cont." class="slide level2">
+<h2>Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb71"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb71-1"><a></a>Student(id, name)    Department(name, office)    Room(id, name, capacity)</span>
+<span id="cb71-2"><a></a>Course(name, start_time, end_time, room_id)      MajorsIn(student_id, dept_name)</span>
+<span id="cb71-3"><a></a>Enrolled(student_id, course_name, credit_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>3) &nbsp;Find the names and ids of all students who have a course in GCB 204.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb72"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb72-1"><a></a><span class="kw">SELECT</span></span>
+<span id="cb72-2"><a></a><span class="kw">FROM</span> Student S, Enrolled E, Course C, Room R</span>
+<span id="cb72-3"><a></a><span class="kw">WHERE</span> S.<span class="kw">id</span> <span class="op">=</span> E.student_id</span>
+<span id="cb72-4"><a></a>  <span class="kw">AND</span> E.course_name <span class="op">=</span> C.name</span>
+<span id="cb72-5"><a></a>  <span class="kw">AND</span> C.room_id <span class="op">=</span> R.<span class="kw">id</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<div class="sourceCode" id="cb73"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb73-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> S.<span class="kw">id</span>, S.name</span>
+<span id="cb73-2"><a></a><span class="kw">FROM</span> Student S, Enrolled E, Course C, Room R</span>
+<span id="cb73-3"><a></a><span class="kw">WHERE</span> S.<span class="kw">id</span> <span class="op">=</span> E.student_id</span>
+<span id="cb73-4"><a></a>  <span class="kw">AND</span> E.course_name <span class="op">=</span> C.name</span>
+<span id="cb73-5"><a></a>  <span class="kw">AND</span> C.room_id <span class="op">=</span> R.<span class="kw">id</span></span>
+<span id="cb73-6"><a></a>  <span class="kw">AND</span> R.name <span class="op">=</span> <span class="st">'GCB 204'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="practice-writing-queries-cont.-1" class="slide level2">
+<h2>Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb74"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb74-1"><a></a>Student(id, name)    Department(name, office)    Room(id, name, capacity)</span>
+<span id="cb74-2"><a></a>Course(name, start_time, end_time, room_id)      MajorsIn(student_id, dept_name)</span>
+<span id="cb74-3"><a></a>Enrolled(student_id, course_name, credit_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>4) &nbsp;Find the names of all rooms in which one or more DS courses meet.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb75"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb75-1"><a></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> Room.name</span>
+<span id="cb75-2"><a></a><span class="kw">FROM</span> Course, Room</span>
+<span id="cb75-3"><a></a><span class="kw">WHERE</span> room_id <span class="op">=</span> <span class="kw">id</span></span>
+<span id="cb75-4"><a></a>  <span class="kw">AND</span> Course.name <span class="kw">LIKE</span> <span class="st">'DS%'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="practice-writing-queries-cont.-2" class="slide level2">
+<h2>Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb76"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb76-1"><a></a>Student(id, name)    Department(name, office)    Room(id, name, capacity)</span>
+<span id="cb76-2"><a></a>Course(name, start_time, end_time, room_id)      MajorsIn(student_id, dept_name)</span>
+<span id="cb76-3"><a></a>Enrolled(student_id, course_name, credit_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>5a) &nbsp;Find the number of DS majors enrolled in DS 310.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb77"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb77-1"><a></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb77-2"><a></a><span class="kw">FROM</span> Enrolled E, MajorsIn M</span>
+<span id="cb77-3"><a></a><span class="kw">WHERE</span> E.student_id <span class="op">=</span> M.student_id</span>
+<span id="cb77-4"><a></a>  <span class="kw">AND</span> course_name <span class="op">=</span> <span class="st">'DS 310'</span></span>
+<span id="cb77-5"><a></a>  <span class="kw">AND</span> dept_name <span class="op">=</span> <span class="st">'data sci'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>5b) &nbsp;Find the number of DS majors enrolled in a course.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb78"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb78-1"><a></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> E.student_id)</span>
+<span id="cb78-2"><a></a><span class="kw">FROM</span> Enrolled E, MajorsIn M</span>
+<span id="cb78-3"><a></a><span class="kw">WHERE</span> E.student_id <span class="op">=</span> M.student_id</span>
+<span id="cb78-4"><a></a>  <span class="kw">AND</span> dept_name <span class="op">=</span> <span class="st">'data sci'</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="practice-writing-queries-cont.-3" class="slide level2">
+<h2>Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb79"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb79-1"><a></a>Student(id, name)    Department(name, office)    Room(id, name, capacity)</span>
+<span id="cb79-2"><a></a>Course(name, start_time, end_time, room_id)      MajorsIn(student_id, dept_name)</span>
+<span id="cb79-3"><a></a>Enrolled(student_id, course_name, credit_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>6) &nbsp;Find the number of majors that each student has declared.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb80"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb80-1"><a></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, <span class="fu">COUNT</span>(dept_name)</span>
+<span id="cb80-2"><a></a><span class="kw">FROM</span> Student <span class="kw">LEFT</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb80-3"><a></a>     <span class="kw">ON</span> Student.<span class="kw">id</span> <span class="op">=</span> MajorsIn.student_id</span>
+<span id="cb80-4"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="kw">id</span>, name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="fragment">
+<ul>
+<li>The following will <em>not</em> work, because it counts the rows, rather than the number of non-NULL values:</li>
+</ul>
+<div class="sourceCode" id="cb81"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb81-1"><a></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb81-2"><a></a><span class="kw">FROM</span> Student <span class="kw">LEFT</span> <span class="kw">JOIN</span> MajorsIn</span>
+<span id="cb81-3"><a></a>     <span class="kw">ON</span> Student.<span class="kw">id</span> <span class="op">=</span> MajorsIn.student_id</span>
+<span id="cb81-4"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="kw">id</span>, name;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="practice-writing-queries-cont.-4" class="slide level2">
+<h2>Practice Writing Queries (cont.)</h2>
+<div class="sourceCode" id="cb82"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb82-1"><a></a>Student(id, name)    Department(name, office)    Room(id, name, capacity)</span>
+<span id="cb82-2"><a></a>Course(name, start_time, end_time, room_id)      MajorsIn(student_id, dept_name)</span>
+<span id="cb82-3"><a></a>Enrolled(student_id, course_name, credit_status)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>7) &nbsp;For each department with more than one majoring student, output the department’s name and the number of majoring students.</p>
+<div class="fragment">
+<div class="sourceCode" id="cb83"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb83-1"><a></a><span class="kw">SELECT</span> dept_name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
+<span id="cb83-2"><a></a><span class="kw">FROM</span> MajorsIn</span>
+<span id="cb83-3"><a></a><span class="kw">GROUP</span> <span class="kw">BY</span> dept_name</span>
+<span id="cb83-4"><a></a><span class="kw">HAVING</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="op">&gt;</span> <span class="dv">1</span>;</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+<p><a href="index.html">DS310 — Data Mechanics</a></p>
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="site_libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"8\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 960,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const onCopySuccess = function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      }
+      const getTextToCopy = function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+        text: getTextToCopy
+      });
+      clipboard.on('success', onCopySuccess);
+      if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+        const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+          text: getTextToCopy,
+          container: window.document.getElementById('quarto-embedded-source-code-modal')
+        });
+        clipboardModal.on('success', onCopySuccess);
+      }
+        var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+        var mailtoRegex = new RegExp(/^mailto:/);
+          var filterRegex = new RegExp('/' + window.location.host + '/');
+        var isInternal = (href) => {
+            return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+        }
+        // Inspect non-navigation links and adorn them if external
+     	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+        for (var i=0; i<links.length; i++) {
+          const link = links[i];
+          if (!isInternal(link.href)) {
+            // undo the damage that might have been done by quarto-nav.js in the case of
+            // links that we want to consider external
+            if (link.dataset.originalHref !== undefined) {
+              link.href = link.dataset.originalHref;
+            }
+          }
+        }
+      function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+        const config = {
+          allowHTML: true,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start',
+        };
+        if (contentFn) {
+          config.content = contentFn;
+        }
+        if (onTriggerFn) {
+          config.onTrigger = onTriggerFn;
+        }
+        if (onUntriggerFn) {
+          config.onUntrigger = onUntriggerFn;
+        }
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note) {
+            return note.innerHTML;
+          } else {
+            return "";
+          }
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
