@@ -34,6 +34,72 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; font-weight: bold; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
   <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-6fc56f21b4422d7997316abafc9e26c3.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -143,21 +209,1164 @@
 <div class="quarto-title-author-name">
 Data Science 310 — Boston University
 </div>
-        <p class="quarto-title-affiliation">
-            Based on notes by David G. Sullivan
-          </p>
-    </div>
+</div>
 </div>
 
 </section>
-<section id="query-processing-and-optimization" class="slide level2">
-<h2>Query Processing and Optimization</h2>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<p>Recall that a DBMS consists of the</p>
 <ul>
-<li>Content coming soon.</li>
+<li>logical layer (the relational model and relational algebra) and</li>
+<li>storage engine (the physical layer, with files, indexes, and hashing)</li>
 </ul>
-
+<p>Query processing and optimization is the part of the DBMS that sits between these two layers. It is responsible for taking a user query (in SQL) and executing it efficiently on the contents of the database.</p>
+</div><div class="column" style="width:40%;">
+<p><img data-src="images/L09-QueryProcessing-Optimization/DMBS.png"></p>
+</div></div>
+</section>
+<section id="lecture-outline" class="slide level2">
+<h2>Lecture Outline</h2>
+<ul>
+<li><strong>Part 1: Query Processing</strong> (how a single plan is executed)
+<ul>
+<li>basic steps in query processing</li>
+<li>measures of query cost</li>
+<li>some algorithms for selection and joins</li>
+<li>evaluating whole expressions: materialization vs.&nbsp;pipelining</li>
+</ul></li>
+<li><strong>Part 2: Query Optimization</strong> (how the best plan is chosen)
+<ul>
+<li>equivalent expressions and equivalence rules</li>
+<li>estimating statistics and result sizes</li>
+<li>choosing a join order: cost-based and heuristic optimization</li>
+</ul></li>
+<li>Running examples: the <em>movie database</em> from L03/L04 (<code>data/movie.sqlite</code>)
+<ul>
+<li><em>Movie(<u>id</u>, name, year, rating, runtime, genre, earnings_rank)</em></li>
+<li><em>Person(<u>id</u>, name, dob, pob)</em></li>
+<li><em>Actor(<u>actor_id, movie_id</u>)</em>   <em>Director(<u>director_id, movie_id</u>)</em>   <em>Oscar(…)</em></li>
+</ul></li>
+</ul>
+</section>
+<section>
+<section id="part-1-query-processing" class="title-slide slide level1 center">
+<h1>Part 1: Query Processing</h1>
 
 </section>
+<section id="basic-steps-in-query-processing" class="slide level2">
+<h2>Basic Steps in Query Processing</h2>
+<p><strong>Query processing</strong> refers to the range of activities involved in extracting data from a database.</p>
+<ul>
+<li>1. <em>Parsing and translation</em>
+<ul>
+<li>check syntax, verify relations</li>
+<li>translate SQL into an internal form: a relational-algebra expression</li>
+</ul></li>
+<li>2. <em>Optimization</em>
+<ul>
+<li>a relational-algebra expression can have many equivalent forms</li>
+<li>each operation can be evaluated with different algorithms</li>
+<li>expression + algorithm annotations = <em>evaluation plan</em> (query plan)</li>
+<li>the optimizer picks the plan with the lowest estimated cost</li>
+</ul></li>
+<li>3. <em>Evaluation</em>
+<ul>
+<li>the query-execution engine runs the chosen plan and returns the answer</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level2">
+
+
+<img data-src="images/L09-QueryProcessing-Optimization/QueryProcessingSteps.png" class="r-stretch quarto-figure-center"><p class="caption">Illustration of query processing</p></section>
+<section id="example-query" class="slide level2">
+<h2>Example Query</h2>
+<p>Consider the following query on our movie database:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a aria-label="1"></a><span class="kw">SELECT</span> runtime</span>
+<span id="cb1-2"><a aria-label="2"></a><span class="kw">FROM</span> Movie</span>
+<span id="cb1-3"><a aria-label="3"></a><span class="kw">WHERE</span>  runtime <span class="op">&lt;</span> <span class="dv">100</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>This query can be translated into the following relational-algebra expressions:</p>
+<ul>
+<li><span class="math inline">\(\sigma_{runtime &lt; 100}(\pi_{runtime}(\text{Movie}))\)</span></li>
+<li><span class="math inline">\(\pi_{runtime}(\sigma_{runtime &lt; 100}(\text{Movie}))\)</span></li>
+</ul>
+<p>The first expression first projects the <code>runtime</code> attribute and then filters the results, while the second expression first filters the <code>Movie</code> relation and then projects the <code>runtime</code> attribute.</p>
+</section>
+<section class="slide level2">
+
+<p>To specify how to evaluate a query, the DBMS needs to provide instructions on how to evaluate each operation in addition to the relational algebra query.</p>
+<p>A relational algebra operation annotated with instructions is called an <strong>evaluation primitive</strong>.</p>
+<p>A sequence of primitive operations that can be used to evaluate a query is a <strong>query plan</strong>.</p>
+</section>
+<section id="query-cost" class="slide level2">
+<h2>Query Cost</h2>
+<p>Each query plan has an associated cost.</p>
+<p>Rather than users specifying how to evaluate a query, the DBMS chooses the plan with the lowest cost.</p>
+<p>Determining the <em>best</em> plan is <strong>query optimization</strong>.</p>
+
+<img data-src="images/L09-QueryProcessing-Optimization/QueryProcessingSteps.png" class="quarto-figure quarto-figure-center r-stretch"></section>
+<section id="recall-l06-how-data-is-stored" class="slide level2">
+<h2>Recall (L06): How Data Is Stored</h2>
+<div class="columns">
+<div class="column" style="width:45%;">
+<ul>
+<li>A relation is stored as a <em>file of blocks</em> on disk.
+<ul>
+<li>a block (typically 4K–8K) is the smallest unit the disk can read or write</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Disk I/O is <em>the</em> expensive operation.
+<ul>
+<li>in the time it takes to read one block, the CPU can execute millions of instructions</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Notation we’ll use all lecture, for a relation <em>r</em>:
+<ul>
+<li>n<sub>r</sub> = number of records</li>
+<li>b<sub>r</sub> = number of blocks</li>
+<li>f<sub>r</sub> = records per block (<em>blocking factor</em>)</li>
+</ul></li>
+</ul>
+</div>
+</div><div class="column" style="width:55%;">
+<p><img data-src="images/L09-QueryProcessing-Optimization/storage-recap.svg" style="width:100.0%"></p>
+</div></div>
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li><span style="color:#3a5fcd;">Consequence: we measure the cost of an algorithm by <em>how many blocks it touches</em> — keep this picture in mind for every slide that follows.</span></li>
+</ul>
+</div>
+</section>
+<section id="recall-l07-indexes-and-btrees" class="slide level2">
+<h2>Recall (L07): Indexes and B+Trees</h2>
+<div class="columns">
+<div class="column" style="width:48%;">
+<ul>
+<li>A relation may also have <em>index structures</em>:
+<ul>
+<li>one <em>clustering (primary)</em> index — <strong>stores the full records</strong> (usually organized by the primary key)</li>
+<li>any number of <em>secondary</em> indices — store (key, pointer) pairs, so reaching a record takes a <em>second</em> lookup</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>B+trees (order <em>m</em>) are the standard index:
+<ul>
+<li>internal nodes hold m to 2m keys → m+1 to 2m+1 children; each node is one page/block</li>
+<li>perfect balance: search = follow <em>one</em> root-to-leaf path</li>
+<li>tree height ≤ log<sub>m</sub> n, and # of nodes accessed ≤ height + 1</li>
+</ul></li>
+</ul>
+</div>
+</div><div class="column" style="width:52%;">
+<p><img data-src="images/L07-Indexing/bplustree.png" style="width:100.0%"></p>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>With order m = 100, every internal node has ≥ 101 children — two levels below the root already reach over 10,000 leaves.
+<ul>
+<li>hundreds of thousands of records, any of them ≤ 3 block reads away</li>
+</ul></li>
+</ul>
+</div>
+</div></div>
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li><span style="color:#3a5fcd;">An index turns “scan everything” into “follow one short path.”</span></li>
+</ul>
+</div>
+</section>
+<section id="measures-of-query-cost" class="slide level2">
+<h2>Measures of Query Cost</h2>
+<ul>
+<li>Many factors: disk access, CPU, (network in distributed DBs)
+<ul>
+<li>disk access is typically dominant → we count disk I/O</li>
+</ul></li>
+<li>Cost of an operation that transfers <em>b</em> blocks with <em>S</em> seeks:
+<ul>
+<li>cost = b × t<sub>T</sub> + S × t<sub>S</sub></li>
+<li>t<sub>T</sub> = time per block transfer; t<sub>S</sub> = time per seek</li>
+</ul></li>
+<li>Simplifications we’ll make:
+<ul>
+<li>often just count <em>block transfers</em> (and sometimes seeks)</li>
+<li>worst-case estimates: assume only the memory the algorithm needs</li>
+</ul></li>
+</ul>
+</section>
+<section id="measures-of-query-cost-example" class="slide level2">
+<h2>Measures of Query Cost: Example</h2>
+<ul>
+<li>Typical magnetic-disk values: t<sub>S</sub> = 4 ms per seek, t<sub>T</sub> = 0.1 ms per block.</li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Read 100 <em>consecutive</em> blocks (one seek, then sequential transfers):
+<ul>
+<li>cost = 100 × 0.1 + 1 × 4 = <span style="color:#3a5fcd;">14 ms</span></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Read 100 <em>scattered</em> blocks (every read needs its own seek):
+<ul>
+<li>cost = 100 × 0.1 + 100 × 4 = <span style="color:#c00;">410 ms — ~30× slower!</span></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li>Two lessons for everything that follows:
+<ul>
+<li>fewer block reads is better…</li>
+<li>…but <em>sequential</em> reads (scans) are much cheaper per block than <em>random</em> reads (index probes) — so counting transfers alone slightly flatters indexes</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="selection-the-two-basic-strategies" class="slide level2">
+<h2>Selection: the Two Basic Strategies</h2>
+<p>Every selection algorithm is built from two ingredients:</p>
+<ul>
+<li><strong>Scan the file</strong> (<em>linear search</em>)
+<ul>
+<li>read every block; works for <em>any</em> condition, with <em>no</em> index</li>
+</ul></li>
+<li><strong>Walk an index</strong>
+<ul>
+<li>follow one root-to-leaf path; works only when a suitable index exists</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>The full menu combines them — which combination applies depends on the <em>index</em> (clustering or secondary?) and the <em>condition</em> (equality on a key? on a non-key? a range?):
+<ul>
+<li>clustering index, equality on a non-key → walk, then read the <em>run</em> of consecutive matching blocks</li>
+<li>secondary index, equality → walk, then chase one pointer <em>per match</em> (can be expensive!)</li>
+<li>comparisons like σ<sub>year≤1970</sub> → walk to the boundary, then scan from there</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li><span style="color:#3a5fcd;">We’ll work through the two base cases carefully — everything else is a combination of them.</span></li>
+</ul>
+</div>
+</section>
+<section id="selection-by-scanning-the-file" class="slide level2">
+<h2>Selection by Scanning the File</h2>
+<ul>
+<li><p>Running example: a toy instance of <em>Movie</em>, with n<sub>r</sub> = 12 records, f<sub>r</sub> = 3 records per block → b<sub>r</sub> = 4 blocks.</p></li>
+<li><p>Linear search is the plan of last resort — it always works: no index needed, any condition, any file order.</p></li>
+</ul>
+<div class="r-stack">
+<p><img data-src="images/L09-QueryProcessing-Optimization/a1-scan-1.svg" style="width:95.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/a1-scan-2.svg" class="fragment" style="width:95.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/a1-scan-3.svg" class="fragment" style="width:95.0%"></p>
+</div>
+</section>
+<section id="selection-by-scanning-cost" class="slide level2">
+<h2>Selection by Scanning: Cost</h2>
+<ul>
+<li>Worst case: read the whole file
+<ul>
+<li>cost = b<sub>r</sub> block transfers + 1 seek <em>(the blocks are consecutive — one seek suffices)</em></li>
+</ul></li>
+<li>Equality on a <em>key</em> attribute (like <code>id</code>): stop at the first match
+<ul>
+<li>average cost ≈ b<sub>r</sub> / 2</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Equality on a <em>non-key</em> attribute (e.g., <code>year</code>, <code>genre</code>): matches can be anywhere
+<ul>
+<li>must read all b<sub>r</sub> blocks, even if we find a match early</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>At toy scale this is fine. At real scale it hurts:</li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>b<sub>r</sub></th>
+<th>scan average (key)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>toy <em>Movie</em></td>
+<td>4</td>
+<td>2 reads</td>
+</tr>
+<tr class="even">
+<td><em>Movie</em> in <code>movie.sqlite</code> (755 records)</td>
+<td>32</td>
+<td>16 reads</td>
+</tr>
+<tr class="odd">
+<td><em>Person</em> at streaming-service scale (100,000)</td>
+<td>2,000</td>
+<td>1,000 reads</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="selection-via-the-clustering-index" class="slide level2">
+<h2>Selection via the Clustering Index</h2>
+<ul>
+<li><p>Now use the clustering B+tree on <em>id</em> — and remember from L07 what <em>clustering</em> means: <strong>the leaves store the full records</strong>. The bottom level of the tree <em>is</em> the file.</p></li>
+<li><p>Search walks <em>one path</em>: root → leaf — and the record is in the leaf when we arrive.</p></li>
+</ul>
+<div class="r-stack">
+<p><img data-src="images/L09-QueryProcessing-Optimization/a2-index-1.svg" style="width:98.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/a2-index-2.svg" class="fragment" style="width:98.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/a2-index-3.svg" class="fragment" style="width:98.0%"></p>
+</div>
+</section>
+<section id="index-lookup-cost-and-when-it-wins" class="slide level2">
+<h2>Index Lookup: Cost — and When It Wins</h2>
+<ul>
+<li>Cost = # of nodes on the root-to-leaf path = <strong>height + 1</strong> block transfers (L07)
+<ul>
+<li>each one is a <em>random</em> read: (height + 1) × (t<sub>T</sub> + t<sub>S</sub>)</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>On our toy file the index <em>didn’t help</em>: 2 reads vs.&nbsp;an average of 2 for the scan!
+<ul>
+<li>index structures have overhead; on 4 blocks there’s nothing to save</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>But the index cost grows with tree <em>height</em> (≤ log<sub>m</sub> n<sub>r</sub>), while the scan grows with <em>file size</em>:</li>
+</ul>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>b<sub>r</sub></th>
+<th>scan average (key)</th>
+<th>index (height + 1)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>toy <em>Movie</em></td>
+<td>4</td>
+<td>2</td>
+<td><span style="color:#c00;">2</span></td>
+</tr>
+<tr class="even">
+<td><em>Movie</em> in <code>movie.sqlite</code> (755 records)</td>
+<td>32</td>
+<td>16</td>
+<td><span style="color:#1a8a1a;">2</span></td>
+</tr>
+<tr class="odd">
+<td><em>Person</em> at streaming scale (100,000)</td>
+<td>2,000</td>
+<td>1,000</td>
+<td><span style="color:#1a8a1a;">3</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li><span style="color:#3a5fcd;">This tradeoff — <em>which plan wins depends on the data</em> — is exactly why the optimizer needs statistics (Part 2).</span></li>
+</ul>
+</div>
+</section>
+<section id="which-plan-and-what-cost" class="slide level2">
+<h2>Which plan — and what cost?</h2>
+<p>Imagine <em>Movie</em> at streaming-service scale: b<sub>r</sub> = 1,000 blocks, with a clustering B+tree on <em>id</em> of height 2. For the query σ<sub>name=‘Casablanca’</sub>(Movie) (no index on <em>name</em>), the best available strategy costs:</p>
+<p>A. 3 block transfers</p>
+<p>B. about 500 block transfers</p>
+<p>C. 1,000 block transfers <span class="fragment" style="color:#00b; font-weight:bold;">← correct — linear search; <em>name</em> has no index, so we must scan every block</span></p>
+<p>D. 2,000 block transfers</p>
+<div class="fragment">
+<ul>
+<li>The B+tree on <em>id</em> is useless here — an index only helps for conditions on <em>its</em> search key.</li>
+<li>And since <em>name</em> is not a key, we can’t even stop at the first match.</li>
+</ul>
+</div>
+</section>
+<section id="developing-a-plan-for-a-join" class="slide level2">
+<h2>Developing a Plan for a Join</h2>
+<ul>
+<li>Let’s follow the optimizer’s problem for one concrete query — who acted in what:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a aria-label="1"></a><span class="kw">SELECT</span> p.name, a.movie_id</span>
+<span id="cb2-2"><a aria-label="2"></a><span class="kw">FROM</span> Person p <span class="kw">JOIN</span> Actor a <span class="kw">ON</span> p.<span class="kw">id</span> <span class="op">=</span> a.actor_id</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><img data-src="images/L09-QueryProcessing-Optimization/plan-tree-1.svg" style="width:95.0%"></p>
+</div><div class="column" style="width:45%;">
+<ul>
+<li>Translated to relational algebra:
+<ul>
+<li><span class="math inline">\(\pi_{name,\, movie\_id}(\text{Person} \bowtie \text{Actor})\)</span></li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>To turn this <em>expression</em> into a <em>plan</em>, the DBMS must decide, for the ⋈ node:
+<ul>
+<li>which <em>algorithm</em> evaluates it</li>
+<li>which input is <em>outer</em>, which is <em>inner</em></li>
+<li>whether to use an <em>index</em></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>We’ll price out the candidates on two scales:
+<ul>
+<li>a toy instance we can trace by hand</li>
+<li>a scaled-up instance, the size a streaming service might manage</li>
+</ul></li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="the-data-at-two-scales" class="slide level2">
+<h2>The Data, at Two Scales</h2>
+<ul>
+<li>Toy instance (used in the traces on the next slides; short ids for readability):</li>
+</ul>
+<table class="caption-top">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>records n<sub>r</sub></th>
+<th>blocks b<sub>r</sub></th>
+<th>contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><em>Person</em></td>
+<td>4</td>
+<td>2</td>
+<td>(101, Hanks), (102, Streep), (103, Pacino), (104, Bullock)</td>
+</tr>
+<tr class="even">
+<td><em>Actor</em></td>
+<td>6</td>
+<td>3</td>
+<td>(101, 502), (101, 509), (102, 503), (103, 502), (103, 507), (104, 509)</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment">
+<ul>
+<li>Scaled-up instance (a streaming service’s catalog; f<sub>r</sub> = 50 <em>Person</em> records or 200 <em>Actor</em> records per block):</li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>records n<sub>r</sub></th>
+<th>blocks b<sub>r</sub></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><em>Person</em></td>
+<td>100,000</td>
+<td>2,000</td>
+</tr>
+<tr class="even">
+<td><em>Actor</em></td>
+<td>500,000</td>
+<td>2,500</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Our <code>movie.sqlite</code> (2,698 people, 3,790 actor rows) sits in between — and at the end of the lecture we’ll watch SQLite make these same choices on it.</li>
+</ul>
+</div>
+</section>
+<section id="candidate-1-nested-loop-join" class="slide level2">
+<h2>Candidate 1: Nested-Loop Join</h2>
+<ul>
+<li>The brute-force algorithm — like the linear scan, it always works (any join condition, no index needed):</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb3-1"><a aria-label="1"></a>for each tuple t_a in Actor:           // Actor = outer relation</span>
+<span id="cb3-2"><a aria-label="2"></a>    for each tuple t_p in Person:      // Person = inner relation</span>
+<span id="cb3-3"><a aria-label="3"></a>        if t_p.id == t_a.actor_id:</span>
+<span id="cb3-4"><a aria-label="4"></a>            add (t_p, t_a) to the result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>In block terms: read each outer block once; for <em>every outer tuple</em>, re-scan all of the inner relation.
+<ul>
+<li>(the basic algorithm doesn’t exploit the fact that <em>id</em> is a key — it just keeps scanning)</li>
+</ul></li>
+</ul>
+</section>
+<section id="nested-loop-join-trace" class="slide level2">
+<h2>Nested-Loop Join: Trace</h2>
+<div class="r-stack">
+<p><img data-src="images/L09-QueryProcessing-Optimization/nlj-1.svg" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/nlj-2.svg" class="fragment" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/nlj-3.svg" class="fragment" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/nlj-4.svg" class="fragment" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/nlj-5.svg" class="fragment" style="width:97.0%"></p>
+</div>
+</section>
+<section id="nested-loop-join-cost" class="slide level2">
+<h2>Nested-Loop Join: Cost</h2>
+<ul>
+<li>Worst case (only one block of memory per relation):
+<ul>
+<li>n<sub>r</sub> × b<sub>s</sub> + b<sub>r</sub> block transfers &nbsp; (r = outer, s = inner)</li>
+</ul></li>
+<li>At streaming scale:
+<ul>
+<li><em>Actor</em> outer: 500,000 × 2,000 + 2,500 = <span style="color:#c00;">1,000,002,500</span> transfers</li>
+<li><em>Person</em> outer: 100,000 × 2,500 + 2,000 = <span style="color:#c00;">250,002,000</span> transfers</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Best case: the inner relation fits entirely in memory
+<ul>
+<li>read each relation once: b<sub>r</sub> + b<sub>s</sub> = 4,500 transfers</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li><em>Block</em> nested-loop join: pair up <em>blocks</em> instead of tuples
+<ul>
+<li>worst case b<sub>r</sub> × b<sub>s</sub> + b<sub>r</sub> = 2,000 × 2,500 + 2,000 = <span style="color:#3a5fcd;">5,002,000</span> transfers</li>
+<li>use the <em>smaller</em> relation as the outer relation</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="3">
+<ul>
+<li><span style="color:#3a5fcd;">Same answer, same result — a 200× cost difference just from how we loop.</span></li>
+</ul>
+</div>
+</section>
+<section id="candidate-2-indexed-nested-loop-join" class="slide level2">
+<h2>Candidate 2: Indexed Nested-Loop Join</h2>
+<ul>
+<li>Look back at the trace: for each Actor row we <em>re-scanned all of Person</em> — just to find the one record with a matching key.</li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>L07 gave us a better tool for exactly this — and the movie database already <em>has</em> it: the clustering B+tree on <em>Person(id)</em>.</li>
+<li><strong>Idea</strong>: keep the outer loop, but replace each inner <em>scan</em> with an index <em>walk</em>:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb4-1"><a aria-label="1"></a>for each tuple t_a in Actor:              // outer, scanned as before</span>
+<span id="cb4-2"><a aria-label="2"></a>    walk the B+tree on Person(id)         // inner: root -&gt; leaf</span>
+<span id="cb4-3"><a aria-label="3"></a>    to find the record with id == t_a.actor_id</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Requirements:
+<ul>
+<li>an index on the <em>inner</em> relation’s join attribute</li>
+<li>a join condition that is an equality — like all our natural joins from L02</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="indexed-nested-loop-join-trace" class="slide level2">
+<h2>Indexed Nested-Loop Join: Trace</h2>
+<div class="r-stack">
+<p><img data-src="images/L09-QueryProcessing-Optimization/inlj-1.svg" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/inlj-2.svg" class="fragment" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/inlj-3.svg" class="fragment" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/inlj-4.svg" class="fragment" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/inlj-5.svg" class="fragment" style="width:97.0%"></p>
+</div>
+</section>
+<section id="indexed-nested-loop-join-cost" class="slide level2">
+<h2>Indexed Nested-Loop Join: Cost</h2>
+<ul>
+<li>Cost = b<sub>r</sub> + n<sub>r</sub> × c
+<ul>
+<li>c = cost of one index lookup = height + 1 (the same formula as before)</li>
+<li>c is an <em>estimate</em> — if a key’s matches spanned several leaves, a probe would cost more</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>On the toy instance: 3 + 6 × 2 = 15 transfers — a dead heat with the plain scan (15)!
+<ul>
+<li>just like selection: on tiny data, index overhead doesn’t pay</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>At streaming scale (B+tree on <em>Person(id)</em> has height 2, so c = 3):
+<ul>
+<li>2,500 + 500,000 × 3 = <span style="color:#1a8a1a;">1,502,500</span> transfers</li>
+</ul></li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th>plan</th>
+<th>block transfers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>NLJ, <em>Actor</em> outer</td>
+<td>1,000,002,500</td>
+</tr>
+<tr class="even">
+<td>NLJ, <em>Person</em> outer</td>
+<td>250,002,000</td>
+</tr>
+<tr class="odd">
+<td>block NLJ, <em>Person</em> outer</td>
+<td>5,002,000</td>
+</tr>
+<tr class="even">
+<td><strong>indexed NLJ, clustering index on Person(id)</strong></td>
+<td><strong>1,502,500</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="the-winning-plan" class="slide level2">
+<h2>The Winning Plan</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<p><img data-src="images/L09-QueryProcessing-Optimization/plan-tree-2.svg" style="width:100.0%"></p>
+</div><div class="column" style="width:40%;">
+<ul>
+<li>The optimizer compares the <em>estimated</em> costs and annotates the tree with the cheapest choices.</li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Notice how much it needed to know:
+<ul>
+<li>sizes n<sub>r</sub>, b<sub>r</sub> of both relations</li>
+<li>which indexes exist, and their heights</li>
+<li>which relation to put on the outside</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li><span style="color:#3a5fcd;">Gathering those statistics and searching the space of alternatives <em>is</em> query optimization — Part 2.</span></li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="what-if-actor-had-an-index-too" class="slide level2">
+<h2>What if Actor had an index too?</h2>
+<p>Suppose there were <em>also</em> a B+tree on <em>Actor(actor_id)</em> with lookup cost c = 3. Scanning <em>Person</em> as the outer (100,000 tuples) and probing <em>Actor</em> would cost b<sub>r</sub> + n<sub>r</sub> × c =</p>
+<p>A. 2,500 + 500,000 × 3 = 1,502,500 transfers</p>
+<p>B. 2,000 + 100,000 × 3 = 302,000 transfers <span class="fragment" style="color:#00b; font-weight:bold;">← correct — <em>Person</em> is now the outer: b<sub>r</sub> = 2,000, n<sub>r</sub> = 100,000</span></p>
+<p>C. 2,000 + 500,000 × 3 = 1,502,000 transfers</p>
+<p>D. 2,500 + 100,000 × 3 = 302,500 transfers</p>
+<div class="fragment">
+<ul>
+<li>Five times better — fewer outer tuples means fewer index probes.</li>
+<li>The best plan depends on <em>which indexes exist</em> and <em>which relation drives the loop</em>. In <code>movie.sqlite</code> only the <em>Person</em> index exists — which is why (as we’ll see) SQLite scans <em>Actor</em>.</li>
+</ul>
+</div>
+</section>
+<section id="join-operation-merge-join-and-hash-join" class="slide level2">
+<h2>Join Operation: Merge Join and Hash Join</h2>
+<ul>
+<li><em>Merge join</em> (sort-merge join)
+<ul>
+<li>sort both inputs on the join attributes, then merge</li>
+<li>cost b<sub>r</sub> + b<sub>s</sub> block transfers (plus the cost of sorting)</li>
+<li>only for equality-based joins</li>
+</ul></li>
+<li><em>Hash join</em>
+<ul>
+<li>partition both relations with a hash function on the join attributes</li>
+<li>join matching partitions: build in-memory hash table, probe with the other relation</li>
+<li>cost ≈ 3(b<sub>r</sub> + b<sub>s</sub>) if no recursive partitioning</li>
+<li>only for equality-based joins</li>
+</ul></li>
+<li>Which join algorithm wins depends on sizes, memory, indexes, sortedness</li>
+</ul>
+</section>
+<section id="other-operations" class="slide level2">
+<h2>Other Operations</h2>
+<ul>
+<li><em>Duplicate elimination</em>: via sorting or hashing</li>
+<li><em>Projection</em>: drop attributes, then eliminate duplicates</li>
+<li><em>Aggregation / grouping</em>: like duplicate elimination (sort or hash on grouping attributes; combine partial aggregates)</li>
+<li><em>Set operations</em> (∪, ∩, −): variants of merge join or hash join</li>
+<li><em>Outer joins</em>: modified join algorithms that pad non-matching tuples with nulls</li>
+</ul>
+</section>
+<section id="evaluating-expressions" class="slide level2">
+<h2>Evaluating Expressions</h2>
+<ul>
+<li><p>So far we’ve priced <em>single operations</em>. But a query is a <em>tree</em> of operations — how do we run the whole tree?</p></li>
+<li><p>Running example, one selection richer than before:</p>
+<ul>
+<li><span class="math inline">\(\pi_{name,\, actor\_id}\big(\sigma_{year = 2008}(\text{Movie}) \bowtie \text{Actor}\big)\)</span></li>
+</ul></li>
+<li><p>Two strategies:</p>
+<ul>
+<li><strong>materialization</strong> — evaluate one operation at a time, saving intermediate results</li>
+<li><strong>pipelining</strong> — evaluate several operations simultaneously, streaming tuples between them</li>
+</ul></li>
+</ul>
+</section>
+<section id="materialization" class="slide level2">
+<h2>Materialization</h2>
+<div class="columns">
+<div class="column" style="width:62%;">
+<p><img data-src="images/L09-QueryProcessing-Optimization/eval-materialization.svg" style="width:100.0%"></p>
+</div><div class="column" style="width:38%;">
+<ul>
+<li>Evaluate the tree <em>bottom-up</em>, one operation at a time:
+<ul>
+<li>run σ to completion → write temp T1</li>
+<li>join T1 with <em>Actor</em> → write temp T2</li>
+<li>run π over T2 → result</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>+ always applicable — any operator, any memory budget</li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>– cost of the plan is <em>more than</em> the sum of the operator costs:
+<ul>
+<li>each temp is written <em>and re-read</em>: extra 2 × b<sub>T</sub> transfers per temp (roughly)</li>
+<li>for a big intermediate result, the temp I/O can dominate everything</li>
+</ul></li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="pipelining" class="slide level2">
+<h2>Pipelining</h2>
+<div class="columns">
+<div class="column" style="width:62%;">
+<p><img data-src="images/L09-QueryProcessing-Optimization/eval-pipelining.svg" style="width:100.0%"></p>
+</div><div class="column" style="width:38%;">
+<ul>
+<li>Pass tuples from child to parent <em>as they are produced</em> — the operations run simultaneously.</li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Implemented with the <em>iterator interface</em>: every operator provides open() / next() / close()
+<ul>
+<li><em>demand-driven</em>: the root calls next() on its children, which call next() on theirs, …</li>
+<li>each next() returns one tuple</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>+ no temporary relations — the temp I/O disappears</li>
+<li>+ first results appear early (nice for <code>LIMIT</code>, or for a user watching)</li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="pipelining-not-always-possible" class="slide level2">
+<h2>Pipelining: Not Always Possible</h2>
+<ul>
+<li>Some operators are <strong>blocking</strong>: they must consume <em>all</em> of their input before producing their first output tuple.
+<ul>
+<li>sorting (e.g., for <code>ORDER BY</code>): can’t emit the smallest tuple until it has seen every tuple</li>
+<li>hash join: must finish <em>building</em> the hash table on one input before probing</li>
+<li>grouped aggregation: a group’s total isn’t final until all input is seen</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>A blocking operator cuts the pipeline: everything below it runs to completion first (materializing its output, at least logically).</li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Our example plan pipelines end-to-end: σ, indexed NLJ, and π are all non-blocking.
+<ul>
+<li>this is part of why the optimizer liked indexed NLJ!</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<p>Which of these operator trees can be <em>fully</em> pipelined?</p>
+<p>A. π over merge-join (inputs unsorted)</p>
+<p>B. σ over indexed nested-loop join <span class="fragment" style="color:#00b; font-weight:bold;">← correct — neither operator needs to see its whole input first</span></p>
+<p>C. <code>ORDER BY</code> over σ</p>
+<p>D. grouped <code>SUM</code> over a file scan</p>
+</div>
+</section></section>
+<section>
+<section id="part-2-query-optimization" class="title-slide slide level1 center">
+<h1>Part 2: Query Optimization</h1>
+
+</section>
+<section id="overview-1" class="slide level2">
+<h2>Overview</h2>
+<ul>
+<li><p>The same query → many equivalent relational-algebra expressions → many evaluation plans with wildly different costs</p></li>
+<li><p>Cost differences can be <em>orders of magnitude</em></p></li>
+<li><p>Steps in cost-based optimization:</p>
+<ul>
+<li>1. generate equivalent expressions using <em>equivalence rules</em></li>
+<li>2. annotate them with algorithms to get alternative plans</li>
+<li>3. estimate each plan’s cost using <em>statistics</em>, choose the cheapest</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li><span style="color:#3a5fcd;">We’ll take the three steps in reverse order of novelty: we’ve already <em>seen</em> step 3 in action — that was Part 1’s cost arithmetic. What’s new is generating the alternatives (steps 1–2) and the statistics that feed step 3.</span></li>
+</ul>
+</div>
+</section>
+<section id="one-query-many-plans" class="slide level2">
+<h2>One Query, Many Plans</h2>
+
+<img data-src="images/L09-QueryProcessing-Optimization/opt-plans.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:90.0%"><ul>
+<li>This is just the <em>algorithm</em> dimension, for one fixed expression — a 650× spread on our two-relation query.</li>
+<li>Add the <em>expression</em> dimension (reordered joins, pushed-down selections) and multi-relation queries, and the spread grows further still.</li>
+</ul>
+</section>
+<section id="equivalence-rules" class="slide level2">
+<h2>Equivalence Rules</h2>
+<ul>
+<li><p>Two expressions are <em>equivalent</em> if they produce the same result on every legal database instance</p></li>
+<li><p>Highlights (there are ~16 such rules):</p>
+<ul>
+<li>conjunctive selections can be split: σ<sub>θ1∧θ2</sub>(E) = σ<sub>θ1</sub>(σ<sub>θ2</sub>(E))</li>
+<li>selection is commutative</li>
+<li>joins are <em>commutative</em> and <em>associative</em> — the basis of join reordering</li>
+<li>selection <em>distributes</em> over join (push selections down)</li>
+<li>projection distributes over join (push projections down)</li>
+<li>rules for set operations and outer joins (with caveats — e.g., outer joins are not associative)</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li><span style="color:#3a5fcd;">Each rule is a rewrite the optimizer may apply in either direction — the rules define the <em>space</em> of candidate expressions.</span></li>
+</ul>
+</div>
+</section>
+<section id="two-rules-pictured" class="slide level2">
+<h2>Two Rules, Pictured</h2>
+
+<img data-src="images/L09-QueryProcessing-Optimization/rules-pictured.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:88.0%"></section>
+<section id="transformation-example-step-by-step" class="slide level2">
+<h2>Transformation Example: Step by Step</h2>
+<ul>
+<li>Let’s transform one query the way an optimizer would — the actors of 2008 movies (we’ll meet this exact query again in SQLite):</li>
+</ul>
+<div class="r-stack">
+<p><img data-src="images/L09-QueryProcessing-Optimization/xform-1.svg" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/xform-2.svg" class="fragment" style="width:97.0%"></p>
+<p><img data-src="images/L09-QueryProcessing-Optimization/xform-3.svg" class="fragment" style="width:97.0%"></p>
+</div>
+</section>
+<section id="transformation-example-the-payoff" class="slide level2">
+<h2>Transformation Example: the Payoff</h2>
+<ul>
+<li>Same answer, before and after — but compare what the top join has to do:</li>
+</ul>
+<table class="caption-top">
+<thead>
+<tr class="header">
+<th></th>
+<th>movies entering the top join</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>original expression</td>
+<td>all 755</td>
+</tr>
+<tr class="even">
+<td>after pushing σ down</td>
+<td>17</td>
+</tr>
+</tbody>
+</table>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>And a smaller join input doesn’t just mean fewer comparisons:
+<ul>
+<li>17 <em>Movie</em> tuples fit in a single block → that side of the join lives entirely in memory</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>But wait — the optimizer chooses a plan <em>before running anything</em>. How did it know the σ would keep 17 movies and not 700?
+<ul>
+<li>it didn’t — it <em>estimated</em> the size, from statistics</li>
+<li>that’s the next stop</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="statistics-and-size-estimation" class="slide level2">
+<h2>Statistics and Size Estimation</h2>
+<ul>
+<li>The catalog stores, for each relation r:
+<ul>
+<li>n<sub>r</sub> (number of tuples), b<sub>r</sub> (number of blocks), l<sub>r</sub> (tuple size), f<sub>r</sub> (blocking factor)</li>
+<li>V(A, r): number of distinct values of attribute A</li>
+</ul></li>
+<li><em>Selection size estimates</em>
+<ul>
+<li>equality σ<sub>A=v</sub>: n<sub>r</sub> / V(A,r) tuples</li>
+<li>ranges: use min/max, or <em>histograms</em> for better accuracy</li>
+</ul></li>
+<li><em>Join size estimates</em>
+<ul>
+<li>A is a key of r: at most n<sub>s</sub> tuples</li>
+<li>A a foreign key of s referencing r: exactly n<sub>s</sub> tuples</li>
+<li>general case: n<sub>r</sub> × n<sub>s</sub> / max(V(A,r), V(A,s))</li>
+</ul></li>
+</ul>
+</section>
+<section id="size-estimation-pictured" class="slide level2">
+<h2>Size Estimation, Pictured</h2>
+
+<img data-src="images/L09-QueryProcessing-Optimization/size-estimation.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:94.0%"><div class="fragment">
+<ul>
+<li>Estimates are <em>heuristics, not guarantees</em> — if PG-13 is far more common than G (it is!), n/V misjudges both.</li>
+<li>Wrong estimates → wrong plan choices; this is a leading cause of real-world slow queries. (Real systems: <code>ANALYZE</code>, auto-collected histograms.)</li>
+</ul>
+</div>
+</section>
+<section id="estimate-the-size" class="slide level2">
+<h2>Estimate the size</h2>
+<p><em>Movie</em> has n<sub>r</sub> = 755 tuples and V(year, Movie) = 97 distinct years. The optimizer’s estimate for σ<sub>year=2008</sub>(Movie) is:</p>
+<p>A. 97 tuples</p>
+<p>B. about 8 tuples <span class="fragment" style="color:#00b; font-weight:bold;">← correct — n<sub>r</sub> / V(A, r) = 755 / 97 ≈ 7.8</span></p>
+<p>C. 17 tuples</p>
+<p>D. 755 tuples</p>
+<div class="fragment">
+<ul>
+<li>The <em>actual</em> answer is 17 — recent years have far more movies than the 1920s, so the uniform assumption undercounts by 2×.</li>
+<li>Close enough to rank the plans correctly here — but this is exactly the kind of error that can flip a plan choice, and why real systems collect histograms.</li>
+</ul>
+</div>
+</section>
+<section id="choosing-a-join-order" class="slide level2">
+<h2>Choosing a Join Order</h2>
+<ul>
+<li>With n relations there are (2(n−1))! / (n−1)! join orders
+<ul>
+<li>n = 7 → 665,280 orders; n = 10 → over 176 billion</li>
+</ul></li>
+<li><em>Dynamic programming</em>: find the best plan for every subset of relations, reusing sub-plans
+<ul>
+<li>“interesting sort orders” matter (e.g., merge join leaves output sorted)</li>
+<li>many optimizers restrict to <em>left-deep</em> join trees</li>
+</ul></li>
+<li><em>Heuristic optimization</em> (when full search is too costly):
+<ul>
+<li>perform selections and projections as early as possible</li>
+<li>avoid Cartesian products</li>
+<li>join the most restrictive relations first</li>
+</ul></li>
+</ul>
+</section>
+<section id="join-trees-left-deep-vs.-bushy" class="slide level2">
+<h2>Join Trees: Left-Deep vs.&nbsp;Bushy</h2>
+
+<img data-src="images/L09-QueryProcessing-Optimization/join-orders.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"><div class="fragment">
+<ul>
+<li>Restricting to left-deep trees shrinks the search space from (2(n−1))!/(n−1)! to n! — and every join can use a <em>base relation</em> (with its indexes!) as the inner input, exactly like our indexed NLJ plan.</li>
+</ul>
+</div>
+</section></section>
+<section>
+<section id="seeing-the-optimizer-at-work" class="title-slide slide level1 center">
+<h1>Seeing the Optimizer at Work</h1>
+
+</section>
+<section id="the-optimizer-is-one-query-away" class="slide level2">
+<h2>The Optimizer Is One Query Away</h2>
+<ul>
+<li>Everything in this lecture happens <em>automatically</em>, on every query you run — and every real DBMS will show you its decision:
+<ul>
+<li>PostgreSQL / MySQL: <code>EXPLAIN</code> (and <code>EXPLAIN ANALYZE</code>)</li>
+<li>SQLite: <code>EXPLAIN QUERY PLAN</code></li>
+</ul></li>
+<li>We can inspect plans from Python, using our movie database (<code>data/movie.sqlite</code>):</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a aria-label="1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb5-2"><a aria-label="2"></a>con <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">"data/movie.sqlite"</span>)</span>
+<span id="cb5-3"><a aria-label="3"></a>cur <span class="op">=</span> con.cursor()</span>
+<span id="cb5-4"><a aria-label="4"></a></span>
+<span id="cb5-5"><a aria-label="5"></a><span class="kw">def</span> plan(sql):</span>
+<span id="cb5-6"><a aria-label="6"></a>    <span class="cf">for</span> row <span class="kw">in</span> cur.execute(<span class="st">"EXPLAIN QUERY PLAN "</span> <span class="op">+</span> sql):</span>
+<span id="cb5-7"><a aria-label="7"></a>        <span class="bu">print</span>(row[<span class="dv">3</span>])          <span class="co"># the plan, one line per operation</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>Each <code>PRIMARY KEY</code> gets an <em>automatic</em> index (<code>sqlite_autoindex_...</code>).
+<ul>
+<li>careful: SQLite stores the table itself in <em>rowid</em> order, so this autoindex is a <strong>secondary</strong> index (id → rowid) — finding a row takes an index walk <em>plus</em> one more lookup: L07’s two-lookup pattern, live</li>
+</ul></li>
+</ul>
+</section>
+<section id="reading-a-plan-selection" class="slide level2">
+<h2>Reading a Plan: Selection</h2>
+<ul>
+<li>Equality on the primary key:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a aria-label="1"></a>plan(<span class="st">"SELECT name FROM Movie WHERE id = '0468569'"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb7-1"><a aria-label="1"></a>SEARCH Movie USING INDEX sqlite_autoindex_Movie_1 (id=?)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>Equality on a non-indexed attribute:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a aria-label="1"></a>plan(<span class="st">"SELECT name FROM Movie WHERE year = 2008"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb9-1"><a aria-label="1"></a>SCAN Movie</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="fragment">
+<ul>
+<li>You already know these two strategies:
+<ul>
+<li><span style="color:#3a5fcd;"><code>SCAN</code> = linear search • <code>SEARCH ... USING INDEX</code> = an index walk</span></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="changing-the-plan-create-index" class="slide level2">
+<h2>Changing the Plan: CREATE INDEX</h2>
+<ul>
+<li>Give the optimizer a new physical option…</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a>cur.execute(<span class="st">"CREATE INDEX MovieYear ON Movie(year)"</span>)</span>
+<span id="cb10-2"><a aria-label="2"></a>plan(<span class="st">"SELECT name FROM Movie WHERE year = 2008"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb11-1"><a aria-label="1"></a>SEARCH Movie USING INDEX MovieYear (year=?)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>…and it changes its choice: same query, same answer, new plan.
+<ul>
+<li><code>CREATE INDEX</code> is a <em>physical-layer</em> change — SQL never mentions it; only the cost changes</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The index also changes <em>other</em> queries. Remember <code>USE TEMP B-TREE</code> (that’s an on-the-fly sort — a blocking operator!):</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a aria-label="1"></a>plan(<span class="st">"SELECT name FROM Movie ORDER BY year"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb13"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb13-1"><a aria-label="1"></a>-- before:  SCAN Movie  +  USE TEMP B-TREE FOR ORDER BY</span>
+<span id="cb13-2"><a aria-label="2"></a>-- after:   SCAN Movie USING INDEX MovieYear</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>the index <em>provides</em> the sorted order — the sort disappears entirely</li>
+</ul>
+</div>
+</section>
+<section id="reading-a-plan-a-join" class="slide level2">
+<h2>Reading a Plan: a Join</h2>
+<ul>
+<li>The actors of 2008 movies — the very query from our transformation example (before adding any indexes of our own):</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a aria-label="1"></a>plan(<span class="st">"""SELECT p.name, m.name</span></span>
+<span id="cb14-2"><a aria-label="2"></a><span class="st">        FROM Person p</span></span>
+<span id="cb14-3"><a aria-label="3"></a><span class="st">        JOIN Actor a ON p.id  = a.actor_id</span></span>
+<span id="cb14-4"><a aria-label="4"></a><span class="st">        JOIN Movie  m ON a.movie_id = m.id</span></span>
+<span id="cb14-5"><a aria-label="5"></a><span class="st">        WHERE m.year = 2008"""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb15-1"><a aria-label="1"></a>SCAN a</span>
+<span id="cb15-2"><a aria-label="2"></a>SEARCH m USING INDEX sqlite_autoindex_Movie_1 (id=?)</span>
+<span id="cb15-3"><a aria-label="3"></a>SEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>Read it top-down as nested loops, outermost first:
+<ul>
+<li>for each <em>Actor</em> row (scanned) → probe <em>Movie</em> by id → probe <em>Person</em> by id</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li><span style="color:#3a5fcd;">This is our <em>indexed nested-loop join</em> — scan the outer, probe <em>Person</em> through its index — in a <em>left-deep</em> tree, exactly the plan we costed by hand.</span></li>
+</ul>
+</div>
+</section>
+<section id="changing-the-join-order" class="slide level2">
+<h2>Changing the Join Order</h2>
+<ul>
+<li>Only 17 of the 755 movies are from 2008 — the current plan scans all 3,790 <em>Actor</em> rows anyway. Give the optimizer what it’s missing:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a aria-label="1"></a>cur.execute(<span class="st">"CREATE INDEX ActorMovie ON Actor(movie_id)"</span>)</span>
+<span id="cb16-2"><a aria-label="2"></a>plan(...)     <span class="co"># the same three-relation join</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb17"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb17-1"><a aria-label="1"></a>SEARCH m USING INDEX MovieYear (year=?)</span>
+<span id="cb17-2"><a aria-label="2"></a>SEARCH a USING INDEX ActorMovie (movie_id=?)</span>
+<span id="cb17-3"><a aria-label="3"></a>SEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ul>
+<li>The join order <em>flipped</em>: start from the ≈17 matching movies, probe <em>Actor</em> per movie, probe <em>Person</em> per actor.
+<ul>
+<li>“join the most restrictive relation first” — the heuristic from a few slides ago, chosen automatically</li>
+<li>and the σ pushdown from the transformation example is realized here as “apply the year filter first”</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>And the statistics? <code>cur.execute("ANALYZE")</code> collects them (row counts and index selectivities, stored in <code>sqlite_stat1</code>) — that’s the catalog from Part 2, live.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><span style="color:#3a5fcd;">Try it yourself: run these against <code>data/movie.sqlite</code>, then try your own queries — predict the plan <em>before</em> you print it.</span></li>
+</ul>
+</div>
+</section>
+<section id="wrap-up" class="slide level2">
+<h2>Wrap-Up</h2>
+<ul>
+<li>Processing: every operator has several algorithms, each with a cost formula
+<ul>
+<li>selection: scan the file vs.&nbsp;walk an index — the index wins once the data is big</li>
+<li>joins: nested loops vs.&nbsp;index probes on the inner — a 650× spread on the <em>same</em> query</li>
+</ul></li>
+<li>Whole expressions: materialize (always works, pays temp I/O) vs.&nbsp;pipeline (cheap, but blocking operators cut it)</li>
+<li>Optimization: equivalence rules generate the options; statistics pick the winner</li>
+<li>The biggest lever is usually <em>join order</em> and <em>pushing selections down</em></li>
+<li>All of it is one <code>EXPLAIN QUERY PLAN</code> away — on any SQLite database, from Python</li>
+<li>Practice: join-cost problems in the homework and discussion sections — trace tiny joins and count the operations yourself</li>
+</ul>
+<!-- Optional advanced topics if time permits (ch16 §16.4+):
+     nested-subquery decorrelation, materialized views and view maintenance,
+     top-K queries, plan caching / parametric optimization -->
+
+
+</section></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

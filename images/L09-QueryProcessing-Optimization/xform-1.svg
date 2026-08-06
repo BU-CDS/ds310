@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1150" height="660" viewBox="0 0 1150 660" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1150" height="660" fill="#ffffff"/>
+<text x="30" y="40" font-family="monospace" font-size="17" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">SELECT p.name, m.name FROM Person p JOIN Actor a ON p.id = a.actor_id</text>
+<text x="30" y="62" font-family="monospace" font-size="17" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">JOIN Movie m ON a.movie_id = m.id WHERE m.year = 2008</text>
+<text x="400" y="130" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">π</text>
+<text x="400" y="150" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">p.name, m.name</text>
+<line x1="400" y1="142" x2="400" y2="172" stroke="#000" stroke-width="2"/>
+<text x="400" y="200" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">σ</text>
+<text x="400" y="220" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">year = 2008</text>
+<line x1="400" y1="224" x2="400" y2="254" stroke="#000" stroke-width="2"/>
+<text x="400" y="282" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<text x="400" y="302" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">a.movie_id = m.id</text>
+<line x1="386" y1="292" x2="290" y2="348" stroke="#000" stroke-width="2"/>
+<line x1="414" y1="292" x2="585" y2="400" stroke="#000" stroke-width="2"/>
+<text x="275" y="375" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="28" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<text x="275" y="395" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">p.id = a.actor_id</text>
+<line x1="262" y1="385" x2="182" y2="438" stroke="#000" stroke-width="2"/>
+<line x1="288" y1="385" x2="375" y2="438" stroke="#000" stroke-width="2"/>
+<rect x="120.0" y="442.0" width="120" height="40" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="180" y="469" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">Person</text>
+<text x="180" y="502" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#777" text-anchor="middle" font-weight="normal" font-style="normal">2,698 tuples</text>
+<rect x="320.0" y="442.0" width="120" height="40" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="380" y="469" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">Actor</text>
+<text x="380" y="502" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#777" text-anchor="middle" font-weight="normal" font-style="normal">3,790 tuples</text>
+<rect x="530.0" y="405.0" width="120" height="40" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="590" y="432" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">Movie</text>
+<text x="590" y="465" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#777" text-anchor="middle" font-weight="normal" font-style="normal">755 tuples</text>
+<text x="760" y="180" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#000" text-anchor="start" font-weight="bold" font-style="normal">start: join everything, filter last</text>
+<text x="760" y="215" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#555" text-anchor="start" font-weight="normal" font-style="normal">the top join pairs 3,790 rows with</text>
+<text x="760" y="240" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#555" text-anchor="start" font-weight="normal" font-style="normal">all 755 movies — and only then does</text>
+<text x="760" y="265" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#555" text-anchor="start" font-weight="normal" font-style="normal">σ keep the 85 rows from 2008 films</text>
+</svg>

@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1150" height="560" viewBox="0 0 1150 560" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1150" height="560" fill="#ffffff"/>
+<text x="60" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">Person ⋈ Actor   —   (tuple-at-a-time) nested-loop join</text>
+<text x="155" y="80" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#000" text-anchor="middle" font-weight="bold" font-style="normal">outer:  Actor</text>
+<text x="490" y="80" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#000" text-anchor="middle" font-weight="bold" font-style="normal">inner:  Person</text>
+<rect x="40" y="100" width="200" height="94" rx="6" fill="#fff" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="140.0" y="124" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block A1</text>
+<line x1="40" y1="132" x2="240" y2="132" stroke="#000" stroke-width="1.5"/>
+<text x="56" y="154" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">101</text>
+<text x="224" y="154" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">502</text>
+<line x1="40" y1="162" x2="240" y2="162" stroke="#bbb" stroke-width="1"/>
+<text x="56" y="184" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">101</text>
+<text x="224" y="184" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">509</text>
+<rect x="40" y="230" width="200" height="94" rx="6" fill="#fff" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="140.0" y="254" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block A2</text>
+<line x1="40" y1="262" x2="240" y2="262" stroke="#000" stroke-width="1.5"/>
+<text x="56" y="284" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">102</text>
+<text x="224" y="284" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">503</text>
+<line x1="40" y1="292" x2="240" y2="292" stroke="#bbb" stroke-width="1"/>
+<text x="56" y="314" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">103</text>
+<text x="224" y="314" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">502</text>
+<rect x="40" y="360" width="200" height="94" rx="6" fill="#fff" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="140.0" y="384" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block A3</text>
+<line x1="40" y1="392" x2="240" y2="392" stroke="#000" stroke-width="1.5"/>
+<text x="56" y="414" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">103</text>
+<text x="224" y="414" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">507</text>
+<line x1="40" y1="422" x2="240" y2="422" stroke="#bbb" stroke-width="1"/>
+<text x="56" y="444" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">104</text>
+<text x="224" y="444" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">509</text>
+<rect x="385" y="100" width="200" height="94" rx="6" fill="#fff" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="485.0" y="124" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block P1</text>
+<line x1="385" y1="132" x2="585" y2="132" stroke="#000" stroke-width="1.5"/>
+<text x="401" y="154" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">101</text>
+<text x="569" y="154" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Hanks</text>
+<line x1="385" y1="162" x2="585" y2="162" stroke="#bbb" stroke-width="1"/>
+<text x="401" y="184" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">102</text>
+<text x="569" y="184" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Streep</text>
+<rect x="385" y="230" width="200" height="94" rx="6" fill="#fff" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="485.0" y="254" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block P2</text>
+<line x1="385" y1="262" x2="585" y2="262" stroke="#000" stroke-width="1.5"/>
+<text x="401" y="284" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">103</text>
+<text x="569" y="284" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Pacino</text>
+<line x1="385" y1="292" x2="585" y2="292" stroke="#bbb" stroke-width="1"/>
+<text x="401" y="314" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">104</text>
+<text x="569" y="314" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Bullock</text>
+<text x="905.0" y="100" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#555" text-anchor="middle" font-weight="normal" font-style="italic">result so far</text>
+<rect x="740" y="110" width="330" height="190" rx="6" fill="#fff" stroke="#888888" stroke-width="2" stroke-dasharray="6,4" opacity="1"/>
+<text x="758" y="137" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">101</text>
+<text x="905.0" y="137" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="middle" font-weight="normal" font-style="normal">Hanks</text>
+<text x="1052" y="137" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="end" font-weight="normal" font-style="normal">502</text>
+<text x="758" y="167" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">101</text>
+<text x="905.0" y="167" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="middle" font-weight="normal" font-style="normal">Hanks</text>
+<text x="1052" y="167" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="end" font-weight="normal" font-style="normal">509</text>
+<text x="758" y="197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">102</text>
+<text x="905.0" y="197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="middle" font-weight="normal" font-style="normal">Streep</text>
+<text x="1052" y="197" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="end" font-weight="normal" font-style="normal">503</text>
+<text x="758" y="227" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">103</text>
+<text x="905.0" y="227" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="middle" font-weight="normal" font-style="normal">Pacino</text>
+<text x="1052" y="227" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="end" font-weight="normal" font-style="normal">502</text>
+<text x="758" y="257" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">103</text>
+<text x="905.0" y="257" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="middle" font-weight="normal" font-style="normal">Pacino</text>
+<text x="1052" y="257" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="end" font-weight="normal" font-style="normal">507</text>
+<text x="758" y="287" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">104</text>
+<text x="905.0" y="287" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="middle" font-weight="normal" font-style="normal">Bullock</text>
+<text x="1052" y="287" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="end" font-weight="normal" font-style="normal">509</text>
+<rect x="40" y="480" width="380" height="54" rx="8" fill="#f2f2f2" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="60" y="514" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="start" font-weight="bold" font-style="normal">block transfers so far:  15</text>
+<text x="450" y="504" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" fill="#3a5fcd" text-anchor="start" font-weight="normal" font-style="normal">total:  nᵣ × bₛ + bᵣ  =  6 × 2 + 3  =  15</text>
+<text x="450" y="528" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="20" fill="#3a5fcd" text-anchor="start" font-weight="normal" font-style="normal">we re-read ALL of Person for every Actor row!</text>
+<text x="905" y="335" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">6 result tuples</text>
+</svg>
