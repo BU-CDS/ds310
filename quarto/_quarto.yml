@@ -11,7 +11,7 @@ project:
     - L06-Storage.qmd
     - L07-Indexing.qmd
     - L08-Dynamic-Hashing.qmd
-    - L09-QueryProcessing-Optimization.qmd   # stub deck ("content coming soon")
+    - L09-QueryProcessing-Optimization.qmd
     - L10-Txns1.qmd
     - L11-Txns2.qmd
     - L12-Locking.qmd
