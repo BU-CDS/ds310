@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="665" viewBox="0 0 1100 665" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1100" height="665" fill="#ffffff"/>
+<text x="40" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="23" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">materialization:  evaluate one operation at a time,</text>
+<text x="40" y="68" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="23" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">storing each result in a temporary relation</text>
+<rect x="175.0" y="516.0" width="170" height="48" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="260" y="548" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">Movie</text>
+<rect x="535.0" y="516.0" width="170" height="48" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="620" y="548" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">Actor</text>
+<text x="260" y="425" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="34" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">σ</text>
+<text x="260" y="447" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">year = 2008</text>
+<text x="440" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<text x="440" y="312" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">id = movie_id</text>
+<text x="440" y="165" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="34" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">π</text>
+<text x="440" y="187" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">name, movie_id</text>
+<line x1="260" y1="512" x2="260" y2="450" stroke="#000" stroke-width="2.5"/>
+<line x1="275" y1="400" x2="425" y2="315" stroke="#000" stroke-width="2.5"/>
+<line x1="620" y1="512" x2="455" y2="315" stroke="#000" stroke-width="2.5"/>
+<line x1="440" y1="262" x2="440" y2="190" stroke="#000" stroke-width="2.5"/>
+<line x1="440" y1="138" x2="440" y2="100" stroke="#000" stroke-width="2.5"/>
+<polygon points="440,100 433.5,111.0 446.5,111.0" fill="#000"/>
+<text x="490" y="115" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="start" font-weight="normal" font-style="italic">result</text>
+<path d="M 30.0 307.6 A 55.0 17.6 0 0 1 140.0 307.6 L 140.0 392.4 A 55.0 17.6 0 0 1 30.0 392.4 Z" fill="#fde9d9" stroke="#000" stroke-width="2"/>
+<ellipse cx="85" cy="307.6" rx="55.0" ry="17.6" fill="#fde9d9" stroke="#000" stroke-width="2"/>
+<text x="85" y="358" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">temp T1</text>
+<path d="M 230 415 Q 160 420 130 390" fill="none" stroke="#c00" stroke-width="2.5" stroke-dasharray="6,4"/>
+<polygon points="130,390 133.2,402.4 142.4,393.2" fill="#c00"/>
+<path d="M 120 300 Q 150 260 260 300" fill="none" stroke="#c00" stroke-width="2.5" stroke-dasharray="6,4"/>
+<polygon points="260,300 251.9,290.1 247.4,302.3" fill="#c00"/>
+<text x="60" y="258" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#c00" text-anchor="start" font-weight="normal" font-style="normal">write σ's result to disk …</text>
+<text x="180" y="232" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#c00" text-anchor="start" font-weight="normal" font-style="normal">… then read it back as an input of ⋈</text>
+<path d="M 695.0 177.6 A 55.0 17.6 0 0 1 805.0 177.6 L 805.0 262.4 A 55.0 17.6 0 0 1 695.0 262.4 Z" fill="#fde9d9" stroke="#000" stroke-width="2"/>
+<ellipse cx="750" cy="177.6" rx="55.0" ry="17.6" fill="#fde9d9" stroke="#000" stroke-width="2"/>
+<text x="750" y="228" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">temp T2</text>
+<path d="M 480 285 Q 600 290 700 250" fill="none" stroke="#c00" stroke-width="2.5" stroke-dasharray="6,4"/>
+<polygon points="700,250 687.4,248.1 692.2,260.1" fill="#c00"/>
+<path d="M 730 155 Q 640 120 490 158" fill="none" stroke="#c00" stroke-width="2.5" stroke-dasharray="6,4"/>
+<polygon points="490,158 502.3,161.6 499.1,149.0" fill="#c00"/>
+<text x="905" y="315" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#c00" text-anchor="middle" font-weight="normal" font-style="normal">write the join result …</text>
+<text x="680" y="95" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#c00" text-anchor="middle" font-weight="normal" font-style="normal">… then read it back for π</text>
+<text x="880" y="610" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#3a5fcd" text-anchor="end" font-weight="bold" font-style="normal">every temp write + read  =  extra disk I/O</text>
+</svg>

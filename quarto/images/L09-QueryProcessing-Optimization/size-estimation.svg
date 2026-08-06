@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1150" height="500" viewBox="0 0 1150 500" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1150" height="500" fill="#ffffff"/>
+<text x="60" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#000" text-anchor="start" font-weight="bold" font-style="normal">equality:  σ</text>
+<text x="180" y="47" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" fill="#000" text-anchor="start" font-weight="bold" font-style="italic">rating = 'PG-13'</text>
+<text x="310" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#000" text-anchor="start" font-weight="bold" font-style="normal">(Movie)   — toy instance</text>
+<rect x="80" y="90" width="52" height="42" rx="5" fill="#fff" stroke="#3a5fcd" stroke-width="2.5" opacity="0.55"/>
+<rect x="142" y="90" width="52" height="42" rx="5" fill="#fff" stroke="#1a8a1a" stroke-width="2.5" opacity="0.55"/>
+<rect x="204" y="90" width="52" height="42" rx="5" fill="#cc6600" stroke="#cc6600" stroke-width="2.5" opacity="1"/>
+<text x="230" y="117" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold" font-style="normal">PG-13</text>
+<rect x="266" y="90" width="52" height="42" rx="5" fill="#fff" stroke="#7b2fbf" stroke-width="2.5" opacity="0.55"/>
+<rect x="328" y="90" width="52" height="42" rx="5" fill="#fff" stroke="#1a8a1a" stroke-width="2.5" opacity="0.55"/>
+<rect x="80" y="142" width="52" height="42" rx="5" fill="#fff" stroke="#3a5fcd" stroke-width="2.5" opacity="0.55"/>
+<rect x="142" y="142" width="52" height="42" rx="5" fill="#cc6600" stroke="#cc6600" stroke-width="2.5" opacity="1"/>
+<text x="168" y="169" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold" font-style="normal">PG-13</text>
+<rect x="204" y="142" width="52" height="42" rx="5" fill="#fff" stroke="#7b2fbf" stroke-width="2.5" opacity="0.55"/>
+<rect x="266" y="142" width="52" height="42" rx="5" fill="#fff" stroke="#1a8a1a" stroke-width="2.5" opacity="0.55"/>
+<rect x="328" y="142" width="52" height="42" rx="5" fill="#cc6600" stroke="#cc6600" stroke-width="2.5" opacity="1"/>
+<text x="354" y="169" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold" font-style="normal">PG-13</text>
+<rect x="80" y="194" width="52" height="42" rx="5" fill="#fff" stroke="#3a5fcd" stroke-width="2.5" opacity="0.55"/>
+<rect x="142" y="194" width="52" height="42" rx="5" fill="#fff" stroke="#7b2fbf" stroke-width="2.5" opacity="0.55"/>
+<rect x="204" y="194" width="52" height="42" rx="5" fill="#fff" stroke="#1a8a1a" stroke-width="2.5" opacity="0.55"/>
+<rect x="266" y="194" width="52" height="42" rx="5" fill="#fff" stroke="#3a5fcd" stroke-width="2.5" opacity="0.55"/>
+<rect x="328" y="194" width="52" height="42" rx="5" fill="#cc6600" stroke="#cc6600" stroke-width="2.5" opacity="1"/>
+<text x="354" y="221" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold" font-style="normal">PG-13</text>
+<rect x="80" y="246" width="52" height="42" rx="5" fill="#fff" stroke="#7b2fbf" stroke-width="2.5" opacity="0.55"/>
+<rect x="142" y="246" width="52" height="42" rx="5" fill="#fff" stroke="#1a8a1a" stroke-width="2.5" opacity="0.55"/>
+<rect x="204" y="246" width="52" height="42" rx="5" fill="#fff" stroke="#7b2fbf" stroke-width="2.5" opacity="0.55"/>
+<rect x="266" y="246" width="52" height="42" rx="5" fill="#fff" stroke="#3a5fcd" stroke-width="2.5" opacity="0.55"/>
+<rect x="328" y="246" width="52" height="42" rx="5" fill="#cc6600" stroke="#cc6600" stroke-width="2.5" opacity="1"/>
+<text x="354" y="273" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="11" fill="#fff" text-anchor="middle" font-weight="bold" font-style="normal">PG-13</text>
+<text x="60" y="330" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#555" text-anchor="start" font-weight="normal" font-style="normal">n = 20 tuples,  V(rating, Movie) = 4</text>
+<text x="60" y="370" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">uniform assumption: each value ≈ equally common</text>
+<text x="60" y="402" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#1a8a1a" text-anchor="start" font-weight="bold" font-style="normal">estimate  =  n / V(A, r)  =  20 / 4  =  5 tuples</text>
+<line x1="590" y1="60" x2="590" y2="440" stroke="#ccc" stroke-width="1.5"/>
+<text x="640" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#000" text-anchor="start" font-weight="bold" font-style="normal">range:  σ</text>
+<text x="732" y="47" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="14" fill="#000" text-anchor="start" font-weight="bold" font-style="italic">year &lt; 1970</text>
+<text x="838" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#000" text-anchor="start" font-weight="bold" font-style="normal">(Movie)   — the real data</text>
+<rect x="640" y="331.35135135135135" width="38" height="8.64864864864865" rx="0" fill="#3a5fcd" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="659.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">1920s</text>
+<text x="659.0" y="324.35135135135135" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">8</text>
+<rect x="685" y="304.3243243243243" width="38" height="35.67567567567568" rx="0" fill="#3a5fcd" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="704.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">30s</text>
+<text x="704.0" y="297.3243243243243" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">33</text>
+<rect x="730" y="297.8378378378378" width="38" height="42.16216216216216" rx="0" fill="#3a5fcd" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="749.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">40s</text>
+<text x="749.0" y="290.8378378378378" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">39</text>
+<rect x="775" y="296.7567567567568" width="38" height="43.24324324324324" rx="0" fill="#3a5fcd" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="794.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">50s</text>
+<text x="794.0" y="289.7567567567568" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">40</text>
+<rect x="820" y="290.27027027027026" width="38" height="49.72972972972973" rx="0" fill="#3a5fcd" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="839.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">60s</text>
+<text x="839.0" y="283.27027027027026" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">46</text>
+<rect x="865" y="295.6756756756757" width="38" height="44.32432432432433" rx="0" fill="#e5e5e5" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="884.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">70s</text>
+<text x="884.0" y="288.6756756756757" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">41</text>
+<rect x="910" y="274.05405405405406" width="38" height="65.94594594594595" rx="0" fill="#e5e5e5" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="929.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">80s</text>
+<text x="929.0" y="267.05405405405406" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">61</text>
+<rect x="955" y="236.2162162162162" width="38" height="103.78378378378379" rx="0" fill="#e5e5e5" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="974.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">90s</text>
+<text x="974.0" y="229.2162162162162" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">96</text>
+<rect x="1000" y="140.0" width="38" height="200.0" rx="0" fill="#e5e5e5" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="1019.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">2000s</text>
+<text x="1019.0" y="133.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">185</text>
+<rect x="1045" y="147.56756756756755" width="38" height="192.43243243243245" rx="0" fill="#e5e5e5" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="1064.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">10s</text>
+<text x="1064.0" y="140.56756756756755" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">178</text>
+<rect x="1090" y="309.72972972972974" width="38" height="30.270270270270274" rx="0" fill="#e5e5e5" stroke="#666" stroke-width="1.2" opacity="1"/>
+<text x="1109.0" y="360" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="12" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">20s</text>
+<text x="1109.0" y="302.72972972972974" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="13" fill="#333" text-anchor="middle" font-weight="normal" font-style="normal">28</text>
+<line x1="630" y1="340" x2="1140" y2="340" stroke="#000" stroke-width="2"/>
+<text x="880" y="395" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">per-decade counts:  8+33+39+40+46  =  166 movies</text>
+<text x="885" y="423" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">— far better than assuming the 97 years are uniform</text>
+</svg>

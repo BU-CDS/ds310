@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1150" height="400" viewBox="0 0 1150 400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1150" height="400" fill="#ffffff"/>
+<text x="320" y="42" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="30" fill="#000" text-anchor="start" font-weight="normal" font-style="italic">σ</text>
+<text x="340" y="51" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="italic">id = '0468569'</text>
+<text x="480" y="42" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="24" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">(Movie) — id is the primary key</text>
+<rect x="30" y="80" width="260" height="124" rx="6" fill="#fff7dd" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="160.0" y="104" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block B1</text>
+<line x1="30" y1="112" x2="290" y2="112" stroke="#000" stroke-width="1.5"/>
+<text x="42" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">0034583</text>
+<text x="278" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Casablanca</text>
+<line x1="30" y1="142" x2="290" y2="142" stroke="#bbb" stroke-width="1"/>
+<text x="42" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">0068646</text>
+<text x="278" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Godfather, The</text>
+<line x1="30" y1="172" x2="290" y2="172" stroke="#bbb" stroke-width="1"/>
+<text x="42" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">0076759</text>
+<text x="278" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Star Wars</text>
+<text x="160" y="245" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#c00" text-anchor="middle" font-weight="bold" font-style="normal">read #1</text>
+<rect x="310" y="80" width="260" height="124" rx="6" fill="#ffe08a" stroke="#c00" stroke-width="3.5" opacity="1"/>
+<text x="440.0" y="104" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block B2</text>
+<line x1="310" y1="112" x2="570" y2="112" stroke="#000" stroke-width="1.5"/>
+<text x="322" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">0120338</text>
+<text x="558" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Titanic</text>
+<line x1="310" y1="142" x2="570" y2="142" stroke="#bbb" stroke-width="1"/>
+<text x="322" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">0172495</text>
+<text x="558" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Gladiator</text>
+<line x1="310" y1="172" x2="570" y2="172" stroke="#bbb" stroke-width="1"/>
+<text x="322" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#1a8a1a" text-anchor="start" font-weight="bold" font-style="normal">0468569</text>
+<text x="558" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#1a8a1a" text-anchor="end" font-weight="bold" font-style="normal">Dark Knight, The</text>
+<text x="440" y="245" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#c00" text-anchor="middle" font-weight="bold" font-style="normal">read #2</text>
+<rect x="590" y="80" width="260" height="124" rx="6" fill="#fff" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="720.0" y="104" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block B3</text>
+<line x1="590" y1="112" x2="850" y2="112" stroke="#000" stroke-width="1.5"/>
+<text x="602" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">0499549</text>
+<text x="838" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Avatar</text>
+<line x1="590" y1="142" x2="850" y2="142" stroke="#bbb" stroke-width="1"/>
+<text x="602" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">1049413</text>
+<text x="838" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Up</text>
+<line x1="590" y1="172" x2="850" y2="172" stroke="#bbb" stroke-width="1"/>
+<text x="602" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">1375666</text>
+<text x="838" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Inception</text>
+<rect x="870" y="80" width="260" height="124" rx="6" fill="#fff" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="1000.0" y="104" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="bold" font-style="normal">block B4</text>
+<line x1="870" y1="112" x2="1130" y2="112" stroke="#000" stroke-width="1.5"/>
+<text x="882" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">2294629</text>
+<text x="1118" y="134" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Frozen</text>
+<line x1="870" y1="142" x2="1130" y2="142" stroke="#bbb" stroke-width="1"/>
+<text x="882" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">2380307</text>
+<text x="1118" y="164" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Coco</text>
+<line x1="870" y1="172" x2="1130" y2="172" stroke="#bbb" stroke-width="1"/>
+<text x="882" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="16" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">4154796</text>
+<text x="1118" y="194" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="15" fill="#000" text-anchor="end" font-weight="normal" font-style="normal">Avengers: Endgame</text>
+<rect x="30" y="290" width="380" height="54" rx="8" fill="#f2f2f2" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="50" y="324" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="start" font-weight="bold" font-style="normal">block transfers so far:  2</text>
+<text x="440" y="312" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">found it — id is a key, so no other record can</text>
+<text x="440" y="338" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">match  →  stop the scan early</text>
+</svg>

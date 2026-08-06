@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1150" height="470" viewBox="0 0 1150 470" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1150" height="470" fill="#ffffff"/>
+<text x="280" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="middle" font-weight="bold" font-style="normal">left-deep join tree</text>
+<text x="280" y="90" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<line x1="270" y1="98" x2="210" y2="138" stroke="#000" stroke-width="2"/>
+<line x1="290" y1="98" x2="350" y2="138" stroke="#000" stroke-width="2"/>
+<text x="210" y="160" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<rect x="330.0" y="142.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="365" y="167" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r4</text>
+<line x1="200" y1="168" x2="140" y2="208" stroke="#000" stroke-width="2"/>
+<line x1="220" y1="168" x2="275" y2="208" stroke="#000" stroke-width="2"/>
+<text x="140" y="230" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<rect x="245.0" y="212.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="280" y="237" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r3</text>
+<line x1="130" y1="238" x2="75" y2="278" stroke="#000" stroke-width="2"/>
+<line x1="150" y1="238" x2="205" y2="278" stroke="#000" stroke-width="2"/>
+<rect x="35.0" y="282.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="70" y="307" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r1</text>
+<rect x="175.0" y="282.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="210" y="307" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r2</text>
+<text x="280" y="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">inner input is always a base relation —</text>
+<text x="280" y="426" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">pipelines well with indexed NLJ; smaller search space</text>
+<line x1="575" y1="50" x2="575" y2="430" stroke="#ccc" stroke-width="1.5"/>
+<text x="860" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="middle" font-weight="bold" font-style="normal">bushy join tree</text>
+<text x="860" y="110" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<line x1="848" y1="118" x2="755" y2="168" stroke="#000" stroke-width="2"/>
+<line x1="872" y1="118" x2="965" y2="168" stroke="#000" stroke-width="2"/>
+<text x="755" y="190" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<text x="965" y="190" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="26" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<line x1="745" y1="198" x2="700" y2="234" stroke="#000" stroke-width="2"/>
+<line x1="765" y1="198" x2="810" y2="234" stroke="#000" stroke-width="2"/>
+<line x1="955" y1="198" x2="910" y2="234" stroke="#000" stroke-width="2"/>
+<line x1="975" y1="198" x2="1020" y2="234" stroke="#000" stroke-width="2"/>
+<rect x="660.0" y="238.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="695" y="263" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r1</text>
+<rect x="780.0" y="238.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="815" y="263" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r2</text>
+<rect x="870.0" y="238.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="905" y="263" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r3</text>
+<rect x="990.0" y="238.0" width="70" height="36" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2" opacity="1"/>
+<text x="1025" y="263" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">r4</text>
+<text x="860" y="400" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">sub-joins can run independently —</text>
+<text x="860" y="426" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">sometimes cheaper, but many more shapes to consider</text>
+</svg>

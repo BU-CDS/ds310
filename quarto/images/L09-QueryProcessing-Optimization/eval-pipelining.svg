@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="665" viewBox="0 0 1100 665" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<rect x="0" y="0" width="1100" height="665" fill="#ffffff"/>
+<text x="40" y="40" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="23" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">pipelining:  pass tuples up the tree as they</text>
+<text x="40" y="68" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="23" fill="#000" text-anchor="start" font-weight="normal" font-style="normal">are produced — no temporary relations</text>
+<rect x="175.0" y="516.0" width="170" height="48" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="260" y="548" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">Movie</text>
+<rect x="535.0" y="516.0" width="170" height="48" rx="8" fill="#cfe2f0" stroke="#000" stroke-width="2.5" opacity="1"/>
+<text x="620" y="548" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="middle" font-weight="normal" font-style="normal">Actor</text>
+<text x="260" y="425" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="34" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">σ</text>
+<text x="260" y="447" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">year = 2008</text>
+<text x="440" y="290" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="36" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">⋈</text>
+<text x="440" y="312" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">id = movie_id</text>
+<text x="440" y="165" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="34" fill="#000" text-anchor="middle" font-weight="normal" font-style="italic">π</text>
+<text x="440" y="187" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#333" text-anchor="middle" font-weight="normal" font-style="italic">name, movie_id</text>
+<line x1="260" y1="512" x2="260" y2="452" stroke="#1a8a1a" stroke-width="3"/>
+<polygon points="260,452 253.5,463.0 266.5,463.0" fill="#1a8a1a"/>
+<circle cx="260" cy="491" r="5" fill="#1a8a1a"/>
+<circle cx="260" cy="473" r="5" fill="#1a8a1a"/>
+<line x1="275" y1="398" x2="423" y2="317" stroke="#1a8a1a" stroke-width="3"/>
+<polygon points="423,317 410.2,316.6 416.5,328.0" fill="#1a8a1a"/>
+<circle cx="327" cy="370" r="5" fill="#1a8a1a"/>
+<circle cx="371" cy="345" r="5" fill="#1a8a1a"/>
+<line x1="620" y1="512" x2="457" y2="317" stroke="#1a8a1a" stroke-width="3"/>
+<polygon points="457,317 459.1,329.6 469.0,321.3" fill="#1a8a1a"/>
+<circle cx="563" cy="444" r="5" fill="#1a8a1a"/>
+<circle cx="514" cy="385" r="5" fill="#1a8a1a"/>
+<line x1="440" y1="262" x2="440" y2="192" stroke="#1a8a1a" stroke-width="3"/>
+<polygon points="440,192 433.5,203.0 446.5,203.0" fill="#1a8a1a"/>
+<circle cx="440" cy="238" r="5" fill="#1a8a1a"/>
+<circle cx="440" cy="216" r="5" fill="#1a8a1a"/>
+<line x1="440" y1="138" x2="440" y2="100" stroke="#1a8a1a" stroke-width="3"/>
+<polygon points="440,100 433.5,111.0 446.5,111.0" fill="#1a8a1a"/>
+<circle cx="440" cy="125" r="5" fill="#1a8a1a"/>
+<circle cx="440" cy="113" r="5" fill="#1a8a1a"/>
+<text x="490" y="115" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="22" fill="#000" text-anchor="start" font-weight="normal" font-style="italic">result</text>
+<text x="300" y="505" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" fill="#1a8a1a" text-anchor="start" font-weight="normal" font-style="normal">tuples</text>
+<rect x="640.28" y="206.0" width="299.44" height="68" rx="8" fill="#fff" stroke="#3a5fcd" stroke-width="2" opacity="1"/>
+<text x="790" y="232.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#3a5fcd" text-anchor="middle" font-weight="normal" font-style="normal">each operator is an iterator:</text>
+<text x="790" y="258.0" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="18" fill="#3a5fcd" text-anchor="middle" font-weight="normal" font-style="normal">open( ) / next( ) / close( )</text>
+<path d="M 660 265 Q 560 265 490 285" fill="none" stroke="#3a5fcd" stroke-width="2" stroke-dasharray="5,4"/>
+<polygon points="490,285 502.4,288.2 498.8,275.7" fill="#3a5fcd"/>
+<text x="790" y="330" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">π calls next( ) on ⋈,</text>
+<text x="790" y="355" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">⋈ calls next( ) on its inputs, …</text>
+<text x="790" y="380" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="19" fill="#555" text-anchor="middle" font-weight="normal" font-style="normal">demand-driven, one tuple at a time</text>
+<text x="1060" y="610" font-family="Helvetica Neue, Helvetica, Arial, sans-serif" font-size="21" fill="#3a5fcd" text-anchor="end" font-weight="bold" font-style="normal">no temp files — but blocking operators (sort, hash-join build) can't pipeline</text>
+</svg>
