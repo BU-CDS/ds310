@@ -72,6 +72,11 @@ Query processing and optimization is the part of the DBMS that sits between thes
 
 ![Illustration of query processing](images/L09-QueryProcessing-Optimization/QueryProcessingSteps.png){fig-align="center"}
 
+::: {.aside}
+Source: Silberschatz, Korth, and Sudarshan, *Database System Concepts*
+:::
+
+
 ## Example Query
 
 Consider the following query on our movie database:
@@ -106,6 +111,10 @@ Rather than users specifying how to evaluate a query, the DBMS chooses the plan 
 Determining the *best* plan is **query optimization**.
 
 ![](images/L09-QueryProcessing-Optimization/QueryProcessingSteps.png){fig-align="center"}
+
+::: {.aside}
+Source: Silberschatz, Korth, and Sudarshan, *Database System Concepts*
+:::
 
 ## Recall (L06): How Data Is Stored
 
