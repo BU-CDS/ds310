@@ -3518,7 +3518,7 @@
     "href": "L09-QueryProcessing-Optimization.html#query-cost",
     "title": "Query Processing and Optimization",
     "section": "Query Cost",
-    "text": "Query Cost\nEach query plan has an associated cost.\nRather than users specifying how to evaluate a query, the DBMS chooses the plan with the lowest cost.\nDetermining the best plan is query optimization."
+    "text": "Query Cost\nEach query plan has an associated cost.\nRather than users specifying how to evaluate a query, the DBMS chooses the plan with the lowest cost.\nDetermining the best plan is query optimization.\n\n\n\n\n\n\n\nSource: Silberschatz, Korth, and Sudarshan, Database System Concepts"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#recall-l06-how-data-is-stored",
