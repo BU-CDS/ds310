@@ -1,6 +1,6 @@
 ---
 title: "DS310 — Data Mechanics"
-author: "Mark Crovella"
+author: "Mark Crovella, Scott Ladenheim, and Xuezhou Zhang"
 format:
   html:
     theme: cosmo
@@ -17,6 +17,9 @@ data management: database design, the relational model and SQL, storage and
 indexing, transactions and recovery, data warehousing, and distributed and
 NoSQL systems.
 
+Many lectures here were originally based on course notes by David G. Sullivan (BU). Some material is based on lecture notes by
+Jiawei Han (SFU), Micheline Kanber (SFU), and Nikos Mamoulas (BU).
+All have been adapted and revised for this course.
 
 ## Format {.unnumbered}
 

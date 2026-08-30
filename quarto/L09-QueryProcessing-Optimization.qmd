@@ -1,6 +1,7 @@
 ---
 title: "Query Processing and Optimization"
-author: "Data Science 310 &mdash; Boston University"
+author: "Data Science 310"
+institute: "Boston University"
 format:
   revealjs:
     theme: [default, custom.scss]
