@@ -1,7 +1,8 @@
 ---
 title: "Data Warehousing and OLAP"
-author: "Data Science 310 &mdash; Boston University"
-institute: "Based on notes by Jiawei Han (SFU), Micheline Kanber (SFU), and Nikos Mamoulas (BU)"
+author: "Data Science 310"
+institute: "Boston University"
+# Based on notes by Jiawei Han (SFU), Micheline Kanber (SFU), and Nikos Mamoulas (BU)
 format:
   revealjs:
     theme: [default, custom.scss]

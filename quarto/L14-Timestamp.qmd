@@ -1,8 +1,9 @@
 ---
 title: "Timestamp-Based"
 subtitle: "Concurrency Control"
-author: "Data Science 310 &mdash; Boston University"
-institute: Based on notes by David G. Sullivan
+author: "Data Science 310"
+institute: "Boston University"
+# Based on notes by David G. Sullivan, Ph.D. 
 format:
   revealjs:
     theme: [default, custom.scss]
