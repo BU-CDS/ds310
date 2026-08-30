@@ -2,102 +2,102 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://BU-CDS.github.io/ds310/L24-Distributed-Atomicity.html</loc>
-    <lastmod>2026-08-10T16:50:11.180Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.787Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L22-NoSQL1.html</loc>
-    <lastmod>2026-08-10T16:50:11.180Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.787Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L20-Distributed2.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.787Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L18-OLAP2.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L16-Logging2.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L14-Timestamp.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L12-Locking.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L10-Txns1.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L08-Dynamic-Hashing.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L06-Storage.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L04-Patterns-Aggregates.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.785Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L02-Relational.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.785Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/index.html</loc>
-    <lastmod>2026-08-10T16:50:11.594Z</lastmod>
+    <lastmod>2026-08-30T16:44:05.141Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L01-Intro-ER.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.785Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L03-RA-SQL.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.785Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L05-Normalization-Practice.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.785Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L07-Indexing.html</loc>
-    <lastmod>2026-08-10T16:50:11.178Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L09-QueryProcessing-Optimization.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L11-Txns2.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L13-Locking2.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L15-Logging1.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L17-OLAP.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.786Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L19-Distributed.html</loc>
-    <lastmod>2026-08-10T16:50:11.179Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.787Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L21-MapReduce.html</loc>
-    <lastmod>2026-08-10T16:50:11.180Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.787Z</lastmod>
   </url>
   <url>
     <loc>https://BU-CDS.github.io/ds310/L23-NoSQL2.html</loc>
-    <lastmod>2026-08-10T16:50:11.180Z</lastmod>
+    <lastmod>2026-08-30T16:44:04.787Z</lastmod>
   </url>
 </urlset>
