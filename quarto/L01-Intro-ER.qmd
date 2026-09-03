@@ -108,10 +108,13 @@ format:
 
 - Instructor:
     - Mark Crovella (crovella@bu.edu)
+    - Abdullah Bin Faisal (abfaisal@bu.edu)
 - Teaching fellows
+    - Belina (Zhiqui) Wang (bbelina@bu.edu)
     - TBD
-- Course Assistant
-    - TBD
+- Course Assistants
+    - Selina Zhang (selinaz@bu.edu)
+    - Eduardo Torres (torrese9@bu.edu)
 - Office hours: Calendar on Piazza
 - For questions: **post on Piazza**
 
@@ -135,20 +138,26 @@ format:
 
 ## Grading
 
-- Eight homework assignments (40%)
+- Eight homework assignments (15%)
     - Late assignments are *not accepted*
-    - Your score will be calculated based on the 7 highest homeworks
-    - So you can skip one homework without grade impact
-    - Homework 1 is already assigned; due Sept 12
+    - Your score will be calculated based on the 6 highest homeworks
+    - So you can skip two homeworks without grade impact
+    - Homework 1 is assigned today; due Sept 15
 
 ::: {.fragment}
-- Participation (10%)
+- Eight discussion quizzes (25%)
+    - Your score will be calculated based on the 6 highest quizzes
+    - So you can skip two quizzes without grade impact
+:::
+
+::: {.fragment}
+- Participation (5%)
     - Attending 85% of discussion sections gets you full credit
 :::
 
 ::: {.fragment}
 - Exams
-    - Midterm (20%) -- during lecture Oct 17, no makeups!
+    - Midterm (25%) -- during lecture Oct 15, no makeups!
     - Final (30%) -- Cumulative
 :::
 
