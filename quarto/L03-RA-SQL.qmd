@@ -298,6 +298,15 @@ WHERE selection condition;
 - The SELECT clause specifies which columns should be included.
 :::
 
+::: {.fragment}
+- The special symbol * used in SELECT means 'all columns'.
+
+```sql
+SELECT *
+```
+selects all columns
+:::
+
 ::: {.aside}
 *Non-numeric column values are surrounded by single quotes. Table/column names and SQL keywords are not.*
 :::
@@ -348,16 +357,19 @@ WHERE selection predicate;
 ```
 
 ::: {.fragment}
-- Relational-algebra equivalent: cross, select, project
-    1. take the cartesian product `R1 × R2 × …`
+The relational-algebra equivalents are: cross ×, then select σ, then project π.
 :::
 
 ::: {.fragment .sub}
-2. perform a selection that selects tuples from the cross product that satisfy the predicate in the WHERE clause
+ * first, take the cartesian product `R1 × R2 × …`
 :::
 
 ::: {.fragment .sub}
-3. perform a projection of attributes `a1, a2, …` from the tuples selected in step 2, *leaving duplicates alone by default*
+ * then, perform a selection that selects tuples from the cross product that satisfy the predicate in the WHERE clause
+:::
+
+::: {.fragment .sub}
+ * then, perform a projection of attributes `a1, a2, …` from the tuples selected in step 2, *leaving duplicates alone by default* (unlike relational algebra!)
 :::
 
 ::: {.fragment}
@@ -466,8 +478,10 @@ C\. &nbsp;`SELECT * FROM Movie WHERE rating = 'PG-%';` [&larr; no. need to use L
 
 - Because NULL is a special value, any comparison involving NULL that uses the standard operators is *always* false.
 - For example, all of the following will always be false:
-    - `room = NULL`     `NULL != 10`
-    - `room != NULL`     `NULL = NULL`
+    - `room = NULL`     
+    - `NULL != 10`
+    - `room != NULL`     
+    - `NULL = NULL`
 
 ::: {.fragment}
 :::: {.columns}
@@ -574,6 +588,10 @@ E\. &nbsp;none of the queries above would work
 SELECT DISTINCT column1, column2, …
 ```
 
+::: {.fragment}
+- Note the syntax: DISTINCT follows SELECT
+:::
+
 ## What would work?
 
 ![](images/L03-RA-SQL/bestactor-table.png){width="65%" fig-align="center"}
@@ -615,6 +633,10 @@ GROUP BY course_name;
 - When you group by an attribute, you [can]{.underline} include it in the SELECT clause alongside an aggregate function.
 :::
 
+::: {.fragment}
+- SELECT(*) in this case will count _how many tuples are in each group._
+:::
+
 ## How many rows would this query produce?
 
 :::: {.columns}
@@ -638,6 +660,20 @@ A\. &nbsp;0 &emsp; B. 1 &emsp; C. 2 &emsp; D. 4 &emsp; E. 6
 
 ![](images/L03-RA-SQL/groupby-result.png){width="65%" fig-align="center"}
 :::
+
+## HAVING
+
+- What if we want to only return certain groups?
+
+::: {.fragment}
+- SELECT selects tuples in the output
+:::
+
+::: {.fragment}
+- We need a new keyword to choose certain groups accordint to a predicate
+- GROUP BY ... HAVING <predicate>
+:::
+
 
 ## How could we limit this to departments with only 1 student?
 
