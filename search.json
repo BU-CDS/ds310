@@ -2874,7 +2874,7 @@
     "href": "L03-RA-SQL.html#select-from-a-single-table",
     "title": "Relational Algebra (cont.)",
     "section": "SELECT (from a single table)",
-    "text": "SELECT (from a single table)\n\nSample query:\n\nSELECT student_id\nFROM Enrolled\nWHERE credit_status = 'grad';\n\nBasic syntax:\n\nSELECT column1, column2, …\nFROM table\nWHERE selection condition;\n\n\nThe FROM clause specifies which table you are using.\nThe WHERE clause specifies which rows should be included in the result.\nThe SELECT clause specifies which columns should be included.\n\n\n\n\nNon-numeric column values are surrounded by single quotes. Table/column names and SQL keywords are not."
+    "text": "SELECT (from a single table)\n\nSample query:\n\nSELECT student_id\nFROM Enrolled\nWHERE credit_status = 'grad';\n\nBasic syntax:\n\nSELECT column1, column2, …\nFROM table\nWHERE selection condition;\n\n\nThe FROM clause specifies which table you are using.\nThe WHERE clause specifies which rows should be included in the result.\nThe SELECT clause specifies which columns should be included.\n\n\n\n\nThe special symbol * used in SELECT means ‘all columns’.\n\nSELECT *\nselects all columns\n\n\n\nNon-numeric column values are surrounded by single quotes. Table/column names and SQL keywords are not."
   },
   {
     "objectID": "L03-RA-SQL.html#how-could-we-get-all-info-about-movies-released-in-2010",
@@ -2895,7 +2895,7 @@
     "href": "L03-RA-SQL.html#select-and-relational-algebra",
     "title": "Relational Algebra (cont.)",
     "section": "SELECT and Relational Algebra",
-    "text": "SELECT and Relational Algebra\n\nSELECT commands implement most rel-alg operations.\nBasic syntax:\n\nSELECT a1, a2, …\nFROM R1, R2, …\nWHERE selection predicate;\n\n\nRelational-algebra equivalent: cross, select, project\n\ntake the cartesian product R1 × R2 × …\n\n\n\n\n\nperform a selection that selects tuples from the cross product that satisfy the predicate in the WHERE clause\n\n\n\n\nperform a projection of attributes a1, a2, … from the tuples selected in step 2, leaving duplicates alone by default\n\n\n\n\n(These steps tell us what tuples will appear in the resulting relation, but the command may be executed differently for the sake of efficiency.)\n\n\n\n\nNote: the SELECT clause by itself specifies a projection! The WHERE clause specifies a selection."
+    "text": "SELECT and Relational Algebra\n\nSELECT commands implement most rel-alg operations.\nBasic syntax:\n\nSELECT a1, a2, …\nFROM R1, R2, …\nWHERE selection predicate;\n\nThe relational-algebra equivalents are: cross ×, then select σ, then project π.\n\n\n\nfirst, take the cartesian product R1 × R2 × …\n\n\n\n\nthen, perform a selection that selects tuples from the cross product that satisfy the predicate in the WHERE clause\n\n\n\n\nthen, perform a projection of attributes a1, a2, … from the tuples selected in step 2, leaving duplicates alone by default (unlike relational algebra!)\n\n\n\n\n(These steps tell us what tuples will appear in the resulting relation, but the command may be executed differently for the sake of efficiency.)\n\n\n\n\nNote: the SELECT clause by itself specifies a projection! The WHERE clause specifies a selection."
   },
   {
     "objectID": "L03-RA-SQL.html#example-query",
@@ -2937,7 +2937,7 @@
     "href": "L03-RA-SQL.html#comparisons-involving-null",
     "title": "Relational Algebra (cont.)",
     "section": "Comparisons Involving NULL",
-    "text": "Comparisons Involving NULL\n\nBecause NULL is a special value, any comparison involving NULL that uses the standard operators is always false.\nFor example, all of the following will always be false:\n\nroom = NULL NULL != 10\nroom != NULL NULL = NULL\n\n\n\n\n\n\nThis is useful for cases like the following:\n\nassume that we add a country column to Student\nuse NULL for students whose country is unknown\n\n\n\n\n\n\n\n\nto get all students from a foreign country:\n\nSELECT name FROM Student\nWHERE country != 'USA';   -- won't include NULLs"
+    "text": "Comparisons Involving NULL\n\nBecause NULL is a special value, any comparison involving NULL that uses the standard operators is always false.\nFor example, all of the following will always be false:\n\nroom = NULL\n\nNULL != 10\nroom != NULL\n\nNULL = NULL\n\n\n\n\n\n\nThis is useful for cases like the following:\n\nassume that we add a country column to Student\nuse NULL for students whose country is unknown\n\n\n\n\n\n\n\n\nto get all students from a foreign country:\n\nSELECT name FROM Student\nWHERE country != 'USA';   -- won't include NULLs"
   },
   {
     "objectID": "L03-RA-SQL.html#comparisons-involving-null-cont.",
@@ -2979,7 +2979,7 @@
     "href": "L03-RA-SQL.html#removing-duplicates-1",
     "title": "Relational Algebra (cont.)",
     "section": "Removing Duplicates",
-    "text": "Removing Duplicates\n\nBy default, a SELECT command may produce duplicates.\nTo eliminate them, add the DISTINCT keyword:\n\nSELECT DISTINCT column1, column2, …"
+    "text": "Removing Duplicates\n\nBy default, a SELECT command may produce duplicates.\nTo eliminate them, add the DISTINCT keyword:\n\nSELECT DISTINCT column1, column2, …\n\n\nNote the syntax: DISTINCT follows SELECT"
   },
   {
     "objectID": "L03-RA-SQL.html#what-would-work",
@@ -3000,7 +3000,7 @@
     "href": "L03-RA-SQL.html#applying-an-aggregate-function-to-subgroups",
     "title": "Relational Algebra (cont.)",
     "section": "Applying an Aggregate Function to Subgroups",
-    "text": "Applying an Aggregate Function to Subgroups\n\nA GROUP BY clause allows us to:\n\ngroup together tuples that have a common value\napply an aggregate function to the tuples in each subgroup\n\nExample: find the enrollment of each course:\n\nSELECT course_name, COUNT(*)\nFROM Enrolled\nGROUP BY course_name;\n\n\nWhen you group by an attribute, you can include it in the SELECT clause alongside an aggregate function."
+    "text": "Applying an Aggregate Function to Subgroups\n\nA GROUP BY clause allows us to:\n\ngroup together tuples that have a common value\napply an aggregate function to the tuples in each subgroup\n\nExample: find the enrollment of each course:\n\nSELECT course_name, COUNT(*)\nFROM Enrolled\nGROUP BY course_name;\n\n\nWhen you group by an attribute, you can include it in the SELECT clause alongside an aggregate function.\n\n\n\n\nSELECT(*) in this case will count how many tuples are in each group."
   },
   {
     "objectID": "L03-RA-SQL.html#how-many-rows-would-this-query-produce",
@@ -3008,6 +3008,13 @@
     "title": "Relational Algebra (cont.)",
     "section": "How many rows would this query produce?",
     "text": "How many rows would this query produce?\n\n\nSELECT dept_name, COUNT(*)\nFROM MajorsIn\nGROUP BY dept_name;\nA.  0   B. 1   C. 2   D. 4   E. 6\n\n\n\n\nAnswer: D – 4 rows"
+  },
+  {
+    "objectID": "L03-RA-SQL.html#having",
+    "href": "L03-RA-SQL.html#having",
+    "title": "Relational Algebra (cont.)",
+    "section": "HAVING",
+    "text": "HAVING\n\nWhat if we want to only return certain groups?\n\n\n\nSELECT selects tuples in the output\n\n\n\n\nWe need a new keyword to choose certain groups accordint to a predicate\nGROUP BY … HAVING"
   },
   {
     "objectID": "L03-RA-SQL.html#how-could-we-limit-this-to-departments-with-only-1-student",
