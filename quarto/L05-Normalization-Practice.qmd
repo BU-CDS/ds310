@@ -1,6 +1,6 @@
 ---
-title: "Normalization in Relational Databases;"
-subtitle: "SQL Practices"
+title: "Normalization in Relational Databases"
+subtitle: "and Practice Writing Queries"
 author: "Data Science 310"
 institute: "Boston University"
 # Based on notes by David G. Sullivan, Ph.D. 
@@ -19,13 +19,11 @@ format:
 ## Database Normalization
 
 - In proposing the relational model, Codd had some very specific advantages in mind.
-
-1. Simple conceptual framework. Everything is a relation, and access is through the precise relational algebra
-2. The structure of the database, and the rules of the DBMS, should ensure *data integrity*
-    - Logical relationships among data items cannot be violated
-3. He proposed certain constraints on how databases should be structured
+  1. *Simple conceptual framework*. Everything is a relation, and access is through the precise relational algebra
+  2. The structure of the database, and the rules of the DBMS, should ensure *data integrity*
+  3. He proposed certain constraints on how databases should be structured
     - Called *normal forms*
-4. These form successively more strict rules
+  4. These form successively more strict rules
     - There are many &ndash; more than six
     - We will study the first three (most important)
 
@@ -181,6 +179,7 @@ Source: wikipedia
 - But relational is far and away the most common structure for databases in practice
 :::
 
+<!-- covered in the previous lecture 
 ## SQL Data Types
 
 - Numeric types include:
@@ -192,6 +191,8 @@ Source: wikipedia
     - two types for *strings* (i.e., arbitrary sequences of characters)
         - CHAR
         - VARCHAR
+
+ --> 
 
 ## Creating the Student table&hellip;
 
@@ -294,6 +295,7 @@ INSERT INTO Student
 [`('Robert B', '4567')` &nbsp;would be stored]{style="color:#3a5fcd;"}
 :::
 
+<!-- covered in the previous lecture 
 ## Types in SQLite
 
 - SQLite has its own types, including:
@@ -306,6 +308,7 @@ INSERT INTO Student
 - As a result, the length restrictions indicated for CHAR and VARCHAR are not observed.
 - It is also more lax in type checking than typical DBMSs.
 :::
+-->
 
 ## Creating the Enrolled table...
 
@@ -428,7 +431,7 @@ WHERE id NOT IN (SELECT student_id
 ![](images/L05-Normalization-Practice/setmem-5.png){.fragment width="70%"}
 :::
 
-## Writing Queries: Rules of Thumb
+## Reminder: Rules of Thumb for Writing Queries
 
 - Start with the FROM clause. Which table(s) do you need?
 
@@ -791,6 +794,7 @@ GROUP BY name;
 :::
 :::
 
+<!-- covered in the previous lecture 
 ## Practice Writing Queries
 
 ```text
@@ -989,7 +993,7 @@ HAVING COUNT(*) > 1;
 ```
 :::
 :::
-
+-->
 ## Which of these problems would require a GROUP BY?
 
 ```text
@@ -1017,7 +1021,7 @@ Which would require a subquery? &nbsp;[A]{style="color:#3a5fcd; font-weight:bold
 Which would require a LEFT OUTER JOIN? &nbsp;[C]{style="color:#1a7a1a; font-weight:bold;"}
 :::
 
-## Now Write the Queries!
+## Now Write this Query!
 
 ```text
 Person(id, name, dob, pob)
@@ -1026,7 +1030,7 @@ Actor(actor_id, movie_id)      Director(director_id, movie_id)
 Oscar(movie_id, person_id, type, year)
 ```
 
-1\) &nbsp;Find the Best-Picture winner with the best/smallest earnings rank. The result should have the form (name, earnings_rank). Assume no two movies have the same earnings rank.
+Find the Best-Picture winner with the best/smallest earnings rank. The result should have the form (name, earnings_rank). Assume no two movies have the same earnings rank.
 
 ::: {.r-stack}
 ::: {style="width:100%;"}
@@ -1107,4 +1111,3 @@ WHERE earnings_rank = (SELECT MIN(earnings_rank)
 :::
 :::
 
-*Hold off on 2 and 3 for now!*

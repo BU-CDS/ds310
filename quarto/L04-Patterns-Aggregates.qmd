@@ -852,6 +852,7 @@ WHERE room_id = id
 ```
 :::
 
+<!-- repeated from above 
 ## Writing Queries: Rules of Thumb
 
 - Start with the FROM clause. Which table(s) do you need?
@@ -866,6 +867,8 @@ WHERE room_id = id
     - is a subquery needed?
 - Fill in the rest of the query: SELECT, ORDER BY?
     - is DISTINCT needed?
+
+--> 
 
 ## Finding the Majors of Enrolled Students
 
@@ -963,7 +966,10 @@ WHERE Student.id = Enrolled.student_id
 
 -->
 
+<!-- covered in the next lecture 
 ## Extra Practice Writing Queries
+
+Try these before the next lecture! (We'll go over them in class.)
 
 ```text
 Person(id, name, dob, pob)
@@ -1058,6 +1064,8 @@ WHERE pob LIKE 'Boston, Mass%'
 GROUP BY name;
 ```
 :::
+
+--> 
 
 ## What does this give?
 
@@ -1195,8 +1203,6 @@ ON id = movie_id GROUP BY name;
 :::
 ::::
 :::
-
-## Extra Practice
 
 ## Practice Writing Queries
 
