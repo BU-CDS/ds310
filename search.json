@@ -1771,20 +1771,6 @@
     "text": "Subqueries in FROM clauses\n\nA subquery can also appear in a FROM clause.\nUseful when you need to perform a computation on values obtained by applying an aggregate.\n\nexample: find the average enrollment in a DS course\n\n\nSELECT AVG(count)\nFROM (SELECT course, COUNT(*) as count\n      FROM Enrolled\n      GROUP BY course) AS enrollCounts\nWHERE course LIKE 'ds%';\n\nSome systems require that you assign a FROM-clause subquery a name (e.g., enrollCounts above)."
   },
   {
-    "objectID": "L04-Patterns-Aggregates.html#sorting-the-results",
-    "href": "L04-Patterns-Aggregates.html#sorting-the-results",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Sorting the Results",
-    "text": "Sorting the Results\n\nAn ORDER BY clause sorts the tuples in the result of the query by one or more attributes.\n\nascending order by default, use DESC to get descending\nexample:\n\n\nSELECT name, capacity\nFROM Room\nWHERE capacity &gt; 100\nORDER BY capacity DESC, name;"
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#set-operations",
-    "href": "L04-Patterns-Aggregates.html#set-operations",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Set Operations",
-    "text": "Set Operations\n\nUNION, INTERSECTION, EXCEPT (set difference)\nExample: find the IDs of students and advisors\n\nSELECT student\nFROM Enrolled\nUNION\nSELECT advisor\nFROM Advises;"
-  },
-  {
     "objectID": "L04-Patterns-Aggregates.html#outer-joins",
     "href": "L04-Patterns-Aggregates.html#outer-joins",
     "title": "SQL: Aggregates, Subqueries,",
@@ -1806,11 +1792,11 @@
     "text": "Outer Joins (cont.)\n\nAnother example: find the IDs and majors of all students enrolled in cscie268 (including those with no major):\n\nSELECT Enrolled.student, dept\nFROM Enrolled LEFT OUTER JOIN MajorsIn\n     ON Enrolled.student = MajorsIn.student\nWHERE course = 'cscie268';\n\n\nin this case, there is a WHERE clause with an additional selection condition\n\n\n\n\nthe additional condition belongs in the WHERE clause because it’s not a join condition – i.e., it isn’t used to match up tuples from the two tables\n\n\n\n\nNote: when there is no additional condition, we don’t need a WHERE clause – the join condition is in the ON clause."
   },
   {
-    "objectID": "L04-Patterns-Aggregates.html#evaluating-a-select-command",
-    "href": "L04-Patterns-Aggregates.html#evaluating-a-select-command",
+    "objectID": "L04-Patterns-Aggregates.html#how-to-evaluate-a-select-command",
+    "href": "L04-Patterns-Aggregates.html#how-to-evaluate-a-select-command",
     "title": "SQL: Aggregates, Subqueries,",
-    "section": "Evaluating a SELECT command",
-    "text": "Evaluating a SELECT command\nSELECT column1, column2, …\nFROM table1, table2, ...\n...\n\nThe result is equivalent to:\n\nevaluating any subqueries in the FROM clause\nforming the Cartesian product of the tables in the FROM clause: table1 x table2 x …\nif there is an OUTER JOIN, applying its join condition and adding extra tuples as needed\napplying the remaining clauses in the following order:\n\n\nWHERE (including any subqueries)   GROUP BY   HAVING   SELECT   ORDER BY"
+    "section": "How to Evaluate a SELECT command",
+    "text": "How to Evaluate a SELECT command\nSELECT column1, column2, …\nFROM table1, table2, ...\n...\n\nThe order of operations to evaluate a SELECT command is:\n\nevaluate any subqueries in the FROM clause\nform the Cartesian product of the tables in the FROM clause: table1 x table2 x …\nif there is an OUTER JOIN, apply its join condition and add extra tuples as needed\napply the remaining clauses in the following order\n\nWHERE (including any subqueries)\nGROUP BY\nHAVING\nSELECT\nORDER BY"
   },
   {
     "objectID": "L04-Patterns-Aggregates.html#create-table",
@@ -1972,20 +1958,6 @@
     "title": "SQL: Aggregates, Subqueries,",
     "section": "Left Outer Joins",
     "text": "Left Outer Joins\n\n\nSELECT DISTINCT\n    Enrolled.student_id, dept_name\nFROM Enrolled\n    LEFT OUTER JOIN MajorsIn\n    ON Enrolled.student_id =\n       MajorsIn.student_id;\n\nThe result is equivalent to:\n\nforming the Cartesian product T1 x T2\nselecting the rows in T1 x T2 that satisfy the join condition in the ON clause\nincluding an extra row for each unmatched row from T1 (the “left table”)\n\nfilling the T2 attributes in the extra rows with nulls\n\napplying the other clauses as before"
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#outer-joins-can-have-a-where-clause",
-    "href": "L04-Patterns-Aggregates.html#outer-joins-can-have-a-where-clause",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Outer Joins Can Have a WHERE Clause",
-    "text": "Outer Joins Can Have a WHERE Clause\n\nExample: find the IDs and majors of all students enrolled in DS 310 (including those with no major):\n\nSELECT Enrolled.student_id, dept_name\nFROM Enrolled LEFT OUTER JOIN MajorsIn\n     ON Enrolled.student_id = MajorsIn.student_id\nWHERE course_name = 'DS 310';\n\nto limit the results to students in DS 310, we need a WHERE clause with the appropriate condition\nthis new condition should not be in the ON clause because it’s not being used to match up rows from the two tables"
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#outer-joins-can-have-extra-tables",
-    "href": "L04-Patterns-Aggregates.html#outer-joins-can-have-extra-tables",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Outer Joins Can Have Extra Tables",
-    "text": "Outer Joins Can Have Extra Tables\n\nExample: find the names and majors of all students enrolled in DS 310 (including those with no major):\n\nSELECT Student.name, dept_name\nFROM Student, Enrolled LEFT OUTER JOIN MajorsIn\n     ON Enrolled.student_id = MajorsIn.student_id\nWHERE Student.id = Enrolled.student_id\n  AND course_name = 'DS 310';\n\nwe need Student in the FROM clause to get the student’s names\nthe extra table requires an additional join condition, which goes in the WHERE clause"
   },
   {
     "objectID": "L04-Patterns-Aggregates.html#extra-practice-writing-queries",
