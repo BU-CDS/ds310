@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.10.18">
 
   <meta name="author" content="Data Science 310">
-  <title>DS310 – Normalization in Relational Databases;</title>
+  <title>DS310 – Normalization in Relational Databases</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -202,8 +202,8 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Normalization in Relational Databases;</h1>
-  <p class="subtitle">SQL Practices</p>
+  <h1 class="title">Normalization in Relational Databases</h1>
+  <p class="subtitle">and Practice Writing Queries</p>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -220,24 +220,23 @@ Data Science 310
 <section id="database-normalization" class="slide level2 scrollable">
 <h2>Database Normalization</h2>
 <ul>
-<li>In proposing the relational model, Codd had some very specific advantages in mind.</li>
-</ul>
+<li>In proposing the relational model, Codd had some very specific advantages in mind.
 <ol type="1">
-<li>Simple conceptual framework. Everything is a relation, and access is through the precise relational algebra</li>
-<li>The structure of the database, and the rules of the DBMS, should ensure <em>data integrity</em>
-<ul>
-<li>Logical relationships among data items cannot be violated</li>
-</ul></li>
-<li>He proposed certain constraints on how databases should be structured
+<li><em>Simple conceptual framework</em>. Everything is a relation, and access is through the precise relational algebra</li>
+<li>The structure of the database, and the rules of the DBMS, should ensure <em>data integrity</em></li>
+<li>He proposed certain constraints on how databases should be structured</li>
+</ol>
 <ul>
 <li>Called <em>normal forms</em></li>
-</ul></li>
-<li>These form successively more strict rules
+</ul>
+<ol start="4" type="1">
+<li>These form successively more strict rules</li>
+</ol>
 <ul>
 <li>There are many – more than six</li>
 <li>We will study the first three (most important)</li>
 </ul></li>
-</ol>
+</ul>
 </section>
 <section id="not-in-1nf" class="slide level2">
 <h2>Not in 1NF</h2>
@@ -420,26 +419,20 @@ Data Science 310
 <li>But relational is far and away the most common structure for databases in practice</li>
 </ul>
 </div>
-</section>
-<section id="sql-data-types" class="slide level2">
-<h2>SQL Data Types</h2>
-<ul>
-<li>Numeric types include:
-<ul>
-<li>INTEGER</li>
-<li>REAL: a real number (i.e., one that may have a fractional part)</li>
-</ul></li>
-<li>Non-numeric types include:
-<ul>
-<li>DATE (e.g., ‘2017-02-23’)</li>
-<li>TIME (e.g., ‘15:30:30’)</li>
-<li>two types for <em>strings</em> (i.e., arbitrary sequences of characters)
-<ul>
-<li>CHAR</li>
-<li>VARCHAR</li>
-</ul></li>
-</ul></li>
-</ul>
+<!-- covered in the previous lecture 
+## SQL Data Types
+
+- Numeric types include:
+    - INTEGER
+    - REAL: a real number (i.e., one that may have a fractional part)
+- Non-numeric types include:
+    - DATE (e.g., '2017-02-23')
+    - TIME (e.g., '15:30:30')
+    - two types for *strings* (i.e., arbitrary sequences of characters)
+        - CHAR
+        - VARCHAR
+
+ -->
 </section>
 <section id="creating-the-student-table" class="slide level2">
 <h2>Creating the Student table…</h2>
@@ -507,24 +500,20 @@ Data Science 310
 <div class="fragment">
 <p><span style="color:#3a5fcd;"><code>('Robert B', '4567')</code> &nbsp;would be stored</span></p>
 </div>
-</section>
-<section id="types-in-sqlite" class="slide level2">
-<h2>Types in SQLite</h2>
-<ul>
-<li>SQLite has its own types, including:
-<ul>
-<li>INTEGER</li>
-<li>REAL</li>
-<li>TEXT</li>
-</ul></li>
-<li>It also allows you to use the typical SQL types, but it converts them to one of its own types.</li>
-</ul>
-<div class="fragment">
-<ul>
-<li>As a result, the length restrictions indicated for CHAR and VARCHAR are not observed.</li>
-<li>It is also more lax in type checking than typical DBMSs.</li>
-</ul>
-</div>
+<!-- covered in the previous lecture 
+## Types in SQLite
+
+- SQLite has its own types, including:
+    - INTEGER
+    - REAL
+    - TEXT
+- It also allows you to use the typical SQL types, but it converts them to one of its own types.
+
+::: {.fragment}
+- As a result, the length restrictions indicated for CHAR and VARCHAR are not observed.
+- It is also more lax in type checking than typical DBMSs.
+:::
+-->
 </section>
 <section id="creating-the-enrolled-table" class="slide level2">
 <h2>Creating the Enrolled table…</h2>
@@ -618,8 +607,8 @@ Data Science 310
 <p><img data-src="images/L05-Normalization-Practice/setmem-5.png" class="fragment" style="width:70.0%"></p>
 </div>
 </section>
-<section id="writing-queries-rules-of-thumb" class="slide level2">
-<h2>Writing Queries: Rules of Thumb</h2>
+<section id="reminder-rules-of-thumb-for-writing-queries" class="slide level2">
+<h2>Reminder: Rules of Thumb for Writing Queries</h2>
 <ul>
 <li>Start with the FROM clause. Which table(s) do you need?</li>
 </ul>
@@ -896,150 +885,213 @@ Data Science 310
 <span id="cb47-4"><a aria-label="4"></a><span class="kw">GROUP</span> <span class="kw">BY</span> name;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-</section>
-<section id="practice-writing-queries" class="slide level2">
-<h2>Practice Writing Queries</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb48-1"><a aria-label="1"></a>Student(id, name)      Department(name, office)      Room(id, name, capacity)</span>
-<span id="cb48-2"><a aria-label="2"></a>Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)</span>
-<span id="cb48-3"><a aria-label="3"></a>Enrolled(student_id, course_name, credit_status)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>1) &nbsp;Find the names of all courses taken by comp sci majors.</p>
-<div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb49-1"><a aria-label="1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> course_name</span>
-<span id="cb49-2"><a aria-label="2"></a><span class="kw">FROM</span> Enrolled E, MajorsIn M</span>
-<span id="cb49-3"><a aria-label="3"></a><span class="kw">WHERE</span> E.student_id <span class="op">=</span> M.student_id</span>
-<span id="cb49-4"><a aria-label="4"></a>  <span class="kw">AND</span> dept_name <span class="op">=</span> <span class="st">'comp sci'</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>2) &nbsp;Find the number of students majoring in each department. (The result should be tuples of the form (dept name, # students).)</p>
-<div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb50-1"><a aria-label="1"></a><span class="kw">SELECT</span> dept_name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
-<span id="cb50-2"><a aria-label="2"></a><span class="kw">FROM</span> MajorsIn</span>
-<span id="cb50-3"><a aria-label="3"></a><span class="kw">GROUP</span> <span class="kw">BY</span> dept_name;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="practice-writing-queries-cont." class="slide level2">
-<h2>Practice Writing Queries (cont.)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb51-1"><a aria-label="1"></a>Student(id, name)      Department(name, office)      Room(id, name, capacity)</span>
-<span id="cb51-2"><a aria-label="2"></a>Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)</span>
-<span id="cb51-3"><a aria-label="3"></a>Enrolled(student_id, course_name, credit_status)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>3) &nbsp;Find the names and ids of all students who have a course in GCB 204.</p>
-<div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb52-1"><a aria-label="1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> S.<span class="kw">id</span>, S.name</span>
-<span id="cb52-2"><a aria-label="2"></a><span class="kw">FROM</span> Student S, Enrolled E, Course C, Room R</span>
-<span id="cb52-3"><a aria-label="3"></a><span class="kw">WHERE</span> S.<span class="kw">id</span> <span class="op">=</span> E.student_id</span>
-<span id="cb52-4"><a aria-label="4"></a>  <span class="kw">AND</span> E.course_name <span class="op">=</span> C.name</span>
-<span id="cb52-5"><a aria-label="5"></a>  <span class="kw">AND</span> C.room_id <span class="op">=</span> R.<span class="kw">id</span></span>
-<span id="cb52-6"><a aria-label="6"></a>  <span class="kw">AND</span> R.name <span class="op">=</span> <span class="st">'GCB 204'</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>4) &nbsp;Find the names of all rooms in which one or more CS courses meet.</p>
-<div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb53-1"><a aria-label="1"></a><span class="kw">SELECT</span> <span class="kw">DISTINCT</span> Room.name</span>
-<span id="cb53-2"><a aria-label="2"></a><span class="kw">FROM</span> Course, Room</span>
-<span id="cb53-3"><a aria-label="3"></a><span class="kw">WHERE</span> room_id <span class="op">=</span> <span class="kw">id</span></span>
-<span id="cb53-4"><a aria-label="4"></a>  <span class="kw">AND</span> Course.name <span class="kw">LIKE</span> <span class="st">'CS%'</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="practice-writing-queries-cont.-1" class="slide level2">
-<h2>Practice Writing Queries (cont.)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb54-1"><a aria-label="1"></a>Student(id, name)      Department(name, office)      Room(id, name, capacity)</span>
-<span id="cb54-2"><a aria-label="2"></a>Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)</span>
-<span id="cb54-3"><a aria-label="3"></a>Enrolled(student_id, course_name, credit_status)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>5a) &nbsp;Find the number of CS majors enrolled in CS 105.</p>
-<div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb55-1"><a aria-label="1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
-<span id="cb55-2"><a aria-label="2"></a><span class="kw">FROM</span> Enrolled E, MajorsIn M</span>
-<span id="cb55-3"><a aria-label="3"></a><span class="kw">WHERE</span> E.student_id <span class="op">=</span> M.student_id</span>
-<span id="cb55-4"><a aria-label="4"></a>  <span class="kw">AND</span> course_name <span class="op">=</span> <span class="st">'CS 105'</span></span>
-<span id="cb55-5"><a aria-label="5"></a>  <span class="kw">AND</span> dept_name <span class="op">=</span> <span class="st">'comp sci'</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<p>5b) &nbsp;Find the number of CS majors enrolled in a course.</p>
-<div class="fragment">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb56-1"><a aria-label="1"></a><span class="kw">SELECT</span> <span class="fu">COUNT</span>(<span class="kw">DISTINCT</span> E.student_id)</span>
-<span id="cb56-2"><a aria-label="2"></a><span class="kw">FROM</span> Enrolled E, MajorsIn M</span>
-<span id="cb56-3"><a aria-label="3"></a><span class="kw">WHERE</span> E.student_id <span class="op">=</span> M.student_id</span>
-<span id="cb56-4"><a aria-label="4"></a>  <span class="kw">AND</span> dept_name <span class="op">=</span> <span class="st">'comp sci'</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="practice-writing-queries-cont.-2" class="slide level2">
-<h2>Practice Writing Queries (cont.)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb57"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb57-1"><a aria-label="1"></a>Student(id, name)      Department(name, office)      Room(id, name, capacity)</span>
-<span id="cb57-2"><a aria-label="2"></a>Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)</span>
-<span id="cb57-3"><a aria-label="3"></a>Enrolled(student_id, course_name, credit_status)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>6) &nbsp;Find the number of majors that each student has declared.</p>
-<div class="r-stack">
-<div style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb58"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb58-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb58-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
-<span id="cb58-3"><a aria-label="3"></a> </span>
-<span id="cb58-4"><a aria-label="4"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb59"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb59-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb59-2"><a aria-label="2"></a><span class="kw">FROM</span> Student <span class="kw">LEFT</span> <span class="kw">JOIN</span> MajorsIn</span>
-<span id="cb59-3"><a aria-label="3"></a>     <span class="kw">ON</span> Student.<span class="kw">id</span> <span class="op">=</span> MajorsIn.student_id</span>
-<span id="cb59-4"><a aria-label="4"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb60"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb60-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb60-2"><a aria-label="2"></a><span class="kw">FROM</span> Student <span class="kw">LEFT</span> <span class="kw">JOIN</span> MajorsIn</span>
-<span id="cb60-3"><a aria-label="3"></a>     <span class="kw">ON</span> Student.<span class="kw">id</span> <span class="op">=</span> MajorsIn.student_id</span>
-<span id="cb60-4"><a aria-label="4"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="kw">id</span>, name;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb61"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb61-1"><a aria-label="1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, <span class="fu">COUNT</span>(dept_name)</span>
-<span id="cb61-2"><a aria-label="2"></a><span class="kw">FROM</span> Student <span class="kw">LEFT</span> <span class="kw">JOIN</span> MajorsIn</span>
-<span id="cb61-3"><a aria-label="3"></a>     <span class="kw">ON</span> Student.<span class="kw">id</span> <span class="op">=</span> MajorsIn.student_id</span>
-<span id="cb61-4"><a aria-label="4"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="kw">id</span>, name;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div>
-<div class="fragment">
-<ul>
-<li>The following will <em>not</em> work, because it counts the rows, rather than the number of non-NULL values:</li>
-</ul>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb62"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb62-1"><a aria-label="1"></a><span class="kw">SELECT</span> <span class="kw">id</span>, name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
-<span id="cb62-2"><a aria-label="2"></a><span class="kw">FROM</span> Student <span class="kw">LEFT</span> <span class="kw">JOIN</span> MajorsIn</span>
-<span id="cb62-3"><a aria-label="3"></a>     <span class="kw">ON</span> Student.<span class="kw">id</span> <span class="op">=</span> MajorsIn.student_id</span>
-<span id="cb62-4"><a aria-label="4"></a><span class="kw">GROUP</span> <span class="kw">BY</span> <span class="kw">id</span>, name;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</section>
-<section id="practice-writing-queries-cont.-3" class="slide level2">
-<h2>Practice Writing Queries (cont.)</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb63"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb63-1"><a aria-label="1"></a>Student(id, name)      Department(name, office)      Room(id, name, capacity)</span>
-<span id="cb63-2"><a aria-label="2"></a>Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)</span>
-<span id="cb63-3"><a aria-label="3"></a>Enrolled(student_id, course_name, credit_status)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>7) &nbsp;For each department with more than one majoring student, output the department’s name and the number of majoring students.</p>
-<div class="r-stack">
-<div style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb64"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb64-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb64-2"><a aria-label="2"></a><span class="kw">FROM</span> MajorsIn</span>
-<span id="cb64-3"><a aria-label="3"></a> </span>
-<span id="cb64-4"><a aria-label="4"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb65"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb65-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb65-2"><a aria-label="2"></a><span class="kw">FROM</span> MajorsIn</span>
-<span id="cb65-3"><a aria-label="3"></a><span class="kw">GROUP</span> <span class="kw">BY</span> dept_name</span>
-<span id="cb65-4"><a aria-label="4"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb66"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb66-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb66-2"><a aria-label="2"></a><span class="kw">FROM</span> MajorsIn</span>
-<span id="cb66-3"><a aria-label="3"></a><span class="kw">GROUP</span> <span class="kw">BY</span> dept_name</span>
-<span id="cb66-4"><a aria-label="4"></a><span class="kw">HAVING</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="op">&gt;</span> <span class="dv">1</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb67"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb67-1"><a aria-label="1"></a><span class="kw">SELECT</span> dept_name, <span class="fu">COUNT</span>(<span class="op">*</span>)</span>
-<span id="cb67-2"><a aria-label="2"></a><span class="kw">FROM</span> MajorsIn</span>
-<span id="cb67-3"><a aria-label="3"></a><span class="kw">GROUP</span> <span class="kw">BY</span> dept_name</span>
-<span id="cb67-4"><a aria-label="4"></a><span class="kw">HAVING</span> <span class="fu">COUNT</span>(<span class="op">*</span>) <span class="op">&gt;</span> <span class="dv">1</span>;</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-</div>
+<!-- covered in the previous lecture 
+## Practice Writing Queries
+
+```text
+Student(id, name)      Department(name, office)      Room(id, name, capacity)
+Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)
+Enrolled(student_id, course_name, credit_status)
+```
+
+1\) &nbsp;Find the names of all courses taken by comp sci majors.
+
+::: {.fragment}
+```sql
+SELECT DISTINCT course_name
+FROM Enrolled E, MajorsIn M
+WHERE E.student_id = M.student_id
+  AND dept_name = 'comp sci';
+```
+:::
+
+2\) &nbsp;Find the number of students majoring in each department. (The result should be tuples of the form (dept name, # students).)
+
+::: {.fragment}
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+GROUP BY dept_name;
+```
+:::
+
+## Practice Writing Queries (cont.)
+
+```text
+Student(id, name)      Department(name, office)      Room(id, name, capacity)
+Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)
+Enrolled(student_id, course_name, credit_status)
+```
+
+3\) &nbsp;Find the names and ids of all students who have a course in GCB 204.
+
+::: {.fragment}
+```sql
+SELECT DISTINCT S.id, S.name
+FROM Student S, Enrolled E, Course C, Room R
+WHERE S.id = E.student_id
+  AND E.course_name = C.name
+  AND C.room_id = R.id
+  AND R.name = 'GCB 204';
+```
+:::
+
+4\) &nbsp;Find the names of all rooms in which one or more CS courses meet.
+
+::: {.fragment}
+```sql
+SELECT DISTINCT Room.name
+FROM Course, Room
+WHERE room_id = id
+  AND Course.name LIKE 'CS%';
+```
+:::
+
+## Practice Writing Queries (cont.)
+
+```text
+Student(id, name)      Department(name, office)      Room(id, name, capacity)
+Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)
+Enrolled(student_id, course_name, credit_status)
+```
+
+5a\) &nbsp;Find the number of CS majors enrolled in CS 105.
+
+::: {.fragment}
+```sql
+SELECT COUNT(*)
+FROM Enrolled E, MajorsIn M
+WHERE E.student_id = M.student_id
+  AND course_name = 'CS 105'
+  AND dept_name = 'comp sci';
+```
+:::
+
+5b\) &nbsp;Find the number of CS majors enrolled in a course.
+
+::: {.fragment}
+```sql
+SELECT COUNT(DISTINCT E.student_id)
+FROM Enrolled E, MajorsIn M
+WHERE E.student_id = M.student_id
+  AND dept_name = 'comp sci';
+```
+:::
+
+## Practice Writing Queries (cont.)
+
+```text
+Student(id, name)      Department(name, office)      Room(id, name, capacity)
+Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)
+Enrolled(student_id, course_name, credit_status)
+```
+
+6\) &nbsp;Find the number of majors that each student has declared.
+
+::: {.r-stack}
+::: {style="width:100%;"}
+```sql
+SELECT
+FROM
+ 
+ 
+```
+:::
+
+::: {.fragment style="width:100%;"}
+```sql
+SELECT
+FROM Student LEFT JOIN MajorsIn
+     ON Student.id = MajorsIn.student_id
+ 
+```
+:::
+
+::: {.fragment style="width:100%;"}
+```sql
+SELECT
+FROM Student LEFT JOIN MajorsIn
+     ON Student.id = MajorsIn.student_id
+GROUP BY id, name;
+```
+:::
+
+::: {.fragment style="width:100%;"}
+```sql
+SELECT id, name, COUNT(dept_name)
+FROM Student LEFT JOIN MajorsIn
+     ON Student.id = MajorsIn.student_id
+GROUP BY id, name;
+```
+:::
+:::
+
+::: {.fragment}
+- The following will *not* work, because it counts the rows, rather than the number of non-NULL values:
+
+```sql
+SELECT id, name, COUNT(*)
+FROM Student LEFT JOIN MajorsIn
+     ON Student.id = MajorsIn.student_id
+GROUP BY id, name;
+```
+:::
+
+## Practice Writing Queries (cont.)
+
+```text
+Student(id, name)      Department(name, office)      Room(id, name, capacity)
+Course(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)
+Enrolled(student_id, course_name, credit_status)
+```
+
+7\) &nbsp;For each department with more than one majoring student, output the department's name and the number of majoring students.
+
+::: {.r-stack}
+::: {style="width:100%;"}
+```sql
+SELECT
+FROM MajorsIn
+ 
+ 
+```
+:::
+
+::: {.fragment style="width:100%;"}
+```sql
+SELECT
+FROM MajorsIn
+GROUP BY dept_name
+ 
+```
+:::
+
+::: {.fragment style="width:100%;"}
+```sql
+SELECT
+FROM MajorsIn
+GROUP BY dept_name
+HAVING COUNT(*) > 1;
+```
+:::
+
+::: {.fragment style="width:100%;"}
+```sql
+SELECT dept_name, COUNT(*)
+FROM MajorsIn
+GROUP BY dept_name
+HAVING COUNT(*) > 1;
+```
+:::
+:::
+-->
 </section>
 <section id="which-of-these-problems-would-require-a-group-by" class="slide level2">
 <h2>Which of these problems would require a GROUP BY?</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb68"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb68-1"><a aria-label="1"></a>Person(id, name, dob, pob)</span>
-<span id="cb68-2"><a aria-label="2"></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
-<span id="cb68-3"><a aria-label="3"></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
-<span id="cb68-4"><a aria-label="4"></a>Oscar(movie_id, person_id, type, year)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb48"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb48-1"><a aria-label="1"></a>Person(id, name, dob, pob)</span>
+<span id="cb48-2"><a aria-label="2"></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
+<span id="cb48-3"><a aria-label="3"></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
+<span id="cb48-4"><a aria-label="4"></a>Oscar(movie_id, person_id, type, year)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>A. &nbsp;finding the Best-Picture winner with the best/smallest earnings rank</p>
 <p>B. &nbsp;finding the number of Oscars won by each person that has won an Oscar</p>
 <p>C. &nbsp;finding the number of Oscars won by each person, including people who have not won any Oscars</p>
@@ -1052,72 +1104,71 @@ Data Science 310
 <p>Which would require a LEFT OUTER JOIN? &nbsp;<span style="color:#1a7a1a; font-weight:bold;">C</span></p>
 </div>
 </section>
-<section id="now-write-the-queries" class="slide level2">
-<h2>Now Write the Queries!</h2>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb69"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb69-1"><a aria-label="1"></a>Person(id, name, dob, pob)</span>
-<span id="cb69-2"><a aria-label="2"></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
-<span id="cb69-3"><a aria-label="3"></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
-<span id="cb69-4"><a aria-label="4"></a>Oscar(movie_id, person_id, type, year)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>1) &nbsp;Find the Best-Picture winner with the best/smallest earnings rank. The result should have the form (name, earnings_rank). Assume no two movies have the same earnings rank.</p>
+<section id="now-write-this-query" class="slide level2">
+<h2>Now Write this Query!</h2>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb49"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb49-1"><a aria-label="1"></a>Person(id, name, dob, pob)</span>
+<span id="cb49-2"><a aria-label="2"></a>Movie(id, name, year, rating, runtime, genre, earnings_rank)</span>
+<span id="cb49-3"><a aria-label="3"></a>Actor(actor_id, movie_id)      Director(director_id, movie_id)</span>
+<span id="cb49-4"><a aria-label="4"></a>Oscar(movie_id, person_id, type, year)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Find the Best-Picture winner with the best/smallest earnings rank. The result should have the form (name, earnings_rank). Assume no two movies have the same earnings rank.</p>
 <div class="r-stack">
 <div style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb70"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb70-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb70-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
-<span id="cb70-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
-<span id="cb70-4"><a aria-label="4"></a>                       <span class="kw">FROM</span></span>
-<span id="cb70-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span>                  );</span>
-<span id="cb70-6"><a aria-label="6"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb50"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb50-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
+<span id="cb50-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
+<span id="cb50-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
+<span id="cb50-4"><a aria-label="4"></a>                       <span class="kw">FROM</span></span>
+<span id="cb50-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span>                  );</span>
+<span id="cb50-6"><a aria-label="6"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb71"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb71-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb71-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
-<span id="cb71-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
-<span id="cb71-4"><a aria-label="4"></a>                       <span class="kw">FROM</span></span>
-<span id="cb71-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id);</span>
-<span id="cb71-6"><a aria-label="6"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb51"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb51-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
+<span id="cb51-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
+<span id="cb51-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
+<span id="cb51-4"><a aria-label="4"></a>                       <span class="kw">FROM</span></span>
+<span id="cb51-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id);</span>
+<span id="cb51-6"><a aria-label="6"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb72"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb72-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb72-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
-<span id="cb72-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
-<span id="cb72-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
-<span id="cb72-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id);</span>
-<span id="cb72-6"><a aria-label="6"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb52"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb52-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
+<span id="cb52-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
+<span id="cb52-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
+<span id="cb52-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
+<span id="cb52-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id);</span>
+<span id="cb52-6"><a aria-label="6"></a> </span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb73"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb73-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb73-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
-<span id="cb73-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
-<span id="cb73-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
-<span id="cb73-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
-<span id="cb73-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb53"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb53-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
+<span id="cb53-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
+<span id="cb53-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span></span>
+<span id="cb53-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
+<span id="cb53-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
+<span id="cb53-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb74"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb74-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb74-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
-<span id="cb74-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span> <span class="fu">MIN</span>(earnings_rank)</span>
-<span id="cb74-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
-<span id="cb74-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
-<span id="cb74-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb54"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb54-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
+<span id="cb54-2"><a aria-label="2"></a><span class="kw">FROM</span></span>
+<span id="cb54-3"><a aria-label="3"></a><span class="kw">WHERE</span>                 (<span class="kw">SELECT</span> <span class="fu">MIN</span>(earnings_rank)</span>
+<span id="cb54-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
+<span id="cb54-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
+<span id="cb54-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb75"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb75-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
-<span id="cb75-2"><a aria-label="2"></a><span class="kw">FROM</span> Movie</span>
-<span id="cb75-3"><a aria-label="3"></a><span class="kw">WHERE</span> earnings_rank <span class="op">=</span> (<span class="kw">SELECT</span> <span class="fu">MIN</span>(earnings_rank)</span>
-<span id="cb75-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
-<span id="cb75-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
-<span id="cb75-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb55"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb55-1"><a aria-label="1"></a><span class="kw">SELECT</span></span>
+<span id="cb55-2"><a aria-label="2"></a><span class="kw">FROM</span> Movie</span>
+<span id="cb55-3"><a aria-label="3"></a><span class="kw">WHERE</span> earnings_rank <span class="op">=</span> (<span class="kw">SELECT</span> <span class="fu">MIN</span>(earnings_rank)</span>
+<span id="cb55-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
+<span id="cb55-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
+<span id="cb55-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="fragment" style="width:100%;">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb76"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb76-1"><a aria-label="1"></a><span class="kw">SELECT</span> name, earnings_rank</span>
-<span id="cb76-2"><a aria-label="2"></a><span class="kw">FROM</span> Movie</span>
-<span id="cb76-3"><a aria-label="3"></a><span class="kw">WHERE</span> earnings_rank <span class="op">=</span> (<span class="kw">SELECT</span> <span class="fu">MIN</span>(earnings_rank)</span>
-<span id="cb76-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
-<span id="cb76-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
-<span id="cb76-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb56"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb56-1"><a aria-label="1"></a><span class="kw">SELECT</span> name, earnings_rank</span>
+<span id="cb56-2"><a aria-label="2"></a><span class="kw">FROM</span> Movie</span>
+<span id="cb56-3"><a aria-label="3"></a><span class="kw">WHERE</span> earnings_rank <span class="op">=</span> (<span class="kw">SELECT</span> <span class="fu">MIN</span>(earnings_rank)</span>
+<span id="cb56-4"><a aria-label="4"></a>                       <span class="kw">FROM</span> Movie M, Oscar O</span>
+<span id="cb56-5"><a aria-label="5"></a>                       <span class="kw">WHERE</span> M.<span class="kw">id</span> <span class="op">=</span> O.movie_id</span>
+<span id="cb56-6"><a aria-label="6"></a>                         <span class="kw">AND</span> O.<span class="kw">type</span> <span class="op">=</span> <span class="st">'BEST-PICTURE'</span>);</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<p><em>Hold off on 2 and 3 for now!</em></p>
 
 
 </section>

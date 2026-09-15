@@ -1939,13 +1939,6 @@
     "text": "What else do I need?\n\nFind the names of all rooms that DS majors have courses in.\n\nSELECT\nFROM Course C, Room R, Enrolled E, MajorsIn M\nWHERE room_id = id\n  AND course_name = C.name\n  AND E.student_id = M.student_id\n\n\nThe selection condition, plus DISTINCT in the SELECT clause:\n\nSELECT DISTINCT R.name\nFROM Course C, Room R, Enrolled E, MajorsIn M\nWHERE room_id = id\n  AND course_name = C.name\n  AND E.student_id = M.student_id\n  AND dept_name = 'data sci';"
   },
   {
-    "objectID": "L04-Patterns-Aggregates.html#writing-queries-rules-of-thumb-1",
-    "href": "L04-Patterns-Aggregates.html#writing-queries-rules-of-thumb-1",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Writing Queries: Rules of Thumb",
-    "text": "Writing Queries: Rules of Thumb\n\nStart with the FROM clause. Which table(s) do you need?\nIf you need more than one table, determine the necessary join conditions.\n\nfor N tables, you typically need N – 1 join conditions\nis an outer join needed? – i.e., do you want unmatched tuples?\n\nDetermine if a GROUP BY clause is needed.\n\nare you performing computations involving subgroups?\n\nDetermine any other conditions that are needed.\n\nif they rely on aggregate functions, put in a HAVING clause\notherwise, add to the WHERE clause\nis a subquery needed?\n\nFill in the rest of the query: SELECT, ORDER BY?\n\nis DISTINCT needed?"
-  },
-  {
     "objectID": "L04-Patterns-Aggregates.html#finding-the-majors-of-enrolled-students",
     "href": "L04-Patterns-Aggregates.html#finding-the-majors-of-enrolled-students",
     "title": "SQL: Aggregates, Subqueries,",
@@ -1958,34 +1951,6 @@
     "title": "SQL: Aggregates, Subqueries,",
     "section": "Left Outer Joins",
     "text": "Left Outer Joins\n\n\nSELECT DISTINCT\n    Enrolled.student_id, dept_name\nFROM Enrolled\n    LEFT OUTER JOIN MajorsIn\n    ON Enrolled.student_id =\n       MajorsIn.student_id;\n\nThe result is equivalent to:\n\nforming the Cartesian product T1 x T2\nselecting the rows in T1 x T2 that satisfy the join condition in the ON clause\nincluding an extra row for each unmatched row from T1 (the “left table”)\n\nfilling the T2 attributes in the extra rows with nulls\n\napplying the other clauses as before"
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#extra-practice-writing-queries",
-    "href": "L04-Patterns-Aggregates.html#extra-practice-writing-queries",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Extra Practice Writing Queries",
-    "text": "Extra Practice Writing Queries\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n1)  Find all people in the database who acted in Avatar.\n\nSELECT P.name\nFROM Person P, Actor A, Movie M\nWHERE P.id = A.actor_id\n  AND M.id = A.movie_id\n  AND M.name = 'Avatar';"
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#extra-practice-writing-queries-cont.",
-    "href": "L04-Patterns-Aggregates.html#extra-practice-writing-queries-cont.",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Extra Practice Writing Queries (cont.)",
-    "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n2)  How many people in the database did not act in Avatar? Will this work?\nSELECT COUNT(*)\nFROM Person P, Actor A, Movie M\nWHERE P.id = A.actor_id AND M.id = A.movie_id\n  AND M.name != 'Avatar';\n\n\nIf not, what will?\n\nSELECT COUNT(*)\nFROM Person\nWHERE id NOT IN (SELECT actor_id\n                 FROM Actor A, Movie M\n                 WHERE A.movie_id = M.id\n                   AND M.name = 'Avatar');"
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#extra-practice-writing-queries-cont.-1",
-    "href": "L04-Patterns-Aggregates.html#extra-practice-writing-queries-cont.-1",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Extra Practice Writing Queries (cont.)",
-    "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n4)  Which people in the database have acted in a movie directed by James Cameron?\n\nSELECT DISTINCT ActP.id, ActP.name\nFROM Person ActP, Actor A,\n     Director D, Person DirP\nWHERE ActP.id = A.actor_id\n  AND A.movie_id = D.movie_id\n  AND D.director_id = DirP.id\n  AND DirP.name = 'James Cameron';"
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#extra-practice-writing-queries-cont.-2",
-    "href": "L04-Patterns-Aggregates.html#extra-practice-writing-queries-cont.-2",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Extra Practice Writing Queries (cont.)",
-    "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n6)  For each person in the database born in Boston, find the number of movies in the database (possibly 0) in which the person has acted.\n\nSELECT name, COUNT(movie_id)\nFROM Person LEFT OUTER JOIN Actor\n     ON id = actor_id\nWHERE pob LIKE 'Boston, Mass%'\nGROUP BY name;"
   },
   {
     "objectID": "L04-Patterns-Aggregates.html#what-does-this-give",
@@ -2028,13 +1993,6 @@
     "title": "SQL: Aggregates, Subqueries,",
     "section": "Which of these would work? (answer)",
     "text": "Which of these would work? (answer)\n\n\nA and B use a regular join, which loses the movies with no Oscars:\n\n\n\n\n\n\n\n\n\n\n\nC is correct: COUNT(type) ignores the NULLs, giving 0 for movies with no Oscars.\n\n\n\nD does not work: COUNT(*) counts the all-NULL rows, giving 1 instead of 0."
-  },
-  {
-    "objectID": "L04-Patterns-Aggregates.html#extra-practice",
-    "href": "L04-Patterns-Aggregates.html#extra-practice",
-    "title": "SQL: Aggregates, Subqueries,",
-    "section": "Extra Practice",
-    "text": "Extra Practice"
   },
   {
     "objectID": "L04-Patterns-Aggregates.html#practice-writing-queries",
@@ -3026,282 +2984,233 @@
   {
     "objectID": "L05-Normalization-Practice.html#database-normalization",
     "href": "L05-Normalization-Practice.html#database-normalization",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Database Normalization",
-    "text": "Database Normalization\n\nIn proposing the relational model, Codd had some very specific advantages in mind.\n\n\nSimple conceptual framework. Everything is a relation, and access is through the precise relational algebra\nThe structure of the database, and the rules of the DBMS, should ensure data integrity\n\nLogical relationships among data items cannot be violated\n\nHe proposed certain constraints on how databases should be structured\n\nCalled normal forms\n\nThese form successively more strict rules\n\nThere are many – more than six\nWe will study the first three (most important)"
+    "text": "Database Normalization\n\nIn proposing the relational model, Codd had some very specific advantages in mind.\n\nSimple conceptual framework. Everything is a relation, and access is through the precise relational algebra\nThe structure of the database, and the rules of the DBMS, should ensure data integrity\nHe proposed certain constraints on how databases should be structured\n\n\nCalled normal forms\n\n\nThese form successively more strict rules\n\n\nThere are many – more than six\nWe will study the first three (most important)"
   },
   {
     "objectID": "L05-Normalization-Practice.html#not-in-1nf",
     "href": "L05-Normalization-Practice.html#not-in-1nf",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Not in 1NF",
     "text": "Not in 1NF\n\n\n\n\n\nPrevious DBMSs allowed structures like this\nTables nested inside tables!\nThis is called a hierarchical database\nCreates a complex data object that is hard to reason about\nCan’t use relational algebra on it\n\n\n\n\nSource: wikipedia"
   },
   {
     "objectID": "L05-Normalization-Practice.html#in-1nf",
     "href": "L05-Normalization-Practice.html#in-1nf",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "In 1NF",
     "text": "In 1NF\n\n\n\n\n\nThe previous structure can be converted into two tables\nDoing so puts the database in first normal form (1NF)\n\n\n\n\nSource: wikipedia"
   },
   {
     "objectID": "L05-Normalization-Practice.html#nf",
     "href": "L05-Normalization-Practice.html#nf",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "1NF",
     "text": "1NF\n\nFirst normal form (1NF): everything is a relation\nIn other words, no attribute domain has relations as elements\nThis is enforced by relational algebra or SQL: it’s not possible to create tables that have tables as elements.\nAdvantages:\n\nsimplifies the data language (relational algebra or SQL)\nsupports one-one and many-to-many (wasn’t possible in previous systems)\nmakes further normalization levels possible"
   },
   {
     "objectID": "L05-Normalization-Practice.html#nf-1",
     "href": "L05-Normalization-Practice.html#nf-1",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "2NF",
     "text": "2NF\n\nThe next problem Codd wanted to solve using normalization was ‘hidden dependencies’\nConsider this relation:"
   },
   {
     "objectID": "L05-Normalization-Practice.html#what-can-go-wrong",
     "href": "L05-Normalization-Practice.html#what-can-go-wrong",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "What can go wrong?",
     "text": "What can go wrong?\nAssume each author only writes in one language\n\nWhat can go wrong when this table is updated?"
   },
   {
     "objectID": "L05-Normalization-Practice.html#second-normal-form-2nf",
     "href": "L05-Normalization-Practice.html#second-normal-form-2nf",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Second Normal Form (2NF)",
     "text": "Second Normal Form (2NF)\n\n\nFormally, a database is in 2NF when\n\nIt is in 1NF, and\nIt does not have any non-prime attribute that is functionally dependent on any proper subset of any candidate key\n\nA non-prime attribute is an attribute that is not part of any candidate key (language is a non-prime attribute)\nProper subset: (author) is a proper subset of (title, author)\nlanguage is functionally dependent on author"
   },
   {
     "objectID": "L05-Normalization-Practice.html#nf-2",
     "href": "L05-Normalization-Practice.html#nf-2",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "3NF",
     "text": "3NF\n\nThe next problem Codd wanted to solve using normalization was ‘dependent updates’\nConsider this relation:"
   },
   {
     "objectID": "L05-Normalization-Practice.html#what-can-go-wrong-1",
     "href": "L05-Normalization-Practice.html#what-can-go-wrong-1",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "What can go wrong?",
     "text": "What can go wrong?\n\nWhat happens when Stephen King changes book agents?\n\n\n\n\nMany updates need to be made, and this is error prone"
   },
   {
     "objectID": "L05-Normalization-Practice.html#nf-3",
     "href": "L05-Normalization-Practice.html#nf-3",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "3NF",
     "text": "3NF\n\nThe solution is:\nFirst put the database in 2NF:\n\n\n\nThen capture the functional relationship between agent and phone number in a separate relation\nNow, when King changes agents, we only update a single record in the Retains relation"
   },
   {
     "objectID": "L05-Normalization-Practice.html#nf-cont.",
     "href": "L05-Normalization-Practice.html#nf-cont.",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "3NF (cont.)",
     "text": "3NF (cont.)\n\nThis could be done as follows:"
   },
   {
     "objectID": "L05-Normalization-Practice.html#nf-cont.-1",
     "href": "L05-Normalization-Practice.html#nf-cont.-1",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "3NF (cont.)",
     "text": "3NF (cont.)\n\nOr alternatively:\n\n\n\n\nCan you think of reasons for preferring this strategy to the previous slide’s strategy?"
   },
   {
     "objectID": "L05-Normalization-Practice.html#nf-cont.-2",
     "href": "L05-Normalization-Practice.html#nf-cont.-2",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "3NF (cont.)",
     "text": "3NF (cont.)\n\nFormally, a database is in 3NF when:\n\nIt is in 2NF, and\nNo non-prime attribute is transitively dependent on the primary key\n\nA non-prime attribute is an attribute that is not part of any primary key\n\n\n\nA transitive dependency is a functional dependency in which X → Z (X determines Z) indirectly, by virtue of X → Y, and Y → Z\nHere: X is author, Y is agent, and Z is agent’s phone number"
   },
   {
     "objectID": "L05-Normalization-Practice.html#benefits-of-normal-forms",
     "href": "L05-Normalization-Practice.html#benefits-of-normal-forms",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Benefits of Normal Forms",
     "text": "Benefits of Normal Forms\n\n1NF: All relations are flat tables; conceptually simple\n2NF: A legal database update cannot violate any hidden dependencies\n3NF: A change to a dependent attribute only needs to be made in one place\nCentral Theme: the structure of the database, and the rules of the database management system, enforce integrity on the data"
   },
   {
     "objectID": "L05-Normalization-Practice.html#criticisms-of-the-relational-model",
     "href": "L05-Normalization-Practice.html#criticisms-of-the-relational-model",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Criticisms of the Relational Model",
     "text": "Criticisms of the Relational Model\n\nPerformance can worsen for some operations. If you are retrieving a many-to-one relation, you need to access multiple tables (perhaps three). In a non-relational model, we could store the “many” in the same table as the “one”, making it possible to retrieve them all more quickly.\n\n\n\nDatabases that store complex data structures do not map well to the relational model. Object-oriented databases, graph databases, and the new vector databases (used with LLMs) do not use the relational model.\n\n\n\n\nFor the above reasons, there are more databases in the world than just relational … and we will study them\nBut relational is far and away the most common structure for databases in practice"
   },
   {
-    "objectID": "L05-Normalization-Practice.html#sql-data-types",
-    "href": "L05-Normalization-Practice.html#sql-data-types",
-    "title": "Normalization in Relational Databases;",
-    "section": "SQL Data Types",
-    "text": "SQL Data Types\n\nNumeric types include:\n\nINTEGER\nREAL: a real number (i.e., one that may have a fractional part)\n\nNon-numeric types include:\n\nDATE (e.g., ‘2017-02-23’)\nTIME (e.g., ‘15:30:30’)\ntwo types for strings (i.e., arbitrary sequences of characters)\n\nCHAR\nVARCHAR"
-  },
-  {
     "objectID": "L05-Normalization-Practice.html#creating-the-student-table",
     "href": "L05-Normalization-Practice.html#creating-the-student-table",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Creating the Student table…",
     "text": "Creating the Student table…\n\n\nCREATE TABLE Student(\n  id CHAR(8) PRIMARY KEY,\n  name VARCHAR(30)\n);"
   },
   {
     "objectID": "L05-Normalization-Practice.html#inserting-a-row",
     "href": "L05-Normalization-Practice.html#inserting-a-row",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Inserting a Row…",
     "text": "Inserting a Row…\n\n\nCREATE TABLE Student(\n  id CHAR(8) PRIMARY KEY,\n  name VARCHAR(30)\n);\nINSERT INTO Student\n  VALUES ('4567', 'Robert Brown');"
   },
   {
     "objectID": "L05-Normalization-Practice.html#given-the-create-table-command-shown-below-what-tuple-would-be-added-by-the-insert-command",
     "href": "L05-Normalization-Practice.html#given-the-create-table-command-shown-below-what-tuple-would-be-added-by-the-insert-command",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Given the CREATE TABLE command shown below, what tuple would be added by the INSERT command?",
     "text": "Given the CREATE TABLE command shown below, what tuple would be added by the INSERT command?\n\n\nCREATE TABLE Student(\n  id CHAR(8) PRIMARY KEY,\n  name VARCHAR(30)\n);\nINSERT INTO Student\n  VALUES ('4567', 'Robert Brown');\n\n\n\nA.  ('4567    ', 'Robert Brown                  ')\n\nB.  ('4567    ', 'Robert Brown')\n\nC.  ('4567', 'Robert Brown                  ')\n\nD.  ('4567', 'Robert Brown')\n\nB is correct — CHAR(8) pads the id with spaces; VARCHAR(30) does not pad."
   },
   {
     "objectID": "L05-Normalization-Practice.html#what-if-we-swapped-the-two-values-in-the-insert",
     "href": "L05-Normalization-Practice.html#what-if-we-swapped-the-two-values-in-the-insert",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "What if we swapped the two values in the INSERT?",
     "text": "What if we swapped the two values in the INSERT?\n\n\nCREATE TABLE Student(\n  id CHAR(8) PRIMARY KEY,\n  name VARCHAR(30)\n);\nINSERT INTO Student\n  VALUES ('Robert Brown', '4567');\n\n\n\n\n('Robert B', '4567')  would be stored"
   },
   {
-    "objectID": "L05-Normalization-Practice.html#types-in-sqlite",
-    "href": "L05-Normalization-Practice.html#types-in-sqlite",
-    "title": "Normalization in Relational Databases;",
-    "section": "Types in SQLite",
-    "text": "Types in SQLite\n\nSQLite has its own types, including:\n\nINTEGER\nREAL\nTEXT\n\nIt also allows you to use the typical SQL types, but it converts them to one of its own types.\n\n\n\nAs a result, the length restrictions indicated for CHAR and VARCHAR are not observed.\nIt is also more lax in type checking than typical DBMSs."
-  },
-  {
     "objectID": "L05-Normalization-Practice.html#creating-the-enrolled-table",
     "href": "L05-Normalization-Practice.html#creating-the-enrolled-table",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Creating the Enrolled table…",
     "text": "Creating the Enrolled table…\n\n\n\nCREATE TABLE Enrolled(\n  student_id CHAR(8), course_name VARCHAR(10),\n  credit_status VARCHAR(10));\n \n \n\n\nCREATE TABLE Enrolled(\n  student_id CHAR(8), course_name VARCHAR(10),\n  credit_status VARCHAR(10),\n  PRIMARY KEY (student_id, course_name));\n \n\n\nCREATE TABLE Enrolled(\n  student_id CHAR(8), course_name VARCHAR(10),\n  credit_status VARCHAR(10),\n  PRIMARY KEY (student_id, course_name),\n  FOREIGN KEY (student_id) REFERENCES Student(id));"
   },
   {
     "objectID": "L05-Normalization-Practice.html#what-about-the-other-foreign-key-in-enrolled",
     "href": "L05-Normalization-Practice.html#what-about-the-other-foreign-key-in-enrolled",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "What about the other foreign key in Enrolled?",
     "text": "What about the other foreign key in Enrolled?\n\n\n\n\n\nCREATE TABLE Enrolled(\n  student_id CHAR(8), course_name VARCHAR(10),\n  credit_status VARCHAR(10),\n  PRIMARY KEY (student_id, course_name),\n  FOREIGN KEY (student_id) REFERENCES Student(id),\n  __________________________________________________);\n\n\n\n\n\nFOREIGN KEY (course_name)\n    REFERENCES Course(name));"
   },
   {
     "objectID": "L05-Normalization-Practice.html#does-the-order-of-these-insertions-matter",
     "href": "L05-Normalization-Practice.html#does-the-order-of-these-insertions-matter",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Does the order of these insertions matter?",
     "text": "Does the order of these insertions matter?\n\n①  INSERT INTO Enrolled VALUES('4567', 'CS 105', 'grad');\n②  INSERT INTO Student VALUES ('4567', 'Robert Brown');\nA.  ① must come before ②\nB.  ② must come before ① ← correct  why? referential integrity!\nC.  the order of the two INSERT commands doesn’t matter"
   },
   {
     "objectID": "L05-Normalization-Practice.html#how-could-i-correctly-remove-mcs-205",
     "href": "L05-Normalization-Practice.html#how-could-i-correctly-remove-mcs-205",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "How could I correctly remove MCS  205?",
     "text": "How could I correctly remove MCS  205?\n\n\n\n\n\nA.  DELETE FROM Room WHERE id = '7000';\nB.  DELETE FROM Room WHERE id = '7000';    UPDATE Course SET room_id = NULL WHERE room_id = '7000';\nC.  UPDATE Course SET room_id = NULL WHERE room_id = '7000';    DELETE FROM Room WHERE id = '7000'; ← correct\nD.  two or more of the above would work"
   },
   {
     "objectID": "L05-Normalization-Practice.html#recall-subqueries-and-set-membership",
     "href": "L05-Normalization-Practice.html#recall-subqueries-and-set-membership",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Recall: Subqueries and Set Membership",
     "text": "Recall: Subqueries and Set Membership\n\nSubqueries can be used to test for set membership in conjunction with the IN and NOT IN operators.\n\nexample: find all students who are not enrolled in CS 105\n\n\nSELECT name\nFROM Student\nWHERE id NOT IN (SELECT student_id\n                 FROM Enrolled\n                 WHERE course_name = 'CS 105');"
   },
   {
-    "objectID": "L05-Normalization-Practice.html#writing-queries-rules-of-thumb",
-    "href": "L05-Normalization-Practice.html#writing-queries-rules-of-thumb",
-    "title": "Normalization in Relational Databases;",
-    "section": "Writing Queries: Rules of Thumb",
-    "text": "Writing Queries: Rules of Thumb\n\nStart with the FROM clause. Which table(s) do you need?\n\n\n\nIf you need more than one table, determine the necessary join conditions.\n\nfor N tables, you typically need N – 1 join conditions\nis an outer join needed? – i.e., do you want unmatched tuples?\n\n\n\n\n\nDetermine if a GROUP BY clause is needed.\n\nare you performing computations involving subgroups?\n\n\n\n\n\nDetermine any other conditions that are needed.\n\nif they rely on aggregate functions, put in a HAVING clause\notherwise, add to the WHERE clause\nis a subquery needed?\n\n\n\n\n\nFill in the rest of the query: SELECT, ORDER BY?\n\nis DISTINCT needed?"
+    "objectID": "L05-Normalization-Practice.html#reminder-rules-of-thumb-for-writing-queries",
+    "href": "L05-Normalization-Practice.html#reminder-rules-of-thumb-for-writing-queries",
+    "title": "Normalization in Relational Databases",
+    "section": "Reminder: Rules of Thumb for Writing Queries",
+    "text": "Reminder: Rules of Thumb for Writing Queries\n\nStart with the FROM clause. Which table(s) do you need?\n\n\n\nIf you need more than one table, determine the necessary join conditions.\n\nfor N tables, you typically need N – 1 join conditions\nis an outer join needed? – i.e., do you want unmatched tuples?\n\n\n\n\n\nDetermine if a GROUP BY clause is needed.\n\nare you performing computations involving subgroups?\n\n\n\n\n\nDetermine any other conditions that are needed.\n\nif they rely on aggregate functions, put in a HAVING clause\notherwise, add to the WHERE clause\nis a subquery needed?\n\n\n\n\n\nFill in the rest of the query: SELECT, ORDER BY?\n\nis DISTINCT needed?"
   },
   {
     "objectID": "L05-Normalization-Practice.html#extra-practice-writing-queries",
     "href": "L05-Normalization-Practice.html#extra-practice-writing-queries",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Extra Practice Writing Queries",
     "text": "Extra Practice Writing Queries\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n1)  Find the names of people in the database who acted in Avatar.\n\n\nSELECT\nFROM ???\nWHERE\n \n \n \n\n\nSELECT\nFROM Person P, Actor A, Movie M\nWHERE ???\n \n \n \n\n\nSELECT\nFROM Person P, Actor A, Movie M\nWHERE P.id = A.actor_id\n  AND M.id = A.movie_id\n \n \n\n\nSELECT\nFROM Person P, Actor A, Movie M\nWHERE P.id = A.actor_id\n  AND M.id = A.movie_id\n  AND M.name = 'Avatar';\n \n\n\nSELECT P.name\nFROM Person P, Actor A, Movie M\nWHERE P.id = A.actor_id\n  AND M.id = A.movie_id\n  AND M.name = 'Avatar';"
   },
   {
     "objectID": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.",
     "href": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Extra Practice Writing Queries (cont.)",
     "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n2)  How many people in the database did not act in Avatar? Will this work?\nSELECT COUNT(*)\nFROM Person P, Actor A, Movie M\nWHERE P.id = A.actor_id AND M.id = A.movie_id\n  AND M.name != 'Avatar';\n\n\nIf not, what will?\n\nSELECT COUNT(*)\nFROM Person\nWHERE id NOT IN (SELECT actor_id\n                 FROM Actor A, Movie M\n                 WHERE A.movie_id = M.id\n                   AND M.name = 'Avatar');"
   },
   {
     "objectID": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-1",
     "href": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-1",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Extra Practice Writing Queries (cont.)",
     "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n3)  How many people in the database who were born in California have won an Oscar? (assume pob = city, state, country)\n\n\nSELECT\nFROM\nWHERE\n \n\n\nSELECT\nFROM Person P, Oscar O\nWHERE\n \n\n\nSELECT\nFROM Person P, Oscar O\nWHERE P.id = O.person_id\n \n\n\nSELECT\nFROM Person P, Oscar O\nWHERE P.id = O.person_id\n  AND P.pob LIKE '%California, USA';\n\n\nSELECT COUNT(DISTINCT P.id)\nFROM Person P, Oscar O\nWHERE P.id = O.person_id\n  AND P.pob LIKE '%California, USA';"
   },
   {
     "objectID": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-2",
     "href": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-2",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Extra Practice Writing Queries (cont.)",
     "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n4)  Find the ids and names of everyone in the database who has acted in a movie directed by James Cameron. (Hint: One table is needed twice!)\n\n\nSELECT\nFROM\nWHERE\n \n \n\n\nSELECT\nFROM Person ActP, Actor A, Director D, Person DirP\nWHERE\n \n \n\n\nSELECT\nFROM Person ActP, Actor A, Director D, Person DirP\nWHERE ActP.id = A.actor_id AND A.movie_id = D.movie_id\n  AND D.director_id = DirP.id\n \n\n\nSELECT\nFROM Person ActP, Actor A, Director D, Person DirP\nWHERE ActP.id = A.actor_id AND A.movie_id = D.movie_id\n  AND D.director_id = DirP.id\n  AND DirP.name = 'James Cameron';\n\n\nSELECT DISTINCT ActP.id, ActP.name\nFROM Person ActP, Actor A, Director D, Person DirP\nWHERE ActP.id = A.actor_id AND A.movie_id = D.movie_id\n  AND D.director_id = DirP.id\n  AND DirP.name = 'James Cameron';"
   },
   {
     "objectID": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-3",
     "href": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-3",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Extra Practice Writing Queries (cont.)",
     "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n5)  Which movie ratings have an avg runtime greater than 120 min, and what are their average runtimes?\n\n\nSELECT\nFROM Movie\n \n \n\n\nSELECT\nFROM Movie\nGROUP BY rating\n \n\n\nSELECT\nFROM Movie\nGROUP BY rating\nHAVING AVG(runtime) &gt; 120;\n\n\nSELECT rating, AVG(runtime)\nFROM Movie\nGROUP BY rating\nHAVING AVG(runtime) &gt; 120;"
   },
   {
     "objectID": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-4",
     "href": "L05-Normalization-Practice.html#extra-practice-writing-queries-cont.-4",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Extra Practice Writing Queries (cont.)",
     "text": "Extra Practice Writing Queries (cont.)\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n6)  For each person in the database born in Boston, Mass, find the number of movies in the database (possibly 0) in which the person has acted. You may assume that names are unique.\n\n\nSELECT\nFROM\nWHERE\n \n\n\nSELECT\nFROM Person LEFT OUTER JOIN Actor ON id = actor_id\nWHERE\n \n\n\nSELECT\nFROM Person LEFT OUTER JOIN Actor ON id = actor_id\nWHERE\nGROUP BY name\n\n\nSELECT\nFROM Person LEFT OUTER JOIN Actor ON id = actor_id\nWHERE pob LIKE 'Boston, Mass%'\nGROUP BY name;\n\n\nSELECT name, COUNT(____________)\nFROM Person LEFT OUTER JOIN Actor ON id = actor_id\nWHERE pob LIKE 'Boston, Mass%'\nGROUP BY name;\n\n\nSELECT name, COUNT(movie_id)\nFROM Person LEFT OUTER JOIN Actor ON id = actor_id\nWHERE pob LIKE 'Boston, Mass%'\nGROUP BY name;"
   },
   {
-    "objectID": "L05-Normalization-Practice.html#practice-writing-queries",
-    "href": "L05-Normalization-Practice.html#practice-writing-queries",
-    "title": "Normalization in Relational Databases;",
-    "section": "Practice Writing Queries",
-    "text": "Practice Writing Queries\nStudent(id, name)      Department(name, office)      Room(id, name, capacity)\nCourse(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)\nEnrolled(student_id, course_name, credit_status)\n1)  Find the names of all courses taken by comp sci majors.\n\nSELECT DISTINCT course_name\nFROM Enrolled E, MajorsIn M\nWHERE E.student_id = M.student_id\n  AND dept_name = 'comp sci';\n\n2)  Find the number of students majoring in each department. (The result should be tuples of the form (dept name, # students).)\n\nSELECT dept_name, COUNT(*)\nFROM MajorsIn\nGROUP BY dept_name;"
-  },
-  {
-    "objectID": "L05-Normalization-Practice.html#practice-writing-queries-cont.",
-    "href": "L05-Normalization-Practice.html#practice-writing-queries-cont.",
-    "title": "Normalization in Relational Databases;",
-    "section": "Practice Writing Queries (cont.)",
-    "text": "Practice Writing Queries (cont.)\nStudent(id, name)      Department(name, office)      Room(id, name, capacity)\nCourse(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)\nEnrolled(student_id, course_name, credit_status)\n3)  Find the names and ids of all students who have a course in GCB 204.\n\nSELECT DISTINCT S.id, S.name\nFROM Student S, Enrolled E, Course C, Room R\nWHERE S.id = E.student_id\n  AND E.course_name = C.name\n  AND C.room_id = R.id\n  AND R.name = 'GCB 204';\n\n4)  Find the names of all rooms in which one or more CS courses meet.\n\nSELECT DISTINCT Room.name\nFROM Course, Room\nWHERE room_id = id\n  AND Course.name LIKE 'CS%';"
-  },
-  {
-    "objectID": "L05-Normalization-Practice.html#practice-writing-queries-cont.-1",
-    "href": "L05-Normalization-Practice.html#practice-writing-queries-cont.-1",
-    "title": "Normalization in Relational Databases;",
-    "section": "Practice Writing Queries (cont.)",
-    "text": "Practice Writing Queries (cont.)\nStudent(id, name)      Department(name, office)      Room(id, name, capacity)\nCourse(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)\nEnrolled(student_id, course_name, credit_status)\n5a)  Find the number of CS majors enrolled in CS 105.\n\nSELECT COUNT(*)\nFROM Enrolled E, MajorsIn M\nWHERE E.student_id = M.student_id\n  AND course_name = 'CS 105'\n  AND dept_name = 'comp sci';\n\n5b)  Find the number of CS majors enrolled in a course.\n\nSELECT COUNT(DISTINCT E.student_id)\nFROM Enrolled E, MajorsIn M\nWHERE E.student_id = M.student_id\n  AND dept_name = 'comp sci';"
-  },
-  {
-    "objectID": "L05-Normalization-Practice.html#practice-writing-queries-cont.-2",
-    "href": "L05-Normalization-Practice.html#practice-writing-queries-cont.-2",
-    "title": "Normalization in Relational Databases;",
-    "section": "Practice Writing Queries (cont.)",
-    "text": "Practice Writing Queries (cont.)\nStudent(id, name)      Department(name, office)      Room(id, name, capacity)\nCourse(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)\nEnrolled(student_id, course_name, credit_status)\n6)  Find the number of majors that each student has declared.\n\n\nSELECT\nFROM\n \n \n\n\nSELECT\nFROM Student LEFT JOIN MajorsIn\n     ON Student.id = MajorsIn.student_id\n \n\n\nSELECT\nFROM Student LEFT JOIN MajorsIn\n     ON Student.id = MajorsIn.student_id\nGROUP BY id, name;\n\n\nSELECT id, name, COUNT(dept_name)\nFROM Student LEFT JOIN MajorsIn\n     ON Student.id = MajorsIn.student_id\nGROUP BY id, name;\n\n\n\n\nThe following will not work, because it counts the rows, rather than the number of non-NULL values:\n\nSELECT id, name, COUNT(*)\nFROM Student LEFT JOIN MajorsIn\n     ON Student.id = MajorsIn.student_id\nGROUP BY id, name;"
-  },
-  {
-    "objectID": "L05-Normalization-Practice.html#practice-writing-queries-cont.-3",
-    "href": "L05-Normalization-Practice.html#practice-writing-queries-cont.-3",
-    "title": "Normalization in Relational Databases;",
-    "section": "Practice Writing Queries (cont.)",
-    "text": "Practice Writing Queries (cont.)\nStudent(id, name)      Department(name, office)      Room(id, name, capacity)\nCourse(name, start_time, end_time, room_id)     MajorsIn(student_id, dept_name)\nEnrolled(student_id, course_name, credit_status)\n7)  For each department with more than one majoring student, output the department’s name and the number of majoring students.\n\n\nSELECT\nFROM MajorsIn\n \n \n\n\nSELECT\nFROM MajorsIn\nGROUP BY dept_name\n \n\n\nSELECT\nFROM MajorsIn\nGROUP BY dept_name\nHAVING COUNT(*) &gt; 1;\n\n\nSELECT dept_name, COUNT(*)\nFROM MajorsIn\nGROUP BY dept_name\nHAVING COUNT(*) &gt; 1;"
-  },
-  {
     "objectID": "L05-Normalization-Practice.html#which-of-these-problems-would-require-a-group-by",
     "href": "L05-Normalization-Practice.html#which-of-these-problems-would-require-a-group-by",
-    "title": "Normalization in Relational Databases;",
+    "title": "Normalization in Relational Databases",
     "section": "Which of these problems would require a GROUP BY?",
     "text": "Which of these problems would require a GROUP BY?\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\nA.  finding the Best-Picture winner with the best/smallest earnings rank\nB.  finding the number of Oscars won by each person that has won an Oscar\nC.  finding the number of Oscars won by each person, including people who have not won any Oscars\nD.  both B and C, but not A ← correct: B and C need computations for multiple subgroups\nE.  A, B, and C\n\nWhich would require a subquery?  A\n\n\nWhich would require a LEFT OUTER JOIN?  C"
   },
   {
-    "objectID": "L05-Normalization-Practice.html#now-write-the-queries",
-    "href": "L05-Normalization-Practice.html#now-write-the-queries",
-    "title": "Normalization in Relational Databases;",
-    "section": "Now Write the Queries!",
-    "text": "Now Write the Queries!\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\n1)  Find the Best-Picture winner with the best/smallest earnings rank. The result should have the form (name, earnings_rank). Assume no two movies have the same earnings rank.\n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM\n                       WHERE                  );\n \n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM\n                       WHERE M.id = O.movie_id);\n \n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id);\n \n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');\n\n\nSELECT\nFROM\nWHERE                 (SELECT MIN(earnings_rank)\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');\n\n\nSELECT\nFROM Movie\nWHERE earnings_rank = (SELECT MIN(earnings_rank)\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');\n\n\nSELECT name, earnings_rank\nFROM Movie\nWHERE earnings_rank = (SELECT MIN(earnings_rank)\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');\n\n\nHold off on 2 and 3 for now!"
+    "objectID": "L05-Normalization-Practice.html#now-write-this-query",
+    "href": "L05-Normalization-Practice.html#now-write-this-query",
+    "title": "Normalization in Relational Databases",
+    "section": "Now Write this Query!",
+    "text": "Now Write this Query!\nPerson(id, name, dob, pob)\nMovie(id, name, year, rating, runtime, genre, earnings_rank)\nActor(actor_id, movie_id)      Director(director_id, movie_id)\nOscar(movie_id, person_id, type, year)\nFind the Best-Picture winner with the best/smallest earnings rank. The result should have the form (name, earnings_rank). Assume no two movies have the same earnings rank.\n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM\n                       WHERE                  );\n \n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM\n                       WHERE M.id = O.movie_id);\n \n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id);\n \n\n\nSELECT\nFROM\nWHERE                 (SELECT\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');\n\n\nSELECT\nFROM\nWHERE                 (SELECT MIN(earnings_rank)\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');\n\n\nSELECT\nFROM Movie\nWHERE earnings_rank = (SELECT MIN(earnings_rank)\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');\n\n\nSELECT name, earnings_rank\nFROM Movie\nWHERE earnings_rank = (SELECT MIN(earnings_rank)\n                       FROM Movie M, Oscar O\n                       WHERE M.id = O.movie_id\n                         AND O.type = 'BEST-PICTURE');"
   },
   {
     "objectID": "L07-Indexing.html#efficient-data-access",
