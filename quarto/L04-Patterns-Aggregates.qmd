@@ -316,6 +316,7 @@ WHERE course LIKE 'ds%';
 
 - Some systems require that you assign a FROM-clause subquery a name (e.g., `enrollCounts` above).
 
+<!-- covered in the previous lecture 
 ## Sorting the Results
 
 - An ORDER BY clause sorts the tuples in the result of the query by one or more attributes.
@@ -331,6 +332,9 @@ ORDER BY capacity DESC, name;
 
 ![](images/L04-Patterns-Aggregates/sort-result.png){width="40%" fig-align="center"}
 
+-->
+
+<!-- Removed for brevity
 ## Set Operations
 
 - UNION, INTERSECTION, EXCEPT (set difference)
@@ -343,6 +347,7 @@ UNION
 SELECT advisor
 FROM Advises;
 ```
+-->
 
 ## Outer Joins
 
@@ -415,7 +420,7 @@ WHERE course = 'cscie268';
 - Note: when there is no additional condition, we don't need a WHERE clause &ndash; the join condition is in the ON clause.
 :::
 
-## Evaluating a SELECT command
+## How to Evaluate a SELECT command
 
 ```sql
 SELECT column1, column2, …
@@ -423,15 +428,16 @@ FROM table1, table2, ...
 ...
 ```
 
-- The result is equivalent to:
-    - evaluating any subqueries in the FROM clause
-    - forming the Cartesian product of the tables in the FROM clause: `table1 x table2 x …`
-    - if there is an OUTER JOIN, applying its join condition and adding extra tuples as needed
-    - applying the remaining clauses in the following order:
-
-```text
-WHERE (including any subqueries)   GROUP BY   HAVING   SELECT   ORDER BY
-```
+* The order of operations to evaluate a SELECT command is:
+    1. evaluate any subqueries in the FROM clause
+    2. form the Cartesian product of the tables in the FROM clause: `table1 x table2 x …`
+    3. if there is an OUTER JOIN, apply its join condition and add extra tuples as needed
+    4. apply the remaining clauses in the following order
+        - WHERE (including any subqueries)
+        - GROUP BY
+        - HAVING
+        - SELECT
+        - ORDER BY
 
 ## CREATE TABLE
 
@@ -925,6 +931,7 @@ FROM Enrolled
 :::
 ::::
 
+<!-- Removed for brevity 
 ## Outer Joins Can Have a WHERE Clause
 
 - Example: find the IDs and majors of all students enrolled in DS 310 (including those with no major):
@@ -953,6 +960,8 @@ WHERE Student.id = Enrolled.student_id
 
 - we need Student in the FROM clause to get the student's names
 - the extra table requires an additional join condition, which goes in the WHERE clause
+
+-->
 
 ## Extra Practice Writing Queries
 
