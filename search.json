@@ -1512,13 +1512,6 @@
     "text": "Which Index Structure Should You Choose?\n\nRecently accessed pages are stored in a cache in memory.\nWorking set = collection of frequently accessed pages\n\n\n\nIf the working set fits in the cache, use a B-tree / B+tree.\n\nefficiently supports a wider range of queries (see last slide)\n\n\n\n\n\nIf the working set can’t fit in memory:\n\nchoose a B-tree/B+tree if the workload exhibits locality\n\nlocality = a query for a key is often followed by a query for a key that is nearby in the space of keys\n\n\n\n\n\n\nbecause the items are sorted by key, the neighbor will be in the cache\n\n\n\n\nchoose a hash table if the working set is very large\n\nuses less space for “bookkeeping” (pointers, etc.), and can thus fit more of the working set in the cache\n\n\n\n\n\nfewer operations are needed before going to disk"
   },
   {
-    "objectID": "L06-Storage.html#trouble-with-db-browser-installation",
-    "href": "L06-Storage.html#trouble-with-db-browser-installation",
-    "title": "Storage Fundamentals",
-    "section": "Trouble with DB Browser installation?",
-    "text": "Trouble with DB Browser installation?\n\nGo to John’s Office Hour on Friday: 2:00–4:00PM on the 14th floor of CDS"
-  },
-  {
     "objectID": "L06-Storage.html#storage",
     "href": "L06-Storage.html#storage",
     "title": "Storage Fundamentals",
@@ -1530,7 +1523,7 @@
     "href": "L06-Storage.html#organization-of-a-disk",
     "title": "Storage Fundamentals",
     "section": "Organization of a Disk",
-    "text": "Organization of a Disk\n\n\n\nThe surfaces of the platters are divided into tracks and blocks.\nA track is a complete ring at a given radial distance, on a single platter.\nThe track is divided into blocks, which are the smallest unit that can be read or written.\nTypically tracks are 4K or 8K blocks."
+    "text": "Organization of a Disk\n\n\n\nThe surfaces of the platters are divided into tracks and blocks.\nA track is a complete ring at a given radial distance, on a single platter.\nThe track is divided into blocks, which are the smallest unit that can be read or written.\nTypically blocks hold 4K or 8K bytes."
   },
   {
     "objectID": "L06-Storage.html#using-a-hard-disk",
@@ -1544,14 +1537,14 @@
     "href": "L06-Storage.html#logical-to-physical",
     "title": "Storage Fundamentals",
     "section": "Logical to Physical",
-    "text": "Logical to Physical\n\nThe database creates a logical view of the data, which we call the logical layer (eg: tables, records, fields)\nThe disk provides low-level access to the data, which we call the physical layer (eg: disk blocks)\nIn order to store something like a database table on a disk drive, we need a logical to physical mapping\n\nFor example, how are tables “laid out” on a disk?\nHow are the table’s data objects arranged when written to disk blocks?\n\nNote that a file system solves a similar problem\n\nFile system logical layer = files\nSimilar problem: how to lay out files on a disk…"
+    "text": "Logical to Physical\n\nThe database creates a logical view of the data, which we call the logical layer (eg: tables, records, fields)\nThe disk provides low-level access to the data, which we call the physical layer (eg: disk blocks)\nIn order to store something like a database table on a disk drive, we need a logical to physical mapping\n\nFor example, how are tables “laid out” on a disk?\nHow are the table’s data objects arranged when written to disk blocks?\n\nNotice also that a file system solves a similar problem\n\nThe file system’s logical layer consists of files\nIt has the same kind of problem: how to lay out files on a disk…"
   },
   {
     "objectID": "L06-Storage.html#accessing-the-disk",
     "href": "L06-Storage.html#accessing-the-disk",
     "title": "Storage Fundamentals",
     "section": "Accessing the Disk",
-    "text": "Accessing the Disk\n\nData is arranged on disk in units called blocks.\n\ntypically fairly large (e.g., 4K or 8K)\n\n\n\n\nRelatively speaking, disk I/O is very expensive.\n\nin the time it takes to read a single disk block, the processor could be executing millions of instructions!\n\n\n\n\n\nThe DBMS tries to minimize the number of disk accesses."
+    "text": "Accessing the Disk\n\nData is arranged on disk in units called blocks.\n\ntypically fairly large (e.g., 4K or 8K bytes)\n\n\n\n\nRelatively speaking, disk I/O is very expensive.\n\nin the time it takes to read a single disk block, the processor could be executing millions of instructions!\n\n\n\n\n\nThe DBMS tries to minimize the number of disk accesses."
   },
   {
     "objectID": "L06-Storage.html#review-dbms-architecture",
@@ -1572,14 +1565,14 @@
     "href": "L06-Storage.html#logical-to-physical-mapping-cont.",
     "title": "Storage Fundamentals",
     "section": "Logical-to-Physical Mapping (cont.)",
-    "text": "Logical-to-Physical Mapping (cont.)\n\n\n\nA DBMS may use the filesystem, or it may bypass it and use its own disk manager.\n\n\n\nIn either case, a DBMS may use units called pages that have a different size than the block size.\n\ncan be helpful in performance tuning"
+    "text": "Logical-to-Physical Mapping (cont.)\n\n\n\nA DBMS may\n\nuse the filesystem, or\nit may bypass it and use its own disk manager.\n\n\n\n\nIn either case, a DBMS may manage data in units called pages that are larger than the block size.\n\ncan be helpful in performance tuning"
   },
   {
     "objectID": "L06-Storage.html#logical-to-physical-mapping-cont.-1",
     "href": "L06-Storage.html#logical-to-physical-mapping-cont.-1",
     "title": "Storage Fundamentals",
     "section": "Logical-to-Physical Mapping (cont.)",
-    "text": "Logical-to-Physical Mapping (cont.)\n\nWe’ll consider:\n\nhow to map logical records to their physical representation\nhow to organize the records in a given collection\n\nincluding the use of index structures\n\n\n\n\n\nDifferent approaches require different amounts of metadata – data about the data.\n\nexample: the types and lengths of the fields\n\n\n\n\n\nper-record metadata – stored within each record\n\n\n\n\nper-collection metadata – stored once for the entire collection\n\n\n\n\nAssumptions about data in the rest of this set of slides:\n\neach character is stored using 1 byte\nInteger data values are stored using 4 bytes – upto 4 billion\nInteger metadata (e.g., offsets) are stored using 2 bytes – upto 65k"
+    "text": "Logical-to-Physical Mapping (cont.)\n\nWe’ll consider:\n\nhow to map logical records to their physical representation\nhow to organize the records in a given collection\n\nincluding the use of index structures\n\n\n\n\n\nDifferent approaches require different amounts of metadata – data about the data.\n\nexample of metadata: the types and lengths of the fields\n\n\n\n\nMetadata can exist at two levels:\n\n\n\nper-record metadata – stored within each record\n\n\n\n\nper-collection metadata – stored once for the entire collection\n\n\n\n\nWe will make the following assumptions about data in the rest of the lecture:\n\neach character is stored using 1 byte\nInteger data values are stored using 4 bytes – up to 4 billion\nInteger metadata (e.g., offsets) are stored using 2 bytes – upto 65k"
   },
   {
     "objectID": "L06-Storage.html#fixed--or-variable-length-records",
@@ -1593,14 +1586,14 @@
     "href": "L06-Storage.html#fixed--or-variable-length-records-cont.",
     "title": "Storage Fundamentals",
     "section": "Fixed- or Variable-Length Records? (cont.)",
-    "text": "Fixed- or Variable-Length Records? (cont.)\n\nThe choice is less straightforward when you have either:\n\nvariable-length fields (e.g., VARCHAR)\na variable number of fields per record (e.g., in XML)\n\n\nTwo options:\n\n\n\nfixed-length records: always allocate the maximum possible length\n\n\n\n\n\n\nplusses and minuses:\n\n+ less metadata is needed, because:\n\nevery record has the same length\na given field is in a consistent position within all records\n\n\n\n\n\n\n+ changing a field’s value doesn’t change the record’s length\n\nthus, changes never necessitate moving the record\n\n\n\n\n\n– we waste space when a record has fields shorter than their max length, or is missing fields"
+    "text": "Fixed- or Variable-Length Records? (cont.)\n\nThe choice is less straightforward when you have either:\n\nvariable-length fields (e.g., VARCHAR)\na variable number of fields per record (e.g., in XML)\n\n\nTwo options:\n\n\n\nfixed-length records: always allocate the maximum possible length\n\n\n\n\n\n\nplusses and minuses:\n\n👍 less metadata is needed, because:\n\nevery record has the same length\na given field is in a consistent position within all records\n\n\n\n\n\n\n👍 changing a field’s value doesn’t change the record’s length\n\nthus, changes never necessitate moving the record\n\n\n\n\n\n👎 we waste space when a record has fields shorter than their max length, or is missing fields"
   },
   {
     "objectID": "L06-Storage.html#fixed--or-variable-length-records-cont.-1",
     "href": "L06-Storage.html#fixed--or-variable-length-records-cont.-1",
     "title": "Storage Fundamentals",
     "section": "Fixed- or Variable-Length Records? (cont.)",
-    "text": "Fixed- or Variable-Length Records? (cont.)\n\n\n\nvariable-length records: only allocate the space that each record actually needs\n\n\n\n\n\n\nplusses and minuses:\n\n– more metadata is needed in order to:\n\ndetermine the boundaries between records\ndetermine the locations of the fields in a given record\n\n\n\n\n\n\n– changing a field’s value can change the record’s length\n\nthus, we may need to move the record\n\n\n\n\n\n+ we don’t waste space when a record has fields shorter than their max length, or is missing fields"
+    "text": "Fixed- or Variable-Length Records? (cont.)\n\n\n\nvariable-length records: only allocate the space that each record actually needs\n\n\n\n\n\n\nplusses and minuses:\n\n👎 more metadata is needed in order to:\n\ndetermine the boundaries between records\ndetermine the locations of the fields in a given record\n\n\n\n\n\n\n👎 changing a field’s value can change the record’s length\n\nthus, we may need to move the record\n\n\n\n\n\n👍 we don’t waste space when a record has fields shorter than their max length, or is missing fields"
   },
   {
     "objectID": "L06-Storage.html#format-of-fixed-length-records",
