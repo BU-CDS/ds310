@@ -38,6 +38,13 @@ $presentation-h2-font-size: 1.6em;
   list-style-type: disc;
 }
 
+// Ordered-list numbers sit outside the item box (list-style-position:
+// outside) and get clipped at the slide/column left edge, and by the
+// modest indent on .sub fragments. A left gutter keeps 1. 2. visible.
+.reveal ol {
+  padding-left: 0.5em;
+}
+
 // Title slide tweaks
 .reveal #title-slide .title {
   color: #7c1717;

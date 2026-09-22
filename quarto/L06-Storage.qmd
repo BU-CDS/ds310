@@ -15,10 +15,6 @@ format:
     chalkboard: true
 ---
 
-## Trouble with DB Browser installation?
-
-- Go to John's Office Hour on Friday: 2:00&ndash;4:00PM on the 14th floor of CDS
-
 ## Storage
 
 :::: {.columns}
@@ -42,7 +38,7 @@ format:
 - The surfaces of the platters are divided into tracks and blocks.
 - A track is a complete ring at a given radial distance, on a single platter.
 - The track is divided into blocks, which are the smallest unit that can be read or written.
-- Typically tracks are 4K or 8K blocks.
+- Typically blocks hold 4K or 8K bytes.
 :::
 
 ::: {.column width="62%"}
@@ -69,14 +65,14 @@ format:
 - In order to store something like a database table on a disk drive, we need a *logical to physical* mapping
     - For example, how are tables "laid out" on a disk?
     - How are the table's data objects arranged when written to disk blocks?
-- Note that a file system solves a similar problem
-    - File system logical layer = files
-    - Similar problem: how to lay out files on a disk&hellip;
+- Notice also that a _file system_ solves a similar problem
+    - The file system's logical layer consists of files
+    - It has the same kind of problem: how to lay out files on a disk&hellip;
 
 ## Accessing the Disk
 
 - Data is arranged on disk in units called *blocks*.
-    - typically fairly large (e.g., 4K or 8K)
+    - typically fairly large (e.g., 4K or 8K bytes)
 
 ::: {.fragment}
 - Relatively speaking, disk I/O is very expensive.
@@ -84,7 +80,7 @@ format:
 :::
 
 ::: {.fragment}
-- The DBMS tries to minimize the number of disk accesses.
+- The DBMS tries to _minimize_ the number of disk accesses.
 :::
 
 ## Review: DBMS Architecture
@@ -140,10 +136,12 @@ format:
 
 :::: {.columns}
 ::: {.column width="60%"}
-- A DBMS may use the filesystem, or it may bypass it and use its own disk manager.
+- A DBMS may
+    - use the filesystem, or 
+    - it may bypass it and use its own disk manager.
 
 ::: {.fragment}
-- In either case, a DBMS may use units called *pages* that have a different size than the block size.
+- In either case, a DBMS may manage data in units called *pages* that are _larger_ than the block size.
     - can be helpful in performance tuning
 :::
 :::
@@ -162,7 +160,11 @@ format:
 
 ::: {.fragment}
 - Different approaches require different amounts of *metadata* &ndash; data about the data.
-    - example: the types and lengths of the fields
+    - example of metadata: the types and lengths of the fields
+:::
+
+::: {.fragment}
+Metadata can exist at two levels:
 :::
 
 ::: {.fragment .sub}
@@ -174,9 +176,9 @@ format:
 :::
 
 ::: {.fragment}
-- Assumptions about data in the rest of this set of slides:
+- We will make the following assumptions about data in the rest of the lecture:
     - each character is stored using 1 byte
-    - Integer data values are stored using 4 bytes &ndash; upto 4 billion
+    - Integer data values are stored using 4 bytes &ndash; up to 4 billion
     - Integer metadata (e.g., offsets) are stored using 2 bytes &ndash; upto 65k
 :::
 
@@ -212,18 +214,18 @@ format:
 
 ::: {.fragment .sub style="margin-left: 2em"}
 - plusses and minuses:
-    - \+ less metadata is needed, because:
+    - 👍 less metadata is needed, because:
         - every record has the same length
         - a given field is in a consistent position within all records
 :::
 
 ::: {.fragment .sub style="margin-left: 3em"}
-- \+ changing a field's value doesn't change the record's length
+- 👍 changing a field's value doesn't change the record's length
     - thus, changes never necessitate moving the record
 :::
 
 ::: {.fragment .sub style="margin-left: 3em"}
-- &ndash; we waste space when a record has fields shorter than their max length, or is missing fields
+- 👎 we waste space when a record has fields shorter than their max length, or is missing fields
 :::
 
 ## Fixed- or Variable-Length Records? (cont.)
@@ -240,18 +242,18 @@ format:
 
 ::: {.fragment .sub style="margin-left: 2em"}
 - plusses and minuses:
-    - &ndash; more metadata is needed in order to:
+    - 👎 more metadata is needed in order to:
         - determine the boundaries between records
         - determine the locations of the fields in a given record
 :::
 
 ::: {.fragment .sub style="margin-left: 3em"}
-- &ndash; changing a field's value can change the record's length
+- 👎 changing a field's value can change the record's length
     - thus, we may need to move the record
 :::
 
 ::: {.fragment .sub style="margin-left: 3em"}
-- \+ we *don't* waste space when a record has fields shorter than their max length, or is missing fields
+- 👍 we *don't* waste space when a record has fields shorter than their max length, or is missing fields
 :::
 
 ## Format of Fixed-Length Records
@@ -343,7 +345,7 @@ WHERE name = 'data sci';
 
 - Option 1: Terminate field values with a special *delimiter* character.
 
-![](images/L06-Storage/vlr-opt1.png){width="52%" fig-align="center"}
+![](images/L06-Storage/vlr-opt1.png){width="50%" fig-align="center"}
 
 1. [finding/extracting the value of a single field]{.underline}\
 this is very inefficient[; need to scan byte-by-byte to:]{.fragment fragment-index=1}
@@ -365,7 +367,7 @@ if it changes in size, we need to shift the values after it, but we don't need t
 
 - Option 2: Precede each field by its *length*.
 
-![](images/L06-Storage/vlr-opt2.png){width="50%" fig-align="center"}
+![](images/L06-Storage/vlr-opt2.png){width="40%" fig-align="center"}
 
 ::: {.fragment fragment-index=1}
 1. [finding/extracting the value of a single field]{.underline}\
@@ -436,7 +438,7 @@ same as option 1
 
 - Option 3 (cont.)
 
-![](images/L06-Storage/opt3b.png){width="62%" fig-align="center"}
+![](images/L06-Storage/opt3b.png){width="50%" fig-align="center"}
 
 1. [finding/extracting the value of a single field]{.underline}\
 [this representation is the most efficient. it allows us to:]{.fragment fragment-index=1}
