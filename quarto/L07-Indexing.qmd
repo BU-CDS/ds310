@@ -91,6 +91,55 @@ select name from employee where employee_id = '142552'
   → his full record, including his zip code
 :::
 
+## The Hard Question
+
+::: {.fragment}
+- How do we make accessing a specific record efficient, given its key?
+:::
+
+::: {.fragment}
+- Warm-up: consider searching for a word in the dictionary
+    - do we start reading the dictionary from the front, until we get to the word?
+:::
+
+::: {.fragment .sub}
+- of course not - we open the dictionary and decide whether the word we are looking for is before or after our current position
+:::
+
+::: {.fragment}
+- The generalization of this process is called _binary search_.
+    - binary search is based on the fact that the dictionary is _already sorted_
+:::
+
+::: {.fragment .sub}
+- because of that, we can divide the dictionary into two parts
+    - the part before the current location, and the part after the current location
+    - and we know that the word is in _only one of those two parts_
+:::
+
+## Seaching with Disk Access in Mind
+
+::: {.fragment}
+- Recall that the expensive operation when using a disk is head movement
+:::
+
+::: {.fragment}
+- Once the head has moved, reading the _entire_ disk block (or page) is cheap
+:::
+
+::: {.fragment}
+- This suggests that we should design our data structure to put as much information as possible into each page
+:::
+
+::: {.fragment}
+- That is, we will design a data structure that performs something like binary search, but using pages as efficiently as possible
+:::
+
+::: {.fragment}
+- This data structure is called a __B-Tree__.
+:::
+
+
 ## B-Trees
 
 - A B-tree of order *m* is a tree in which each node has:
@@ -101,9 +150,18 @@ select name from employee where employee_id = '142552'
 - exception: the root node may have as few as 1 item
 :::
 
-- Example: a B-tree of order 2&emsp;*(we're just showing the keys)*
+::: {.fragment}
+- Think of each _node_ as being stored in a single _block_ or _page_.
+    - We use the *m* parameter to make the structure block-efficient
+    - requiring at least _m_: ensures each block read gets lots of useful information
+    - requiring at most _2m_: ensures the node does not get bigger than a block
+:::
+
+::: {.fragment}
+- Example: a B-tree of order 2&emsp;*(we're just showing the keys, but the items are present too!)*
 
 ![](images/L07-Indexing/btree-order2.png){width="45%" fig-align="center"}
+:::
 
 ::: {.fragment}
 - A B-tree has *perfect balance*: all paths from the root node to a leaf node have the same length.
