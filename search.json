@@ -3234,11 +3234,25 @@
     "text": "Unclustered/Secondary Indices\n\nIn addition to the clustered/primary index, there can be one or more unclustered indices based on other fields.\n\nalso known as secondary indices\n\n\n\n\nExample: Customer(id, name, street, city, state, zip)\n\n\n\n\nprimary index:\n(key, value) = (id, all of the remaining fields in the record)\n\n\n\n\na secondary index to enable quick searches by name\n(key, value) = (name, id) does not include the other fields!\n\n\n\n\nWe need two lookups when we start with the secondary index.\n\nexample: looking for Ted Codd’s zip code\n\n\n\n\n\nsearch for 'Ted Codd' in the secondary index\n→ '123456' (his id)\n\n\n\n\nsearch for '123456' in the primary index\n→ his full record, including his zip code"
   },
   {
+    "objectID": "L07-Indexing.html#the-hard-question",
+    "href": "L07-Indexing.html#the-hard-question",
+    "title": "Indexing",
+    "section": "The Hard Question",
+    "text": "The Hard Question\n\n\nHow do we make accessing a specific record efficient, given its key?\n\n\n\n\nWarm-up: consider searching for a word in the dictionary\n\ndo we start reading the dictionary from the front, until we get to the word?\n\n\n\n\n\nof course not - we open the dictionary and decide whether the word we are looking for is before or after our current position\n\n\n\n\nThe generalization of this process is called binary search.\n\nbinary search is based on the fact that the dictionary is already sorted\n\n\n\n\n\nbecause of that, we can divide the dictionary into two parts\n\nthe part before the current location, and the part after the current location\nand we know that the word is in only one of those two parts"
+  },
+  {
+    "objectID": "L07-Indexing.html#seaching-with-disk-access-in-mind",
+    "href": "L07-Indexing.html#seaching-with-disk-access-in-mind",
+    "title": "Indexing",
+    "section": "Seaching with Disk Access in Mind",
+    "text": "Seaching with Disk Access in Mind\n\n\nRecall that the expensive operation when using a disk is head movement\n\n\n\n\nOnce the head has moved, reading the entire disk block (or page) is cheap\n\n\n\n\nThis suggests that we should design our data structure to put as much information as possible into each page\n\n\n\n\nThat is, we will design a data structure that performs something like binary search, but using pages as efficiently as possible\n\n\n\n\nThis data structure is called a B-Tree."
+  },
+  {
     "objectID": "L07-Indexing.html#b-trees",
     "href": "L07-Indexing.html#b-trees",
     "title": "Indexing",
     "section": "B-Trees",
-    "text": "B-Trees\n\nA B-tree of order m is a tree in which each node has:\n\nat most 2m items (and, for internal nodes, 2m + 1 children)\nat least m items (and, for internal nodes, m + 1 children)\n\n\n\n\nexception: the root node may have as few as 1 item\n\n\n\nExample: a B-tree of order 2 (we’re just showing the keys)\n\n\n\n\nA B-tree has perfect balance: all paths from the root node to a leaf node have the same length."
+    "text": "B-Trees\n\nA B-tree of order m is a tree in which each node has:\n\nat most 2m items (and, for internal nodes, 2m + 1 children)\nat least m items (and, for internal nodes, m + 1 children)\n\n\n\n\nexception: the root node may have as few as 1 item\n\n\n\n\nThink of each node as being stored in a single block or page.\n\nWe use the m parameter to make the structure block-efficient\nrequiring at least m: ensures each block read gets lots of useful information\nrequiring at most 2m: ensures the node does not get bigger than a block\n\n\n\n\n\nExample: a B-tree of order 2 (we’re just showing the keys, but the items are present too!)\n\n\n\n\n\n\n\n\n\nA B-tree has perfect balance: all paths from the root node to a leaf node have the same length."
   },
   {
     "objectID": "L07-Indexing.html#search-in-b-trees",

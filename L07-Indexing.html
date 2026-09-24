@@ -323,6 +323,72 @@ Data Science 310
 </ul>
 </div>
 </section>
+<section id="the-hard-question" class="slide level2">
+<h2>The Hard Question</h2>
+<div class="fragment">
+<ul>
+<li>How do we make accessing a specific record efficient, given its key?</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Warm-up: consider searching for a word in the dictionary
+<ul>
+<li>do we start reading the dictionary from the front, until we get to the word?</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>of course not - we open the dictionary and decide whether the word we are looking for is before or after our current position</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>The generalization of this process is called <em>binary search</em>.
+<ul>
+<li>binary search is based on the fact that the dictionary is <em>already sorted</em></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>because of that, we can divide the dictionary into two parts
+<ul>
+<li>the part before the current location, and the part after the current location</li>
+<li>and we know that the word is in <em>only one of those two parts</em></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="seaching-with-disk-access-in-mind" class="slide level2">
+<h2>Seaching with Disk Access in Mind</h2>
+<div class="fragment">
+<ul>
+<li>Recall that the expensive operation when using a disk is head movement</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Once the head has moved, reading the <em>entire</em> disk block (or page) is cheap</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>This suggests that we should design our data structure to put as much information as possible into each page</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>That is, we will design a data structure that performs something like binary search, but using pages as efficiently as possible</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>This data structure is called a <strong>B-Tree</strong>.</li>
+</ul>
+</div>
+</section>
 <section id="b-trees" class="slide level2">
 <h2>B-Trees</h2>
 <ul>
@@ -337,11 +403,27 @@ Data Science 310
 <li>exception: the root node may have as few as 1 item</li>
 </ul>
 </div>
+<div class="fragment">
 <ul>
-<li>Example: a B-tree of order 2 <em>(we’re just showing the keys)</em></li>
+<li>Think of each <em>node</em> as being stored in a single <em>block</em> or <em>page</em>.
+<ul>
+<li>We use the <em>m</em> parameter to make the structure block-efficient</li>
+<li>requiring at least <em>m</em>: ensures each block read gets lots of useful information</li>
+<li>requiring at most <em>2m</em>: ensures the node does not get bigger than a block</li>
+</ul></li>
 </ul>
-
-<img data-src="images/L07-Indexing/btree-order2.png" class="quarto-figure quarto-figure-center r-stretch" style="width:45.0%"><div class="fragment">
+</div>
+<div class="fragment">
+<ul>
+<li>Example: a B-tree of order 2 <em>(we’re just showing the keys, but the items are present too!)</em></li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L07-Indexing/btree-order2.png" class="quarto-figure quarto-figure-center" style="width:45.0%"></p>
+</figure>
+</div>
+</div>
+<div class="fragment">
 <ul>
 <li>A B-tree has <em>perfect balance</em>: all paths from the root node to a leaf node have the same length.</li>
 </ul>
