@@ -1474,7 +1474,7 @@
     "href": "L08-Dynamic-Hashing.html#additional-details",
     "title": "Dynamic Linear Hashing",
     "section": "Additional Details",
-    "text": "Additional Details\n\nIf the number of buckets exceeds 2i, we increment i and begin using one additional bit.\n\n\n\n\n\n\n\n\n\nwhich bucket should be rehashed?\nA. bucket 0 ← yes: 4 = 100, and items that should now be in that bucket were put in 000 = 0 (using the rightmost i – 1 bits)\nB. bucket 1  C. bucket 2  D. bucket 3"
+    "text": "Additional Details\n\nIf the number of buckets exceeds 2i, we increment i and begin using one additional bit.\n\n\n\n\n\n\n\n\n\nwhich bucket should be rehashed?\nA. bucket 0 ← yes: 4 = 100, and items that should now be in that bucket were put in 000 = 0 (using the rightmost i – 1 bits)\nB. bucket 1\nC. bucket 2\nD. bucket 3"
   },
   {
     "objectID": "L08-Dynamic-Hashing.html#additional-details-cont.",
