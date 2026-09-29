@@ -511,26 +511,3 @@ D\. 5 is sent up as part of a split
 ![](images/L07-Indexing/rehash-5.png){.fragment fragment-index=7 width="86%"}
 :::
 
-## Search in B-Trees (cont.)
-
-::: {.r-stack}
-![](images/L07-Indexing/trace-1.png){width="84%"}
-
-![](images/L07-Indexing/trace-2.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-3.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-4.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-5.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-6.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-7.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-8.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-9.png){.fragment width="84%"}
-
-![](images/L07-Indexing/trace-10.png){.fragment width="84%"}
-:::
