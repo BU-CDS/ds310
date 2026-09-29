@@ -3374,13 +3374,6 @@
     "text": "A Simplistic Approach to Dynamic Hashing\n\nAssume that:\n\nwe’re using keys that are strings\nh(key) = number of characters in key\nwe use mod (%) to ensure we get a valid bucket number:\nbucket index = h(key) % number of buckets\n\n\n\n\nWhen the hash table gets to be too full:\n\ndouble the number of buckets\n\n\n\n\n\nrehash all existing items. why? % may give a different result"
   },
   {
-    "objectID": "L07-Indexing.html#search-in-b-trees-cont.-2",
-    "href": "L07-Indexing.html#search-in-b-trees-cont.-2",
-    "title": "Indexing",
-    "section": "Search in B-Trees (cont.)",
-    "text": "Search in B-Trees (cont.)"
-  },
-  {
     "objectID": "L09-QueryProcessing-Optimization.html#overview",
     "href": "L09-QueryProcessing-Optimization.html#overview",
     "title": "Query Processing and Optimization",
