@@ -299,7 +299,11 @@ which bucket should be rehashed?
 
 A\. bucket 0 [**&larr; yes: 4 = 100, and items that should now be in that bucket were put in 000 = 0 (using the rightmost i &ndash; 1 bits)**]{.fragment fragment-index=5 style="color:#3a5fcd;"}
 
-B\. bucket 1&emsp;&emsp;C. bucket 2&emsp;&emsp;D. bucket 3
+B\. bucket 1
+
+C\. bucket 2
+
+D.\ bucket 3
 :::
 
 ## Additional Details (cont.)
