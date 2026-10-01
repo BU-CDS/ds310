@@ -328,7 +328,8 @@ D\. 2,000 block transfers
 
 ```sql
 SELECT p.name, a.movie_id
-FROM Person p JOIN Actor a ON p.id = a.actor_id
+FROM Person p, Actor a 
+WHERE p.id = a.actor_id
 ```
 
 :::: {.columns}
@@ -343,12 +344,12 @@ FROM Person p JOIN Actor a ON p.id = a.actor_id
 ::: {.fragment fragment-index=1}
 - To turn this *expression* into a *plan*, the DBMS must decide, for the &bowtie; node:
     - which *algorithm* evaluates it
-    - which input is *outer*, which is *inner*
+    - which input is *outer*, which is *inner* (explained shortly)
     - whether to use an *index*
 :::
 
 ::: {.fragment fragment-index=2}
-- We'll price out the candidates on two scales:
+- We'll find the costs of the candidates on two scales:
     - a toy instance we can trace by hand
     - a scaled-up instance, the size a streaming service might manage
 :::
@@ -386,8 +387,12 @@ for each tuple t_a in Actor:           // Actor = outer relation
             add (t_p, t_a) to the result
 ```
 
+::: {.fragment}
+- `outer' and `inner' relations refer to the role each plays in a nested loop
+
 - In block terms: read each outer block once; for *every outer tuple*, re-scan all of the inner relation.
-    - (the basic algorithm doesn't exploit the fact that *id* is a key &mdash; it just keeps scanning)
+    - Notice that this basic algorithm doesn't exploit the fact that *id* is a key &mdash; it just keeps scanning
+:::
 
 ## Nested-Loop Join: Trace
 
@@ -413,6 +418,7 @@ for each tuple t_a in Actor:           // Actor = outer relation
     - *Person* outer: 100,000 &times; 2,500 + 2,000 = [250,002,000]{style="color:#c00;"} transfers
 
 ::: {.fragment fragment-index=1}
+- However, this assumes we were not able to *cache* blocks
 - Best case: the inner relation fits entirely in memory
     - read each relation once: b~r~ + b~s~ = 4,500 transfers
 :::
@@ -552,7 +558,7 @@ D\. 2,500 + 100,000 &times; 3 = 302,500 transfers
 
 - So far we've priced *single operations*. But a query is a *tree* of operations &mdash; how do we run the whole tree?
 
-- Running example, one selection richer than before:
+- Running example, one more selection than before:
     - $\pi_{name,\, actor\_id}\big(\sigma_{year = 2008}(\text{Movie}) \bowtie \text{Actor}\big)$
 
 - Two strategies:
@@ -649,7 +655,7 @@ D\. grouped `SUM` over a file scan
     - 3\. estimate each plan's cost using *statistics*, choose the cheapest
 
 ::: {.fragment}
-- [We'll take the three steps in reverse order of novelty: we've already *seen* step 3 in action &mdash; that was Part 1's cost arithmetic. What's new is generating the alternatives (steps 1&ndash;2) and the statistics that feed step 3.]{style="color:#3a5fcd;"}
+- [We've already *seen* step 3 in action &mdash; that was Part 1's cost arithmetic. What's new is generating the alternatives (steps 1&ndash;2) and the statistics that feed step 3.]{style="color:#3a5fcd;"}
 :::
 
 ## One Query, Many Plans
@@ -657,11 +663,13 @@ D\. grouped `SUM` over a file scan
 ![](images/L09-QueryProcessing-Optimization/opt-plans.svg){width="90%" fig-align="center"}
 
 - This is just the *algorithm* dimension, for one fixed expression &mdash; a 650&times; spread on our two-relation query.
-- Add the *expression* dimension (reordered joins, pushed-down selections) and multi-relation queries, and the spread grows further still.
+- Add the *expression* dimension (reordered joins, pushed-down selections) and multi-relation queries, and the spread can get even larger.
 
 ## Equivalence Rules
 
 - Two expressions are *equivalent* if they produce the same result on every legal database instance
+
+- We can turn one expression into another equivalent one using a standard set of rules
 
 - Highlights (there are ~16 such rules):
     - conjunctive selections can be split: &sigma;~&theta;1&and;&theta;2~(E) = &sigma;~&theta;1~(&sigma;~&theta;2~(E))
@@ -822,7 +830,8 @@ SCAN Movie
 
 ::: {.fragment}
 - You already know these two strategies:
-    - [`SCAN` = linear search&emsp;&bull;&emsp;`SEARCH ... USING INDEX` = an index walk]{style="color:#3a5fcd;"}
+    - [`SCAN` = linear search]{style="color:#3a5fcd;"}
+    - [`SEARCH ... USING INDEX` = an index walk]{style="color:#3a5fcd;"}
 :::
 
 ## Changing the Plan: CREATE INDEX
