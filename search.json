@@ -3483,7 +3483,7 @@
     "href": "L09-QueryProcessing-Optimization.html#developing-a-plan-for-a-join",
     "title": "Query Processing and Optimization",
     "section": "Developing a Plan for a Join",
-    "text": "Developing a Plan for a Join\n\nLet’s follow the optimizer’s problem for one concrete query — who acted in what:\n\nSELECT p.name, a.movie_id\nFROM Person p JOIN Actor a ON p.id = a.actor_id\n\n\n\n\n\nTranslated to relational algebra:\n\n\\(\\pi_{name,\\, movie\\_id}(\\text{Person} \\bowtie \\text{Actor})\\)\n\n\n\n\nTo turn this expression into a plan, the DBMS must decide, for the ⋈ node:\n\nwhich algorithm evaluates it\nwhich input is outer, which is inner\nwhether to use an index\n\n\n\n\n\nWe’ll price out the candidates on two scales:\n\na toy instance we can trace by hand\na scaled-up instance, the size a streaming service might manage"
+    "text": "Developing a Plan for a Join\n\nLet’s follow the optimizer’s problem for one concrete query — who acted in what:\n\nSELECT p.name, a.movie_id\nFROM Person p, Actor a \nWHERE p.id = a.actor_id\n\n\n\n\n\nTranslated to relational algebra:\n\n\\(\\pi_{name,\\, movie\\_id}(\\text{Person} \\bowtie \\text{Actor})\\)\n\n\n\n\nTo turn this expression into a plan, the DBMS must decide, for the ⋈ node:\n\nwhich algorithm evaluates it\nwhich input is outer, which is inner (explained shortly)\nwhether to use an index\n\n\n\n\n\nWe’ll find the costs of the candidates on two scales:\n\na toy instance we can trace by hand\na scaled-up instance, the size a streaming service might manage"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#the-data-at-two-scales",
@@ -3497,7 +3497,7 @@
     "href": "L09-QueryProcessing-Optimization.html#candidate-1-nested-loop-join",
     "title": "Query Processing and Optimization",
     "section": "Candidate 1: Nested-Loop Join",
-    "text": "Candidate 1: Nested-Loop Join\n\nThe brute-force algorithm — like the linear scan, it always works (any join condition, no index needed):\n\nfor each tuple t_a in Actor:           // Actor = outer relation\n    for each tuple t_p in Person:      // Person = inner relation\n        if t_p.id == t_a.actor_id:\n            add (t_p, t_a) to the result\n\nIn block terms: read each outer block once; for every outer tuple, re-scan all of the inner relation.\n\n(the basic algorithm doesn’t exploit the fact that id is a key — it just keeps scanning)"
+    "text": "Candidate 1: Nested-Loop Join\n\nThe brute-force algorithm — like the linear scan, it always works (any join condition, no index needed):\n\nfor each tuple t_a in Actor:           // Actor = outer relation\n    for each tuple t_p in Person:      // Person = inner relation\n        if t_p.id == t_a.actor_id:\n            add (t_p, t_a) to the result\n\n\nouter' andinner’ relations refer to the role each plays in a nested loop\nIn block terms: read each outer block once; for every outer tuple, re-scan all of the inner relation.\n\nNotice that this basic algorithm doesn’t exploit the fact that id is a key — it just keeps scanning"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#nested-loop-join-trace",
@@ -3511,7 +3511,7 @@
     "href": "L09-QueryProcessing-Optimization.html#nested-loop-join-cost",
     "title": "Query Processing and Optimization",
     "section": "Nested-Loop Join: Cost",
-    "text": "Nested-Loop Join: Cost\n\nWorst case (only one block of memory per relation):\n\nnr × bs + br block transfers   (r = outer, s = inner)\n\nAt streaming scale:\n\nActor outer: 500,000 × 2,000 + 2,500 = 1,000,002,500 transfers\nPerson outer: 100,000 × 2,500 + 2,000 = 250,002,000 transfers\n\n\n\n\nBest case: the inner relation fits entirely in memory\n\nread each relation once: br + bs = 4,500 transfers\n\n\n\n\n\nBlock nested-loop join: pair up blocks instead of tuples\n\nworst case br × bs + br = 2,000 × 2,500 + 2,000 = 5,002,000 transfers\nuse the smaller relation as the outer relation\n\n\n\n\n\nSame answer, same result — a 200× cost difference just from how we loop."
+    "text": "Nested-Loop Join: Cost\n\nWorst case (only one block of memory per relation):\n\nnr × bs + br block transfers   (r = outer, s = inner)\n\nAt streaming scale:\n\nActor outer: 500,000 × 2,000 + 2,500 = 1,000,002,500 transfers\nPerson outer: 100,000 × 2,500 + 2,000 = 250,002,000 transfers\n\n\n\n\nHowever, this assumes we were not able to cache blocks\nBest case: the inner relation fits entirely in memory\n\nread each relation once: br + bs = 4,500 transfers\n\n\n\n\n\nBlock nested-loop join: pair up blocks instead of tuples\n\nworst case br × bs + br = 2,000 × 2,500 + 2,000 = 5,002,000 transfers\nuse the smaller relation as the outer relation\n\n\n\n\n\nSame answer, same result — a 200× cost difference just from how we loop."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#candidate-2-indexed-nested-loop-join",
@@ -3567,7 +3567,7 @@
     "href": "L09-QueryProcessing-Optimization.html#evaluating-expressions",
     "title": "Query Processing and Optimization",
     "section": "Evaluating Expressions",
-    "text": "Evaluating Expressions\n\nSo far we’ve priced single operations. But a query is a tree of operations — how do we run the whole tree?\nRunning example, one selection richer than before:\n\n\\(\\pi_{name,\\, actor\\_id}\\big(\\sigma_{year = 2008}(\\text{Movie}) \\bowtie \\text{Actor}\\big)\\)\n\nTwo strategies:\n\nmaterialization — evaluate one operation at a time, saving intermediate results\npipelining — evaluate several operations simultaneously, streaming tuples between them"
+    "text": "Evaluating Expressions\n\nSo far we’ve priced single operations. But a query is a tree of operations — how do we run the whole tree?\nRunning example, one more selection than before:\n\n\\(\\pi_{name,\\, actor\\_id}\\big(\\sigma_{year = 2008}(\\text{Movie}) \\bowtie \\text{Actor}\\big)\\)\n\nTwo strategies:\n\nmaterialization — evaluate one operation at a time, saving intermediate results\npipelining — evaluate several operations simultaneously, streaming tuples between them"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#materialization",
@@ -3595,21 +3595,21 @@
     "href": "L09-QueryProcessing-Optimization.html#overview-1",
     "title": "Query Processing and Optimization",
     "section": "Overview",
-    "text": "Overview\n\nThe same query → many equivalent relational-algebra expressions → many evaluation plans with wildly different costs\nCost differences can be orders of magnitude\nSteps in cost-based optimization:\n\n1. generate equivalent expressions using equivalence rules\n2. annotate them with algorithms to get alternative plans\n3. estimate each plan’s cost using statistics, choose the cheapest\n\n\n\n\nWe’ll take the three steps in reverse order of novelty: we’ve already seen step 3 in action — that was Part 1’s cost arithmetic. What’s new is generating the alternatives (steps 1–2) and the statistics that feed step 3."
+    "text": "Overview\n\nThe same query → many equivalent relational-algebra expressions → many evaluation plans with wildly different costs\nCost differences can be orders of magnitude\nSteps in cost-based optimization:\n\n1. generate equivalent expressions using equivalence rules\n2. annotate them with algorithms to get alternative plans\n3. estimate each plan’s cost using statistics, choose the cheapest\n\n\n\n\nWe’ve already seen step 3 in action — that was Part 1’s cost arithmetic. What’s new is generating the alternatives (steps 1–2) and the statistics that feed step 3."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#one-query-many-plans",
     "href": "L09-QueryProcessing-Optimization.html#one-query-many-plans",
     "title": "Query Processing and Optimization",
     "section": "One Query, Many Plans",
-    "text": "One Query, Many Plans\n\n\nThis is just the algorithm dimension, for one fixed expression — a 650× spread on our two-relation query.\nAdd the expression dimension (reordered joins, pushed-down selections) and multi-relation queries, and the spread grows further still."
+    "text": "One Query, Many Plans\n\n\nThis is just the algorithm dimension, for one fixed expression — a 650× spread on our two-relation query.\nAdd the expression dimension (reordered joins, pushed-down selections) and multi-relation queries, and the spread can get even larger."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#equivalence-rules",
     "href": "L09-QueryProcessing-Optimization.html#equivalence-rules",
     "title": "Query Processing and Optimization",
     "section": "Equivalence Rules",
-    "text": "Equivalence Rules\n\nTwo expressions are equivalent if they produce the same result on every legal database instance\nHighlights (there are ~16 such rules):\n\nconjunctive selections can be split: σθ1∧θ2(E) = σθ1(σθ2(E))\nselection is commutative\njoins are commutative and associative — the basis of join reordering\nselection distributes over join (push selections down)\nprojection distributes over join (push projections down)\nrules for set operations and outer joins (with caveats — e.g., outer joins are not associative)\n\n\n\n\nEach rule is a rewrite the optimizer may apply in either direction — the rules define the space of candidate expressions."
+    "text": "Equivalence Rules\n\nTwo expressions are equivalent if they produce the same result on every legal database instance\nWe can turn one expression into another equivalent one using a standard set of rules\nHighlights (there are ~16 such rules):\n\nconjunctive selections can be split: σθ1∧θ2(E) = σθ1(σθ2(E))\nselection is commutative\njoins are commutative and associative — the basis of join reordering\nselection distributes over join (push selections down)\nprojection distributes over join (push projections down)\nrules for set operations and outer joins (with caveats — e.g., outer joins are not associative)\n\n\n\n\nEach rule is a rewrite the optimizer may apply in either direction — the rules define the space of candidate expressions."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#two-rules-pictured",
@@ -3679,7 +3679,7 @@
     "href": "L09-QueryProcessing-Optimization.html#reading-a-plan-selection",
     "title": "Query Processing and Optimization",
     "section": "Reading a Plan: Selection",
-    "text": "Reading a Plan: Selection\n\nEquality on the primary key:\n\nplan(\"SELECT name FROM Movie WHERE id = '0468569'\")\nSEARCH Movie USING INDEX sqlite_autoindex_Movie_1 (id=?)\n\nEquality on a non-indexed attribute:\n\nplan(\"SELECT name FROM Movie WHERE year = 2008\")\nSCAN Movie\n\n\nYou already know these two strategies:\n\nSCAN = linear search • SEARCH ... USING INDEX = an index walk"
+    "text": "Reading a Plan: Selection\n\nEquality on the primary key:\n\nplan(\"SELECT name FROM Movie WHERE id = '0468569'\")\nSEARCH Movie USING INDEX sqlite_autoindex_Movie_1 (id=?)\n\nEquality on a non-indexed attribute:\n\nplan(\"SELECT name FROM Movie WHERE year = 2008\")\nSCAN Movie\n\n\nYou already know these two strategies:\n\nSCAN = linear search\nSEARCH ... USING INDEX = an index walk"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#changing-the-plan-create-index",

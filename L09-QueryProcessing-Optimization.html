@@ -639,7 +639,8 @@ Data Science 310
 <li>Let’s follow the optimizer’s problem for one concrete query — who acted in what:</li>
 </ul>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a aria-label="1"></a><span class="kw">SELECT</span> p.name, a.movie_id</span>
-<span id="cb2-2"><a aria-label="2"></a><span class="kw">FROM</span> Person p <span class="kw">JOIN</span> Actor a <span class="kw">ON</span> p.<span class="kw">id</span> <span class="op">=</span> a.actor_id</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-2"><a aria-label="2"></a><span class="kw">FROM</span> Person p, Actor a </span>
+<span id="cb2-3"><a aria-label="3"></a><span class="kw">WHERE</span> p.<span class="kw">id</span> <span class="op">=</span> a.actor_id</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="columns">
 <div class="column" style="width:55%;">
 <p><img data-src="images/L09-QueryProcessing-Optimization/plan-tree-1.svg" style="width:95.0%"></p>
@@ -655,14 +656,14 @@ Data Science 310
 <li>To turn this <em>expression</em> into a <em>plan</em>, the DBMS must decide, for the ⋈ node:
 <ul>
 <li>which <em>algorithm</em> evaluates it</li>
-<li>which input is <em>outer</em>, which is <em>inner</em></li>
+<li>which input is <em>outer</em>, which is <em>inner</em> (explained shortly)</li>
 <li>whether to use an <em>index</em></li>
 </ul></li>
 </ul>
 </div>
 <div class="fragment" data-fragment-index="2">
 <ul>
-<li>We’ll price out the candidates on two scales:
+<li>We’ll find the costs of the candidates on two scales:
 <ul>
 <li>a toy instance we can trace by hand</li>
 <li>a scaled-up instance, the size a streaming service might manage</li>
@@ -745,12 +746,15 @@ Data Science 310
 <span id="cb3-2"><a aria-label="2"></a>    for each tuple t_p in Person:      // Person = inner relation</span>
 <span id="cb3-3"><a aria-label="3"></a>        if t_p.id == t_a.actor_id:</span>
 <span id="cb3-4"><a aria-label="4"></a>            add (t_p, t_a) to the result</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="fragment">
 <ul>
-<li>In block terms: read each outer block once; for <em>every outer tuple</em>, re-scan all of the inner relation.
+<li><p><code>outer' and</code>inner’ relations refer to the role each plays in a nested loop</p></li>
+<li><p>In block terms: read each outer block once; for <em>every outer tuple</em>, re-scan all of the inner relation.</p>
 <ul>
-<li>(the basic algorithm doesn’t exploit the fact that <em>id</em> is a key — it just keeps scanning)</li>
+<li>Notice that this basic algorithm doesn’t exploit the fact that <em>id</em> is a key — it just keeps scanning</li>
 </ul></li>
 </ul>
+</div>
 </section>
 <section id="nested-loop-join-trace" class="slide level2">
 <h2>Nested-Loop Join: Trace</h2>
@@ -777,6 +781,7 @@ Data Science 310
 </ul>
 <div class="fragment" data-fragment-index="1">
 <ul>
+<li>However, this assumes we were not able to <em>cache</em> blocks</li>
 <li>Best case: the inner relation fits entirely in memory
 <ul>
 <li>read each relation once: b<sub>r</sub> + b<sub>s</sub> = 4,500 transfers</li>
@@ -957,7 +962,7 @@ Data Science 310
 <h2>Evaluating Expressions</h2>
 <ul>
 <li><p>So far we’ve priced <em>single operations</em>. But a query is a <em>tree</em> of operations — how do we run the whole tree?</p></li>
-<li><p>Running example, one selection richer than before:</p>
+<li><p>Running example, one more selection than before:</p>
 <ul>
 <li><span class="math inline">\(\pi_{name,\, actor\_id}\big(\sigma_{year = 2008}(\text{Movie}) \bowtie \text{Actor}\big)\)</span></li>
 </ul></li>
@@ -1074,7 +1079,7 @@ Data Science 310
 </ul>
 <div class="fragment">
 <ul>
-<li><span style="color:#3a5fcd;">We’ll take the three steps in reverse order of novelty: we’ve already <em>seen</em> step 3 in action — that was Part 1’s cost arithmetic. What’s new is generating the alternatives (steps 1–2) and the statistics that feed step 3.</span></li>
+<li><span style="color:#3a5fcd;">We’ve already <em>seen</em> step 3 in action — that was Part 1’s cost arithmetic. What’s new is generating the alternatives (steps 1–2) and the statistics that feed step 3.</span></li>
 </ul>
 </div>
 </section>
@@ -1083,13 +1088,14 @@ Data Science 310
 
 <img data-src="images/L09-QueryProcessing-Optimization/opt-plans.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:90.0%"><ul>
 <li>This is just the <em>algorithm</em> dimension, for one fixed expression — a 650× spread on our two-relation query.</li>
-<li>Add the <em>expression</em> dimension (reordered joins, pushed-down selections) and multi-relation queries, and the spread grows further still.</li>
+<li>Add the <em>expression</em> dimension (reordered joins, pushed-down selections) and multi-relation queries, and the spread can get even larger.</li>
 </ul>
 </section>
 <section id="equivalence-rules" class="slide level2">
 <h2>Equivalence Rules</h2>
 <ul>
 <li><p>Two expressions are <em>equivalent</em> if they produce the same result on every legal database instance</p></li>
+<li><p>We can turn one expression into another equivalent one using a standard set of rules</p></li>
 <li><p>Highlights (there are ~16 such rules):</p>
 <ul>
 <li>conjunctive selections can be split: σ<sub>θ1∧θ2</sub>(E) = σ<sub>θ1</sub>(σ<sub>θ2</sub>(E))</li>
@@ -1281,7 +1287,8 @@ Data Science 310
 <ul>
 <li>You already know these two strategies:
 <ul>
-<li><span style="color:#3a5fcd;"><code>SCAN</code> = linear search • <code>SEARCH ... USING INDEX</code> = an index walk</span></li>
+<li><span style="color:#3a5fcd;"><code>SCAN</code> = linear search</span></li>
+<li><span style="color:#3a5fcd;"><code>SEARCH ... USING INDEX</code> = an index walk</span></li>
 </ul></li>
 </ul>
 </div>
