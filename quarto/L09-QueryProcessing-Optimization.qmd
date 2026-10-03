@@ -122,7 +122,7 @@ Source: Silberschatz, Korth, and Sudarshan, *Database System Concepts*
 :::: {.columns}
 ::: {.column width="45%"}
 - A relation is stored as a *file of blocks* on disk.
-    - a block (typically 4K&ndash;8K) is the smallest unit the disk can read or write
+    - a _block_ is the smallest unit the disk can read or write
 
 ::: {.fragment fragment-index=1}
 - Disk I/O is *the* expensive operation.
@@ -143,7 +143,7 @@ Source: Silberschatz, Korth, and Sudarshan, *Database System Concepts*
 ::::
 
 ::: {.fragment fragment-index=3}
-- [Consequence: we measure the cost of an algorithm by *how many blocks it touches* &mdash; keep this picture in mind for every slide that follows.]{style="color:#3a5fcd;"}
+- [Consequence: we measure the cost of an algorithm by *how many blocks it touches*.]{style="color:#3a5fcd;"}
 :::
 
 ## Recall (L07): Indexes and B+Trees
@@ -169,12 +169,15 @@ Source: Silberschatz, Korth, and Sudarshan, *Database System Concepts*
 - With order m = 100, every internal node has &ge; 101 children &mdash; two levels below the root already reach over 10,000 leaves.
     - hundreds of thousands of records, any of them &le; 3 block reads away
 :::
+
+::: {.fragment fragment-index=3}
+- [Using an index turns a _complete scan_ into following _a short path_.]{style="color:#3a5fcd;"}
+:::
+
 :::
 ::::
 
-::: {.fragment fragment-index=3}
-- [An index turns "scan everything" into "follow one short path."]{style="color:#3a5fcd;"}
-:::
+
 
 ## Measures of Query Cost
 
@@ -246,7 +249,8 @@ Every selection algorithm is built from two ingredients:
 ## Selection by Scanning: Cost
 
 - Worst case: read the whole file
-    - cost = b~r~ block transfers + 1 seek *(the blocks are consecutive &mdash; one seek suffices)*
+    - cost = b~r~ block transfers + 1 seek 
+    - *the blocks are consecutive &mdash; one seek suffices*
 
 - Equality on a *key* attribute (like `id`): stop at the first match
     - average cost &asymp; b~r~ / 2
@@ -257,7 +261,7 @@ Every selection algorithm is built from two ingredients:
 :::
 
 ::: {.fragment fragment-index=2}
-- At toy scale this is fine. At real scale it hurts:
+- At small scale this is OK. At realistic scale, it is very expensive:
 
 |  | b~r~ | scan average (key) |
 |---|---|---|
@@ -268,7 +272,7 @@ Every selection algorithm is built from two ingredients:
 
 ## Selection via the Clustering Index
 
-- Now use the clustering B+tree on *id* &mdash; and remember from L07 what *clustering* means: **the leaves store the full records**. The bottom level of the tree *is* the file.
+- Now use the clustering B+tree on *id* &mdash; and remember what *clustering* means: **the leaves store the full records**. The bottom level of the tree *is* the file.
 
 - Search walks *one path*: root &rarr; leaf &mdash; and the record is in the leaf when we arrive.
 
@@ -280,7 +284,7 @@ Every selection algorithm is built from two ingredients:
 ![](images/L09-QueryProcessing-Optimization/a2-index-3.svg){.fragment width="98%"}
 :::
 
-## Index Lookup: Cost &mdash; and When It Wins
+## Index Lookup: When is it a benefit?
 
 - Cost = # of nodes on the root-to-leaf path = **height + 1** block transfers (L07)
     - each one is a *random* read: (height + 1) &times; (t~T~ + t~S~)
@@ -301,7 +305,7 @@ Every selection algorithm is built from two ingredients:
 :::
 
 ::: {.fragment fragment-index=3}
-- [This tradeoff &mdash; *which plan wins depends on the data* &mdash; is exactly why the optimizer needs statistics (Part 2).]{style="color:#3a5fcd;"}
+- [The point is: *which plan is preferable depends on the size of the data* &mdash; this is why the optimizer needs statistics (Part 2).]{style="color:#3a5fcd;"}
 :::
 
 ## Which plan &mdash; and what cost?
@@ -347,13 +351,14 @@ WHERE p.id = a.actor_id
     - which input is *outer*, which is *inner* (explained shortly)
     - whether to use an *index*
 :::
+:::
 
 ::: {.fragment fragment-index=2}
 - We'll find the costs of the candidates on two scales:
     - a toy instance we can trace by hand
     - a scaled-up instance, the size a streaming service might manage
 :::
-:::
+
 ::::
 
 ## The Data, at Two Scales
@@ -373,7 +378,7 @@ WHERE p.id = a.actor_id
 | *Person* | 100,000 | 2,000 |
 | *Actor* | 500,000 | 2,500 |
 
-- Our `movie.sqlite` (2,698 people, 3,790 actor rows) sits in between &mdash; and at the end of the lecture we'll watch SQLite make these same choices on it.
+- Our `movie.sqlite` (2,698 people, 3,790 actor rows) sits in between &mdash; at the end of the lecture we'll see how SQLite makes these same choices on it.
 :::
 
 ## Candidate 1: Nested-Loop Join
@@ -388,7 +393,7 @@ for each tuple t_a in Actor:           // Actor = outer relation
 ```
 
 ::: {.fragment}
-- `outer' and `inner' relations refer to the role each plays in a nested loop
+- `outer` and `inner` relations refer to the role each plays in a nested loop
 
 - In block terms: read each outer block once; for *every outer tuple*, re-scan all of the inner relation.
     - Notice that this basic algorithm doesn't exploit the fact that *id* is a key &mdash; it just keeps scanning
@@ -425,12 +430,13 @@ for each tuple t_a in Actor:           // Actor = outer relation
 
 ::: {.fragment fragment-index=2}
 - *Block* nested-loop join: pair up *blocks* instead of tuples
+    - process all the records in the outer block before moving to the next block
     - worst case b~r~ &times; b~s~ + b~r~ = 2,000 &times; 2,500 + 2,000 = [5,002,000]{style="color:#3a5fcd;"} transfers
     - use the *smaller* relation as the outer relation
 :::
 
 ::: {.fragment fragment-index=3}
-- [Same answer, same result &mdash; a 200&times; cost difference just from how we loop.]{style="color:#3a5fcd;"}
+- [These all return the same result &mdash; but there is a 200&times; cost difference just from the choice of join algorithm.]{style="color:#3a5fcd;"}
 :::
 
 ## Candidate 2: Indexed Nested-Loop Join
@@ -438,7 +444,7 @@ for each tuple t_a in Actor:           // Actor = outer relation
 - Look back at the trace: for each Actor row we *re-scanned all of Person* &mdash; just to find the one record with a matching key.
 
 ::: {.fragment fragment-index=1}
-- L07 gave us a better tool for exactly this &mdash; and the movie database already *has* it: the clustering B+tree on *Person(id)*.
+- A B+ tree is a better tool for this &mdash; and the movie database already has it: the index on *Person(id)*.
 - **Idea**: keep the outer loop, but replace each inner *scan* with an index *walk*:
 
 ```text
@@ -451,7 +457,7 @@ for each tuple t_a in Actor:              // outer, scanned as before
 ::: {.fragment fragment-index=2}
 - Requirements:
     - an index on the *inner* relation's join attribute
-    - a join condition that is an equality &mdash; like all our natural joins from L02
+    - a join condition that is an equality &mdash; such as any natural join
 :::
 
 ## Indexed Nested-Loop Join: Trace
@@ -491,7 +497,7 @@ for each tuple t_a in Actor:              // outer, scanned as before
 | **indexed NLJ, clustering index on Person(id)** | **1,502,500** |
 :::
 
-## The Winning Plan
+## The Best Plan
 
 :::: {.columns}
 ::: {.column width="60%"}
@@ -530,6 +536,8 @@ D\. 2,500 + 100,000 &times; 3 = 302,500 transfers
 - Five times better &mdash; fewer outer tuples means fewer index probes.
 - The best plan depends on *which indexes exist* and *which relation drives the loop*. In `movie.sqlite` only the *Person* index exists &mdash; which is why (as we'll see) SQLite scans *Actor*.
 :::
+
+<!--- commenting these out for brevity; not necessary 
 
 ## Join Operation: Merge Join and Hash Join
 
@@ -641,6 +649,8 @@ C\. `ORDER BY` over &sigma;
 D\. grouped `SUM` over a file scan
 :::
 
+End of removed slides ---->
+
 # Part 2: Query Optimization
 
 ## Overview
@@ -655,7 +665,8 @@ D\. grouped `SUM` over a file scan
     - 3\. estimate each plan's cost using *statistics*, choose the cheapest
 
 ::: {.fragment}
-- [We've already *seen* step 3 in action &mdash; that was Part 1's cost arithmetic. What's new is generating the alternatives (steps 1&ndash;2) and the statistics that feed step 3.]{style="color:#3a5fcd;"}
+- [We've covered step 3 &mdash; that was Part 1's cost calculations.]{style="color:#3a5fcd;"}
+- [We'll now look at steps 1&ndash;2 and the statistics needed for step 3.]{style="color:#3a5fcd;"}
 :::
 
 ## One Query, Many Plans
@@ -671,13 +682,17 @@ D\. grouped `SUM` over a file scan
 
 - We can turn one expression into another equivalent one using a standard set of rules
 
-- Highlights (there are ~16 such rules):
+- We won't cover these rules in detail, just mention some examples.
+
+::: {.fragment}
+- There are about 16 such rules:
     - conjunctive selections can be split: &sigma;~&theta;1&and;&theta;2~(E) = &sigma;~&theta;1~(&sigma;~&theta;2~(E))
     - selection is commutative
     - joins are *commutative* and *associative* &mdash; the basis of join reordering
     - selection *distributes* over join (push selections down)
     - projection distributes over join (push projections down)
     - rules for set operations and outer joins (with caveats &mdash; e.g., outer joins are not associative)
+:::
 
 ::: {.fragment}
 - [Each rule is a rewrite the optimizer may apply in either direction &mdash; the rules define the *space* of candidate expressions.]{style="color:#3a5fcd;"}
@@ -716,7 +731,7 @@ D\. grouped `SUM` over a file scan
 ::: {.fragment fragment-index=2}
 - But wait &mdash; the optimizer chooses a plan *before running anything*. How did it know the &sigma; would keep 17 movies and not 700?
     - it didn't &mdash; it *estimated* the size, from statistics
-    - that's the next stop
+    - let's look at that process
 :::
 
 ## Statistics and Size Estimation
@@ -739,8 +754,8 @@ D\. grouped `SUM` over a file scan
 ![](images/L09-QueryProcessing-Optimization/size-estimation.svg){width="94%" fig-align="center"}
 
 ::: {.fragment}
-- Estimates are *heuristics, not guarantees* &mdash; if PG-13 is far more common than G (it is!), n/V misjudges both.
-- Wrong estimates &rarr; wrong plan choices; this is a leading cause of real-world slow queries. (Real systems: `ANALYZE`, auto-collected histograms.)
+- Estimates are *heuristics, not guarantees* &mdash; if PG-13 is far more common than G (it is!), n/V is a poor estimate.
+- Wrong estimates &rarr; wrong plan choices; this is a leading cause of real-world slow queries. 
 :::
 
 ## Estimate the size
@@ -760,6 +775,8 @@ D\. 755 tuples
 - The *actual* answer is 17 &mdash; recent years have far more movies than the 1920s, so the uniform assumption undercounts by 2&times;.
 - Close enough to rank the plans correctly here &mdash; but this is exactly the kind of error that can flip a plan choice, and why real systems collect histograms.
 :::
+
+<!---- removing next two slides for brevity 
 
 ## Choosing a Join Order
 
@@ -783,11 +800,14 @@ D\. 755 tuples
 - Restricting to left-deep trees shrinks the search space from (2(n&minus;1))!/(n&minus;1)! to n! &mdash; and every join can use a *base relation* (with its indexes!) as the inner input, exactly like our indexed NLJ plan.
 :::
 
+removed slides end here ---->
+
 # Seeing the Optimizer at Work
 
-## The Optimizer Is One Query Away
+## The Optimizer Is Visible to You
 
-- Everything in this lecture happens *automatically*, on every query you run &mdash; and every real DBMS will show you its decision:
+- Everything in this lecture happens *automatically*, on *every* query you run 
+- A DBMS will show you its plan:
     - PostgreSQL / MySQL: `EXPLAIN` (and `EXPLAIN ANALYZE`)
     - SQLite: `EXPLAIN QUERY PLAN`
 
@@ -804,7 +824,9 @@ def plan(sql):
 ```
 
 - Each `PRIMARY KEY` gets an *automatic* index (`sqlite_autoindex_...`).
+    <!---- remove this; unnecessary
     - careful: SQLite stores the table itself in *rowid* order, so this autoindex is a **secondary** index (id &rarr; rowid) &mdash; finding a row takes an index walk *plus* one more lookup: L07's two-lookup pattern, live
+    ---->
 
 ## Reading a Plan: Selection
 
@@ -851,7 +873,7 @@ SEARCH Movie USING INDEX MovieYear (year=?)
     - `CREATE INDEX` is a *physical-layer* change &mdash; SQL never mentions it; only the cost changes
 
 ::: {.fragment}
-- The index also changes *other* queries. Remember `USE TEMP B-TREE` (that's an on-the-fly sort &mdash; a blocking operator!):
+- The index also changes *other* queries. `USE TEMP B-TREE` is an on-the-fly sort:
 
 ```python
 plan("SELECT name FROM Movie ORDER BY year")
@@ -867,7 +889,7 @@ plan("SELECT name FROM Movie ORDER BY year")
 
 ## Reading a Plan: a Join
 
-- The actors of 2008 movies &mdash; the very query from our transformation example (before adding any indexes of our own):
+- The actors of 2008 movies &mdash; the query from our transformation example (before adding any indexes of our own):
 
 ```python
 plan("""SELECT p.name, m.name
@@ -887,12 +909,13 @@ SEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)
     - for each *Actor* row (scanned) &rarr; probe *Movie* by id &rarr; probe *Person* by id
 
 ::: {.fragment}
-- [This is our *indexed nested-loop join* &mdash; scan the outer, probe *Person* through its index &mdash; in a *left-deep* tree, exactly the plan we costed by hand.]{style="color:#3a5fcd;"}
+- [This is our *indexed nested-loop join* &mdash; scan the outer, probe *Person* through its index.]{style="color:#3a5fcd;"}
 :::
 
 ## Changing the Join Order
 
-- Only 17 of the 755 movies are from 2008 &mdash; the current plan scans all 3,790 *Actor* rows anyway. Give the optimizer what it's missing:
+- Only 17 of the 755 movies are from 2008 &mdash; the current plan scans all 3,790 *Actor* rows anyway. 
+- On seeing this, we can decide to give the optimizer the index that it needs:
 
 ```python
 cur.execute("CREATE INDEX ActorMovie ON Actor(movie_id)")
@@ -910,7 +933,8 @@ SEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)
     - and the &sigma; pushdown from the transformation example is realized here as "apply the year filter first"
 
 ::: {.fragment}
-- And the statistics? `cur.execute("ANALYZE")` collects them (row counts and index selectivities, stored in `sqlite_stat1`) &mdash; that's the catalog from Part 2, live.
+- We can even see the statistics used by the optimizer
+- `cur.execute("ANALYZE")` collects them (row counts and index selectivities, stored in `sqlite_stat1`)
 :::
 
 ::: {.fragment}
@@ -922,10 +946,12 @@ SEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)
 - Processing: every operator has several algorithms, each with a cost formula
     - selection: scan the file vs. walk an index &mdash; the index wins once the data is big
     - joins: nested loops vs. index probes on the inner &mdash; a 650&times; spread on the *same* query
+<!---
 - Whole expressions: materialize (always works, pays temp I/O) vs. pipeline (cheap, but blocking operators cut it)
+---->
 - Optimization: equivalence rules generate the options; statistics pick the winner
-- The biggest lever is usually *join order* and *pushing selections down*
-- All of it is one `EXPLAIN QUERY PLAN` away &mdash; on any SQLite database, from Python
+- The most useful transformations are usually *join order* and *pushing selections down*
+- We can see what is done using `EXPLAIN QUERY PLAN` on any SQLite database, from Python
 - Practice: join-cost problems in the homework and discussion sections &mdash; trace tiny joins and count the operations yourself
 
 <!-- Optional advanced topics if time permits (ch16 §16.4+):
