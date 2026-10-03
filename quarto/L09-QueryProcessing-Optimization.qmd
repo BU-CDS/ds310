@@ -946,9 +946,6 @@ SEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)
 - Processing: every operator has several algorithms, each with a cost formula
     - selection: scan the file vs. walk an index &mdash; the index wins once the data is big
     - joins: nested loops vs. index probes on the inner &mdash; a 650&times; spread on the *same* query
-<!---
-- Whole expressions: materialize (always works, pays temp I/O) vs. pipeline (cheap, but blocking operators cut it)
----->
 - Optimization: equivalence rules generate the options; statistics pick the winner
 - The most useful transformations are usually *join order* and *pushing selections down*
 - We can see what is done using `EXPLAIN QUERY PLAN` on any SQLite database, from Python
