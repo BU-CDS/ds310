@@ -1366,9 +1366,8 @@ removed slides end here ---->
 <li>Processing: every operator has several algorithms, each with a cost formula
 <ul>
 <li>selection: scan the file vs.&nbsp;walk an index — the index wins once the data is big</li>
-<li>joins: nested loops vs.&nbsp;index probes on the inner — a 650× spread on the <em>same</em> query &lt;!—</li>
+<li>joins: nested loops vs.&nbsp;index probes on the inner — a 650× spread on the <em>same</em> query</li>
 </ul></li>
-<li>Whole expressions: materialize (always works, pays temp I/O) vs.&nbsp;pipeline (cheap, but blocking operators cut it) —-&gt;</li>
 <li>Optimization: equivalence rules generate the options; statistics pick the winner</li>
 <li>The most useful transformations are usually <em>join order</em> and <em>pushing selections down</em></li>
 <li>We can see what is done using <code>EXPLAIN QUERY PLAN</code> on any SQLite database, from Python</li>

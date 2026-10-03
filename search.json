@@ -3651,7 +3651,7 @@
     "href": "L09-QueryProcessing-Optimization.html#wrap-up",
     "title": "Query Processing and Optimization",
     "section": "Wrap-Up",
-    "text": "Wrap-Up\n\nProcessing: every operator has several algorithms, each with a cost formula\n\nselection: scan the file vs. walk an index — the index wins once the data is big\njoins: nested loops vs. index probes on the inner — a 650× spread on the same query &lt;!—\n\nWhole expressions: materialize (always works, pays temp I/O) vs. pipeline (cheap, but blocking operators cut it) —-&gt;\nOptimization: equivalence rules generate the options; statistics pick the winner\nThe most useful transformations are usually join order and pushing selections down\nWe can see what is done using EXPLAIN QUERY PLAN on any SQLite database, from Python\nPractice: join-cost problems in the homework and discussion sections — trace tiny joins and count the operations yourself"
+    "text": "Wrap-Up\n\nProcessing: every operator has several algorithms, each with a cost formula\n\nselection: scan the file vs. walk an index — the index wins once the data is big\njoins: nested loops vs. index probes on the inner — a 650× spread on the same query\n\nOptimization: equivalence rules generate the options; statistics pick the winner\nThe most useful transformations are usually join order and pushing selections down\nWe can see what is done using EXPLAIN QUERY PLAN on any SQLite database, from Python\nPractice: join-cost problems in the homework and discussion sections — trace tiny joins and count the operations yourself"
   },
   {
     "objectID": "L11-Txns2.html#from-the-last-lecture",
