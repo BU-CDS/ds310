@@ -3413,14 +3413,14 @@
     "href": "L09-QueryProcessing-Optimization.html#recall-l06-how-data-is-stored",
     "title": "Query Processing and Optimization",
     "section": "Recall (L06): How Data Is Stored",
-    "text": "Recall (L06): How Data Is Stored\n\n\n\nA relation is stored as a file of blocks on disk.\n\na block (typically 4K–8K) is the smallest unit the disk can read or write\n\n\n\n\nDisk I/O is the expensive operation.\n\nin the time it takes to read one block, the CPU can execute millions of instructions\n\n\n\n\n\nNotation we’ll use all lecture, for a relation r:\n\nnr = number of records\nbr = number of blocks\nfr = records per block (blocking factor)\n\n\n\n\n\n\n\n\nConsequence: we measure the cost of an algorithm by how many blocks it touches — keep this picture in mind for every slide that follows."
+    "text": "Recall (L06): How Data Is Stored\n\n\n\nA relation is stored as a file of blocks on disk.\n\na block is the smallest unit the disk can read or write\n\n\n\n\nDisk I/O is the expensive operation.\n\nin the time it takes to read one block, the CPU can execute millions of instructions\n\n\n\n\n\nNotation we’ll use all lecture, for a relation r:\n\nnr = number of records\nbr = number of blocks\nfr = records per block (blocking factor)\n\n\n\n\n\n\n\n\nConsequence: we measure the cost of an algorithm by how many blocks it touches."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#recall-l07-indexes-and-btrees",
     "href": "L09-QueryProcessing-Optimization.html#recall-l07-indexes-and-btrees",
     "title": "Query Processing and Optimization",
     "section": "Recall (L07): Indexes and B+Trees",
-    "text": "Recall (L07): Indexes and B+Trees\n\n\n\nA relation may also have index structures:\n\none clustering (primary) index — stores the full records (usually organized by the primary key)\nany number of secondary indices — store (key, pointer) pairs, so reaching a record takes a second lookup\n\n\n\n\nB+trees (order m) are the standard index:\n\ninternal nodes hold m to 2m keys → m+1 to 2m+1 children; each node is one page/block\nperfect balance: search = follow one root-to-leaf path\ntree height ≤ logm n, and # of nodes accessed ≤ height + 1\n\n\n\n\n\n\n\nWith order m = 100, every internal node has ≥ 101 children — two levels below the root already reach over 10,000 leaves.\n\nhundreds of thousands of records, any of them ≤ 3 block reads away\n\n\n\n\n\n\nAn index turns “scan everything” into “follow one short path.”"
+    "text": "Recall (L07): Indexes and B+Trees\n\n\n\nA relation may also have index structures:\n\none clustering (primary) index — stores the full records (usually organized by the primary key)\nany number of secondary indices — store (key, pointer) pairs, so reaching a record takes a second lookup\n\n\n\n\nB+trees (order m) are the standard index:\n\ninternal nodes hold m to 2m keys → m+1 to 2m+1 children; each node is one page/block\nperfect balance: search = follow one root-to-leaf path\ntree height ≤ logm n, and # of nodes accessed ≤ height + 1\n\n\n\n\n\n\n\nWith order m = 100, every internal node has ≥ 101 children — two levels below the root already reach over 10,000 leaves.\n\nhundreds of thousands of records, any of them ≤ 3 block reads away\n\n\n\n\n\nUsing an index turns a complete scan into following a short path."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#measures-of-query-cost",
@@ -3455,21 +3455,21 @@
     "href": "L09-QueryProcessing-Optimization.html#selection-by-scanning-cost",
     "title": "Query Processing and Optimization",
     "section": "Selection by Scanning: Cost",
-    "text": "Selection by Scanning: Cost\n\nWorst case: read the whole file\n\ncost = br block transfers + 1 seek (the blocks are consecutive — one seek suffices)\n\nEquality on a key attribute (like id): stop at the first match\n\naverage cost ≈ br / 2\n\n\n\n\nEquality on a non-key attribute (e.g., year, genre): matches can be anywhere\n\nmust read all br blocks, even if we find a match early\n\n\n\n\n\nAt toy scale this is fine. At real scale it hurts:\n\n\n\n\n\nbr\nscan average (key)\n\n\n\n\ntoy Movie\n4\n2 reads\n\n\nMovie in movie.sqlite (755 records)\n32\n16 reads\n\n\nPerson at streaming-service scale (100,000)\n2,000\n1,000 reads"
+    "text": "Selection by Scanning: Cost\n\nWorst case: read the whole file\n\ncost = br block transfers + 1 seek\nthe blocks are consecutive — one seek suffices\n\nEquality on a key attribute (like id): stop at the first match\n\naverage cost ≈ br / 2\n\n\n\n\nEquality on a non-key attribute (e.g., year, genre): matches can be anywhere\n\nmust read all br blocks, even if we find a match early\n\n\n\n\n\nAt small scale this is OK. At realistic scale, it is very expensive:\n\n\n\n\n\nbr\nscan average (key)\n\n\n\n\ntoy Movie\n4\n2 reads\n\n\nMovie in movie.sqlite (755 records)\n32\n16 reads\n\n\nPerson at streaming-service scale (100,000)\n2,000\n1,000 reads"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#selection-via-the-clustering-index",
     "href": "L09-QueryProcessing-Optimization.html#selection-via-the-clustering-index",
     "title": "Query Processing and Optimization",
     "section": "Selection via the Clustering Index",
-    "text": "Selection via the Clustering Index\n\nNow use the clustering B+tree on id — and remember from L07 what clustering means: the leaves store the full records. The bottom level of the tree is the file.\nSearch walks one path: root → leaf — and the record is in the leaf when we arrive."
+    "text": "Selection via the Clustering Index\n\nNow use the clustering B+tree on id — and remember what clustering means: the leaves store the full records. The bottom level of the tree is the file.\nSearch walks one path: root → leaf — and the record is in the leaf when we arrive."
   },
   {
-    "objectID": "L09-QueryProcessing-Optimization.html#index-lookup-cost-and-when-it-wins",
-    "href": "L09-QueryProcessing-Optimization.html#index-lookup-cost-and-when-it-wins",
+    "objectID": "L09-QueryProcessing-Optimization.html#index-lookup-when-is-it-a-benefit",
+    "href": "L09-QueryProcessing-Optimization.html#index-lookup-when-is-it-a-benefit",
     "title": "Query Processing and Optimization",
-    "section": "Index Lookup: Cost — and When It Wins",
-    "text": "Index Lookup: Cost — and When It Wins\n\nCost = # of nodes on the root-to-leaf path = height + 1 block transfers (L07)\n\neach one is a random read: (height + 1) × (tT + tS)\n\n\n\n\nOn our toy file the index didn’t help: 2 reads vs. an average of 2 for the scan!\n\nindex structures have overhead; on 4 blocks there’s nothing to save\n\n\n\n\n\nBut the index cost grows with tree height (≤ logm nr), while the scan grows with file size:\n\n\n\n\n\n\n\n\n\n\n\nbr\nscan average (key)\nindex (height + 1)\n\n\n\n\ntoy Movie\n4\n2\n2\n\n\nMovie in movie.sqlite (755 records)\n32\n16\n2\n\n\nPerson at streaming scale (100,000)\n2,000\n1,000\n3\n\n\n\n\n\n\nThis tradeoff — which plan wins depends on the data — is exactly why the optimizer needs statistics (Part 2)."
+    "section": "Index Lookup: When is it a benefit?",
+    "text": "Index Lookup: When is it a benefit?\n\nCost = # of nodes on the root-to-leaf path = height + 1 block transfers (L07)\n\neach one is a random read: (height + 1) × (tT + tS)\n\n\n\n\nOn our toy file the index didn’t help: 2 reads vs. an average of 2 for the scan!\n\nindex structures have overhead; on 4 blocks there’s nothing to save\n\n\n\n\n\nBut the index cost grows with tree height (≤ logm nr), while the scan grows with file size:\n\n\n\n\n\n\n\n\n\n\n\nbr\nscan average (key)\nindex (height + 1)\n\n\n\n\ntoy Movie\n4\n2\n2\n\n\nMovie in movie.sqlite (755 records)\n32\n16\n2\n\n\nPerson at streaming scale (100,000)\n2,000\n1,000\n3\n\n\n\n\n\n\nThe point is: which plan is preferable depends on the size of the data — this is why the optimizer needs statistics (Part 2)."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#which-plan-and-what-cost",
@@ -3490,14 +3490,14 @@
     "href": "L09-QueryProcessing-Optimization.html#the-data-at-two-scales",
     "title": "Query Processing and Optimization",
     "section": "The Data, at Two Scales",
-    "text": "The Data, at Two Scales\n\nToy instance (used in the traces on the next slides; short ids for readability):\n\n\n\n\n\n\n\n\n\n\n\nrecords nr\nblocks br\ncontents\n\n\n\n\nPerson\n4\n2\n(101, Hanks), (102, Streep), (103, Pacino), (104, Bullock)\n\n\nActor\n6\n3\n(101, 502), (101, 509), (102, 503), (103, 502), (103, 507), (104, 509)\n\n\n\n\n\nScaled-up instance (a streaming service’s catalog; fr = 50 Person records or 200 Actor records per block):\n\n\n\n\n\nrecords nr\nblocks br\n\n\n\n\nPerson\n100,000\n2,000\n\n\nActor\n500,000\n2,500\n\n\n\n\nOur movie.sqlite (2,698 people, 3,790 actor rows) sits in between — and at the end of the lecture we’ll watch SQLite make these same choices on it."
+    "text": "The Data, at Two Scales\n\nToy instance (used in the traces on the next slides; short ids for readability):\n\n\n\n\n\n\n\n\n\n\n\nrecords nr\nblocks br\ncontents\n\n\n\n\nPerson\n4\n2\n(101, Hanks), (102, Streep), (103, Pacino), (104, Bullock)\n\n\nActor\n6\n3\n(101, 502), (101, 509), (102, 503), (103, 502), (103, 507), (104, 509)\n\n\n\n\n\nScaled-up instance (a streaming service’s catalog; fr = 50 Person records or 200 Actor records per block):\n\n\n\n\n\nrecords nr\nblocks br\n\n\n\n\nPerson\n100,000\n2,000\n\n\nActor\n500,000\n2,500\n\n\n\n\nOur movie.sqlite (2,698 people, 3,790 actor rows) sits in between — at the end of the lecture we’ll see how SQLite makes these same choices on it."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#candidate-1-nested-loop-join",
     "href": "L09-QueryProcessing-Optimization.html#candidate-1-nested-loop-join",
     "title": "Query Processing and Optimization",
     "section": "Candidate 1: Nested-Loop Join",
-    "text": "Candidate 1: Nested-Loop Join\n\nThe brute-force algorithm — like the linear scan, it always works (any join condition, no index needed):\n\nfor each tuple t_a in Actor:           // Actor = outer relation\n    for each tuple t_p in Person:      // Person = inner relation\n        if t_p.id == t_a.actor_id:\n            add (t_p, t_a) to the result\n\n\nouter' andinner’ relations refer to the role each plays in a nested loop\nIn block terms: read each outer block once; for every outer tuple, re-scan all of the inner relation.\n\nNotice that this basic algorithm doesn’t exploit the fact that id is a key — it just keeps scanning"
+    "text": "Candidate 1: Nested-Loop Join\n\nThe brute-force algorithm — like the linear scan, it always works (any join condition, no index needed):\n\nfor each tuple t_a in Actor:           // Actor = outer relation\n    for each tuple t_p in Person:      // Person = inner relation\n        if t_p.id == t_a.actor_id:\n            add (t_p, t_a) to the result\n\n\nouter and inner relations refer to the role each plays in a nested loop\nIn block terms: read each outer block once; for every outer tuple, re-scan all of the inner relation.\n\nNotice that this basic algorithm doesn’t exploit the fact that id is a key — it just keeps scanning"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#nested-loop-join-trace",
@@ -3511,14 +3511,14 @@
     "href": "L09-QueryProcessing-Optimization.html#nested-loop-join-cost",
     "title": "Query Processing and Optimization",
     "section": "Nested-Loop Join: Cost",
-    "text": "Nested-Loop Join: Cost\n\nWorst case (only one block of memory per relation):\n\nnr × bs + br block transfers   (r = outer, s = inner)\n\nAt streaming scale:\n\nActor outer: 500,000 × 2,000 + 2,500 = 1,000,002,500 transfers\nPerson outer: 100,000 × 2,500 + 2,000 = 250,002,000 transfers\n\n\n\n\nHowever, this assumes we were not able to cache blocks\nBest case: the inner relation fits entirely in memory\n\nread each relation once: br + bs = 4,500 transfers\n\n\n\n\n\nBlock nested-loop join: pair up blocks instead of tuples\n\nworst case br × bs + br = 2,000 × 2,500 + 2,000 = 5,002,000 transfers\nuse the smaller relation as the outer relation\n\n\n\n\n\nSame answer, same result — a 200× cost difference just from how we loop."
+    "text": "Nested-Loop Join: Cost\n\nWorst case (only one block of memory per relation):\n\nnr × bs + br block transfers   (r = outer, s = inner)\n\nAt streaming scale:\n\nActor outer: 500,000 × 2,000 + 2,500 = 1,000,002,500 transfers\nPerson outer: 100,000 × 2,500 + 2,000 = 250,002,000 transfers\n\n\n\n\nHowever, this assumes we were not able to cache blocks\nBest case: the inner relation fits entirely in memory\n\nread each relation once: br + bs = 4,500 transfers\n\n\n\n\n\nBlock nested-loop join: pair up blocks instead of tuples\n\nprocess all the records in the outer block before moving to the next block\nworst case br × bs + br = 2,000 × 2,500 + 2,000 = 5,002,000 transfers\nuse the smaller relation as the outer relation\n\n\n\n\n\nThese all return the same result — but there is a 200× cost difference just from the choice of join algorithm."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#candidate-2-indexed-nested-loop-join",
     "href": "L09-QueryProcessing-Optimization.html#candidate-2-indexed-nested-loop-join",
     "title": "Query Processing and Optimization",
     "section": "Candidate 2: Indexed Nested-Loop Join",
-    "text": "Candidate 2: Indexed Nested-Loop Join\n\nLook back at the trace: for each Actor row we re-scanned all of Person — just to find the one record with a matching key.\n\n\n\nL07 gave us a better tool for exactly this — and the movie database already has it: the clustering B+tree on Person(id).\nIdea: keep the outer loop, but replace each inner scan with an index walk:\n\nfor each tuple t_a in Actor:              // outer, scanned as before\n    walk the B+tree on Person(id)         // inner: root -&gt; leaf\n    to find the record with id == t_a.actor_id\n\n\n\nRequirements:\n\nan index on the inner relation’s join attribute\na join condition that is an equality — like all our natural joins from L02"
+    "text": "Candidate 2: Indexed Nested-Loop Join\n\nLook back at the trace: for each Actor row we re-scanned all of Person — just to find the one record with a matching key.\n\n\n\nA B+ tree is a better tool for this — and the movie database already has it: the index on Person(id).\nIdea: keep the outer loop, but replace each inner scan with an index walk:\n\nfor each tuple t_a in Actor:              // outer, scanned as before\n    walk the B+tree on Person(id)         // inner: root -&gt; leaf\n    to find the record with id == t_a.actor_id\n\n\n\nRequirements:\n\nan index on the inner relation’s join attribute\na join condition that is an equality — such as any natural join"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#indexed-nested-loop-join-trace",
@@ -3535,11 +3535,11 @@
     "text": "Indexed Nested-Loop Join: Cost\n\nCost = br + nr × c\n\nc = cost of one index lookup = height + 1 (the same formula as before)\nc is an estimate — if a key’s matches spanned several leaves, a probe would cost more\n\n\n\n\nOn the toy instance: 3 + 6 × 2 = 15 transfers — a dead heat with the plain scan (15)!\n\njust like selection: on tiny data, index overhead doesn’t pay\n\n\n\n\n\nAt streaming scale (B+tree on Person(id) has height 2, so c = 3):\n\n2,500 + 500,000 × 3 = 1,502,500 transfers\n\n\n\n\n\nplan\nblock transfers\n\n\n\n\nNLJ, Actor outer\n1,000,002,500\n\n\nNLJ, Person outer\n250,002,000\n\n\nblock NLJ, Person outer\n5,002,000\n\n\nindexed NLJ, clustering index on Person(id)\n1,502,500"
   },
   {
-    "objectID": "L09-QueryProcessing-Optimization.html#the-winning-plan",
-    "href": "L09-QueryProcessing-Optimization.html#the-winning-plan",
+    "objectID": "L09-QueryProcessing-Optimization.html#the-best-plan",
+    "href": "L09-QueryProcessing-Optimization.html#the-best-plan",
     "title": "Query Processing and Optimization",
-    "section": "The Winning Plan",
-    "text": "The Winning Plan\n\n\n\n\n\nThe optimizer compares the estimated costs and annotates the tree with the cheapest choices.\n\n\n\nNotice how much it needed to know:\n\nsizes nr, br of both relations\nwhich indexes exist, and their heights\nwhich relation to put on the outside\n\n\n\n\n\nGathering those statistics and searching the space of alternatives is query optimization — Part 2."
+    "section": "The Best Plan",
+    "text": "The Best Plan\n\n\n\n\n\nThe optimizer compares the estimated costs and annotates the tree with the cheapest choices.\n\n\n\nNotice how much it needed to know:\n\nsizes nr, br of both relations\nwhich indexes exist, and their heights\nwhich relation to put on the outside\n\n\n\n\n\nGathering those statistics and searching the space of alternatives is query optimization — Part 2."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#what-if-actor-had-an-index-too",
@@ -3549,53 +3549,11 @@
     "text": "What if Actor had an index too?\nSuppose there were also a B+tree on Actor(actor_id) with lookup cost c = 3. Scanning Person as the outer (100,000 tuples) and probing Actor would cost br + nr × c =\nA. 2,500 + 500,000 × 3 = 1,502,500 transfers\nB. 2,000 + 100,000 × 3 = 302,000 transfers ← correct — Person is now the outer: br = 2,000, nr = 100,000\nC. 2,000 + 500,000 × 3 = 1,502,000 transfers\nD. 2,500 + 100,000 × 3 = 302,500 transfers\n\n\nFive times better — fewer outer tuples means fewer index probes.\nThe best plan depends on which indexes exist and which relation drives the loop. In movie.sqlite only the Person index exists — which is why (as we’ll see) SQLite scans Actor."
   },
   {
-    "objectID": "L09-QueryProcessing-Optimization.html#join-operation-merge-join-and-hash-join",
-    "href": "L09-QueryProcessing-Optimization.html#join-operation-merge-join-and-hash-join",
-    "title": "Query Processing and Optimization",
-    "section": "Join Operation: Merge Join and Hash Join",
-    "text": "Join Operation: Merge Join and Hash Join\n\nMerge join (sort-merge join)\n\nsort both inputs on the join attributes, then merge\ncost br + bs block transfers (plus the cost of sorting)\nonly for equality-based joins\n\nHash join\n\npartition both relations with a hash function on the join attributes\njoin matching partitions: build in-memory hash table, probe with the other relation\ncost ≈ 3(br + bs) if no recursive partitioning\nonly for equality-based joins\n\nWhich join algorithm wins depends on sizes, memory, indexes, sortedness"
-  },
-  {
-    "objectID": "L09-QueryProcessing-Optimization.html#other-operations",
-    "href": "L09-QueryProcessing-Optimization.html#other-operations",
-    "title": "Query Processing and Optimization",
-    "section": "Other Operations",
-    "text": "Other Operations\n\nDuplicate elimination: via sorting or hashing\nProjection: drop attributes, then eliminate duplicates\nAggregation / grouping: like duplicate elimination (sort or hash on grouping attributes; combine partial aggregates)\nSet operations (∪, ∩, −): variants of merge join or hash join\nOuter joins: modified join algorithms that pad non-matching tuples with nulls"
-  },
-  {
-    "objectID": "L09-QueryProcessing-Optimization.html#evaluating-expressions",
-    "href": "L09-QueryProcessing-Optimization.html#evaluating-expressions",
-    "title": "Query Processing and Optimization",
-    "section": "Evaluating Expressions",
-    "text": "Evaluating Expressions\n\nSo far we’ve priced single operations. But a query is a tree of operations — how do we run the whole tree?\nRunning example, one more selection than before:\n\n\\(\\pi_{name,\\, actor\\_id}\\big(\\sigma_{year = 2008}(\\text{Movie}) \\bowtie \\text{Actor}\\big)\\)\n\nTwo strategies:\n\nmaterialization — evaluate one operation at a time, saving intermediate results\npipelining — evaluate several operations simultaneously, streaming tuples between them"
-  },
-  {
-    "objectID": "L09-QueryProcessing-Optimization.html#materialization",
-    "href": "L09-QueryProcessing-Optimization.html#materialization",
-    "title": "Query Processing and Optimization",
-    "section": "Materialization",
-    "text": "Materialization\n\n\n\n\n\nEvaluate the tree bottom-up, one operation at a time:\n\nrun σ to completion → write temp T1\njoin T1 with Actor → write temp T2\nrun π over T2 → result\n\n\n\n\n+ always applicable — any operator, any memory budget\n\n\n\n\n– cost of the plan is more than the sum of the operator costs:\n\neach temp is written and re-read: extra 2 × bT transfers per temp (roughly)\nfor a big intermediate result, the temp I/O can dominate everything"
-  },
-  {
-    "objectID": "L09-QueryProcessing-Optimization.html#pipelining",
-    "href": "L09-QueryProcessing-Optimization.html#pipelining",
-    "title": "Query Processing and Optimization",
-    "section": "Pipelining",
-    "text": "Pipelining\n\n\n\n\n\nPass tuples from child to parent as they are produced — the operations run simultaneously.\n\n\n\nImplemented with the iterator interface: every operator provides open() / next() / close()\n\ndemand-driven: the root calls next() on its children, which call next() on theirs, …\neach next() returns one tuple\n\n\n\n\n\n+ no temporary relations — the temp I/O disappears\n+ first results appear early (nice for LIMIT, or for a user watching)"
-  },
-  {
-    "objectID": "L09-QueryProcessing-Optimization.html#pipelining-not-always-possible",
-    "href": "L09-QueryProcessing-Optimization.html#pipelining-not-always-possible",
-    "title": "Query Processing and Optimization",
-    "section": "Pipelining: Not Always Possible",
-    "text": "Pipelining: Not Always Possible\n\nSome operators are blocking: they must consume all of their input before producing their first output tuple.\n\nsorting (e.g., for ORDER BY): can’t emit the smallest tuple until it has seen every tuple\nhash join: must finish building the hash table on one input before probing\ngrouped aggregation: a group’s total isn’t final until all input is seen\n\n\n\n\nA blocking operator cuts the pipeline: everything below it runs to completion first (materializing its output, at least logically).\n\n\n\n\nOur example plan pipelines end-to-end: σ, indexed NLJ, and π are all non-blocking.\n\nthis is part of why the optimizer liked indexed NLJ!\n\n\n\n\nWhich of these operator trees can be fully pipelined?\nA. π over merge-join (inputs unsorted)\nB. σ over indexed nested-loop join ← correct — neither operator needs to see its whole input first\nC. ORDER BY over σ\nD. grouped SUM over a file scan"
-  },
-  {
     "objectID": "L09-QueryProcessing-Optimization.html#overview-1",
     "href": "L09-QueryProcessing-Optimization.html#overview-1",
     "title": "Query Processing and Optimization",
     "section": "Overview",
-    "text": "Overview\n\nThe same query → many equivalent relational-algebra expressions → many evaluation plans with wildly different costs\nCost differences can be orders of magnitude\nSteps in cost-based optimization:\n\n1. generate equivalent expressions using equivalence rules\n2. annotate them with algorithms to get alternative plans\n3. estimate each plan’s cost using statistics, choose the cheapest\n\n\n\n\nWe’ve already seen step 3 in action — that was Part 1’s cost arithmetic. What’s new is generating the alternatives (steps 1–2) and the statistics that feed step 3."
+    "text": "Overview\n\nThe same query → many equivalent relational-algebra expressions → many evaluation plans with wildly different costs\nCost differences can be orders of magnitude\nSteps in cost-based optimization:\n\n1. generate equivalent expressions using equivalence rules\n2. annotate them with algorithms to get alternative plans\n3. estimate each plan’s cost using statistics, choose the cheapest\n\n\n\n\nWe’ve covered step 3 — that was Part 1’s cost calculations.\nWe’ll now look at steps 1–2 and the statistics needed for step 3."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#one-query-many-plans",
@@ -3609,7 +3567,7 @@
     "href": "L09-QueryProcessing-Optimization.html#equivalence-rules",
     "title": "Query Processing and Optimization",
     "section": "Equivalence Rules",
-    "text": "Equivalence Rules\n\nTwo expressions are equivalent if they produce the same result on every legal database instance\nWe can turn one expression into another equivalent one using a standard set of rules\nHighlights (there are ~16 such rules):\n\nconjunctive selections can be split: σθ1∧θ2(E) = σθ1(σθ2(E))\nselection is commutative\njoins are commutative and associative — the basis of join reordering\nselection distributes over join (push selections down)\nprojection distributes over join (push projections down)\nrules for set operations and outer joins (with caveats — e.g., outer joins are not associative)\n\n\n\n\nEach rule is a rewrite the optimizer may apply in either direction — the rules define the space of candidate expressions."
+    "text": "Equivalence Rules\n\nTwo expressions are equivalent if they produce the same result on every legal database instance\nWe can turn one expression into another equivalent one using a standard set of rules\nWe won’t cover these rules in detail, just mention some examples.\n\n\n\nThere are about 16 such rules:\n\nconjunctive selections can be split: σθ1∧θ2(E) = σθ1(σθ2(E))\nselection is commutative\njoins are commutative and associative — the basis of join reordering\nselection distributes over join (push selections down)\nprojection distributes over join (push projections down)\nrules for set operations and outer joins (with caveats — e.g., outer joins are not associative)\n\n\n\n\n\nEach rule is a rewrite the optimizer may apply in either direction — the rules define the space of candidate expressions."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#two-rules-pictured",
@@ -3630,7 +3588,7 @@
     "href": "L09-QueryProcessing-Optimization.html#transformation-example-the-payoff",
     "title": "Query Processing and Optimization",
     "section": "Transformation Example: the Payoff",
-    "text": "Transformation Example: the Payoff\n\nSame answer, before and after — but compare what the top join has to do:\n\n\n\n\n\nmovies entering the top join\n\n\n\n\noriginal expression\nall 755\n\n\nafter pushing σ down\n17\n\n\n\n\n\nAnd a smaller join input doesn’t just mean fewer comparisons:\n\n17 Movie tuples fit in a single block → that side of the join lives entirely in memory\n\n\n\n\n\nBut wait — the optimizer chooses a plan before running anything. How did it know the σ would keep 17 movies and not 700?\n\nit didn’t — it estimated the size, from statistics\nthat’s the next stop"
+    "text": "Transformation Example: the Payoff\n\nSame answer, before and after — but compare what the top join has to do:\n\n\n\n\n\nmovies entering the top join\n\n\n\n\noriginal expression\nall 755\n\n\nafter pushing σ down\n17\n\n\n\n\n\nAnd a smaller join input doesn’t just mean fewer comparisons:\n\n17 Movie tuples fit in a single block → that side of the join lives entirely in memory\n\n\n\n\n\nBut wait — the optimizer chooses a plan before running anything. How did it know the σ would keep 17 movies and not 700?\n\nit didn’t — it estimated the size, from statistics\nlet’s look at that process"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#statistics-and-size-estimation",
@@ -3644,7 +3602,7 @@
     "href": "L09-QueryProcessing-Optimization.html#size-estimation-pictured",
     "title": "Query Processing and Optimization",
     "section": "Size Estimation, Pictured",
-    "text": "Size Estimation, Pictured\n\n\n\nEstimates are heuristics, not guarantees — if PG-13 is far more common than G (it is!), n/V misjudges both.\nWrong estimates → wrong plan choices; this is a leading cause of real-world slow queries. (Real systems: ANALYZE, auto-collected histograms.)"
+    "text": "Size Estimation, Pictured\n\n\n\nEstimates are heuristics, not guarantees — if PG-13 is far more common than G (it is!), n/V is a poor estimate.\nWrong estimates → wrong plan choices; this is a leading cause of real-world slow queries."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#estimate-the-size",
@@ -3654,25 +3612,11 @@
     "text": "Estimate the size\nMovie has nr = 755 tuples and V(year, Movie) = 97 distinct years. The optimizer’s estimate for σyear=2008(Movie) is:\nA. 97 tuples\nB. about 8 tuples ← correct — nr / V(A, r) = 755 / 97 ≈ 7.8\nC. 17 tuples\nD. 755 tuples\n\n\nThe actual answer is 17 — recent years have far more movies than the 1920s, so the uniform assumption undercounts by 2×.\nClose enough to rank the plans correctly here — but this is exactly the kind of error that can flip a plan choice, and why real systems collect histograms."
   },
   {
-    "objectID": "L09-QueryProcessing-Optimization.html#choosing-a-join-order",
-    "href": "L09-QueryProcessing-Optimization.html#choosing-a-join-order",
+    "objectID": "L09-QueryProcessing-Optimization.html#the-optimizer-is-visible-to-you",
+    "href": "L09-QueryProcessing-Optimization.html#the-optimizer-is-visible-to-you",
     "title": "Query Processing and Optimization",
-    "section": "Choosing a Join Order",
-    "text": "Choosing a Join Order\n\nWith n relations there are (2(n−1))! / (n−1)! join orders\n\nn = 7 → 665,280 orders; n = 10 → over 176 billion\n\nDynamic programming: find the best plan for every subset of relations, reusing sub-plans\n\n“interesting sort orders” matter (e.g., merge join leaves output sorted)\nmany optimizers restrict to left-deep join trees\n\nHeuristic optimization (when full search is too costly):\n\nperform selections and projections as early as possible\navoid Cartesian products\njoin the most restrictive relations first"
-  },
-  {
-    "objectID": "L09-QueryProcessing-Optimization.html#join-trees-left-deep-vs.-bushy",
-    "href": "L09-QueryProcessing-Optimization.html#join-trees-left-deep-vs.-bushy",
-    "title": "Query Processing and Optimization",
-    "section": "Join Trees: Left-Deep vs. Bushy",
-    "text": "Join Trees: Left-Deep vs. Bushy\n\n\n\nRestricting to left-deep trees shrinks the search space from (2(n−1))!/(n−1)! to n! — and every join can use a base relation (with its indexes!) as the inner input, exactly like our indexed NLJ plan."
-  },
-  {
-    "objectID": "L09-QueryProcessing-Optimization.html#the-optimizer-is-one-query-away",
-    "href": "L09-QueryProcessing-Optimization.html#the-optimizer-is-one-query-away",
-    "title": "Query Processing and Optimization",
-    "section": "The Optimizer Is One Query Away",
-    "text": "The Optimizer Is One Query Away\n\nEverything in this lecture happens automatically, on every query you run — and every real DBMS will show you its decision:\n\nPostgreSQL / MySQL: EXPLAIN (and EXPLAIN ANALYZE)\nSQLite: EXPLAIN QUERY PLAN\n\nWe can inspect plans from Python, using our movie database (data/movie.sqlite):\n\nimport sqlite3\ncon = sqlite3.connect(\"data/movie.sqlite\")\ncur = con.cursor()\n\ndef plan(sql):\n    for row in cur.execute(\"EXPLAIN QUERY PLAN \" + sql):\n        print(row[3])          # the plan, one line per operation\n\nEach PRIMARY KEY gets an automatic index (sqlite_autoindex_...).\n\ncareful: SQLite stores the table itself in rowid order, so this autoindex is a secondary index (id → rowid) — finding a row takes an index walk plus one more lookup: L07’s two-lookup pattern, live"
+    "section": "The Optimizer Is Visible to You",
+    "text": "The Optimizer Is Visible to You\n\nEverything in this lecture happens automatically, on every query you run\nA DBMS will show you its plan:\n\nPostgreSQL / MySQL: EXPLAIN (and EXPLAIN ANALYZE)\nSQLite: EXPLAIN QUERY PLAN\n\nWe can inspect plans from Python, using our movie database (data/movie.sqlite):\n\nimport sqlite3\ncon = sqlite3.connect(\"data/movie.sqlite\")\ncur = con.cursor()\n\ndef plan(sql):\n    for row in cur.execute(\"EXPLAIN QUERY PLAN \" + sql):\n        print(row[3])          # the plan, one line per operation\n\nEach PRIMARY KEY gets an automatic index (sqlite_autoindex_...)."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#reading-a-plan-selection",
@@ -3686,28 +3630,28 @@
     "href": "L09-QueryProcessing-Optimization.html#changing-the-plan-create-index",
     "title": "Query Processing and Optimization",
     "section": "Changing the Plan: CREATE INDEX",
-    "text": "Changing the Plan: CREATE INDEX\n\nGive the optimizer a new physical option…\n\ncur.execute(\"CREATE INDEX MovieYear ON Movie(year)\")\nplan(\"SELECT name FROM Movie WHERE year = 2008\")\nSEARCH Movie USING INDEX MovieYear (year=?)\n\n…and it changes its choice: same query, same answer, new plan.\n\nCREATE INDEX is a physical-layer change — SQL never mentions it; only the cost changes\n\n\n\n\nThe index also changes other queries. Remember USE TEMP B-TREE (that’s an on-the-fly sort — a blocking operator!):\n\nplan(\"SELECT name FROM Movie ORDER BY year\")\n-- before:  SCAN Movie  +  USE TEMP B-TREE FOR ORDER BY\n-- after:   SCAN Movie USING INDEX MovieYear\n\nthe index provides the sorted order — the sort disappears entirely"
+    "text": "Changing the Plan: CREATE INDEX\n\nGive the optimizer a new physical option…\n\ncur.execute(\"CREATE INDEX MovieYear ON Movie(year)\")\nplan(\"SELECT name FROM Movie WHERE year = 2008\")\nSEARCH Movie USING INDEX MovieYear (year=?)\n\n…and it changes its choice: same query, same answer, new plan.\n\nCREATE INDEX is a physical-layer change — SQL never mentions it; only the cost changes\n\n\n\n\nThe index also changes other queries. USE TEMP B-TREE is an on-the-fly sort:\n\nplan(\"SELECT name FROM Movie ORDER BY year\")\n-- before:  SCAN Movie  +  USE TEMP B-TREE FOR ORDER BY\n-- after:   SCAN Movie USING INDEX MovieYear\n\nthe index provides the sorted order — the sort disappears entirely"
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#reading-a-plan-a-join",
     "href": "L09-QueryProcessing-Optimization.html#reading-a-plan-a-join",
     "title": "Query Processing and Optimization",
     "section": "Reading a Plan: a Join",
-    "text": "Reading a Plan: a Join\n\nThe actors of 2008 movies — the very query from our transformation example (before adding any indexes of our own):\n\nplan(\"\"\"SELECT p.name, m.name\n        FROM Person p\n        JOIN Actor a ON p.id  = a.actor_id\n        JOIN Movie  m ON a.movie_id = m.id\n        WHERE m.year = 2008\"\"\")\nSCAN a\nSEARCH m USING INDEX sqlite_autoindex_Movie_1 (id=?)\nSEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)\n\nRead it top-down as nested loops, outermost first:\n\nfor each Actor row (scanned) → probe Movie by id → probe Person by id\n\n\n\n\nThis is our indexed nested-loop join — scan the outer, probe Person through its index — in a left-deep tree, exactly the plan we costed by hand."
+    "text": "Reading a Plan: a Join\n\nThe actors of 2008 movies — the query from our transformation example (before adding any indexes of our own):\n\nplan(\"\"\"SELECT p.name, m.name\n        FROM Person p\n        JOIN Actor a ON p.id  = a.actor_id\n        JOIN Movie  m ON a.movie_id = m.id\n        WHERE m.year = 2008\"\"\")\nSCAN a\nSEARCH m USING INDEX sqlite_autoindex_Movie_1 (id=?)\nSEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)\n\nRead it top-down as nested loops, outermost first:\n\nfor each Actor row (scanned) → probe Movie by id → probe Person by id\n\n\n\n\nThis is our indexed nested-loop join — scan the outer, probe Person through its index."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#changing-the-join-order",
     "href": "L09-QueryProcessing-Optimization.html#changing-the-join-order",
     "title": "Query Processing and Optimization",
     "section": "Changing the Join Order",
-    "text": "Changing the Join Order\n\nOnly 17 of the 755 movies are from 2008 — the current plan scans all 3,790 Actor rows anyway. Give the optimizer what it’s missing:\n\ncur.execute(\"CREATE INDEX ActorMovie ON Actor(movie_id)\")\nplan(...)     # the same three-relation join\nSEARCH m USING INDEX MovieYear (year=?)\nSEARCH a USING INDEX ActorMovie (movie_id=?)\nSEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)\n\nThe join order flipped: start from the ≈17 matching movies, probe Actor per movie, probe Person per actor.\n\n“join the most restrictive relation first” — the heuristic from a few slides ago, chosen automatically\nand the σ pushdown from the transformation example is realized here as “apply the year filter first”\n\n\n\n\nAnd the statistics? cur.execute(\"ANALYZE\") collects them (row counts and index selectivities, stored in sqlite_stat1) — that’s the catalog from Part 2, live.\n\n\n\n\nTry it yourself: run these against data/movie.sqlite, then try your own queries — predict the plan before you print it."
+    "text": "Changing the Join Order\n\nOnly 17 of the 755 movies are from 2008 — the current plan scans all 3,790 Actor rows anyway.\nOn seeing this, we can decide to give the optimizer the index that it needs:\n\ncur.execute(\"CREATE INDEX ActorMovie ON Actor(movie_id)\")\nplan(...)     # the same three-relation join\nSEARCH m USING INDEX MovieYear (year=?)\nSEARCH a USING INDEX ActorMovie (movie_id=?)\nSEARCH p USING INDEX sqlite_autoindex_Person_1 (id=?)\n\nThe join order flipped: start from the ≈17 matching movies, probe Actor per movie, probe Person per actor.\n\n“join the most restrictive relation first” — the heuristic from a few slides ago, chosen automatically\nand the σ pushdown from the transformation example is realized here as “apply the year filter first”\n\n\n\n\nWe can even see the statistics used by the optimizer\ncur.execute(\"ANALYZE\") collects them (row counts and index selectivities, stored in sqlite_stat1)\n\n\n\n\nTry it yourself: run these against data/movie.sqlite, then try your own queries — predict the plan before you print it."
   },
   {
     "objectID": "L09-QueryProcessing-Optimization.html#wrap-up",
     "href": "L09-QueryProcessing-Optimization.html#wrap-up",
     "title": "Query Processing and Optimization",
     "section": "Wrap-Up",
-    "text": "Wrap-Up\n\nProcessing: every operator has several algorithms, each with a cost formula\n\nselection: scan the file vs. walk an index — the index wins once the data is big\njoins: nested loops vs. index probes on the inner — a 650× spread on the same query\n\nWhole expressions: materialize (always works, pays temp I/O) vs. pipeline (cheap, but blocking operators cut it)\nOptimization: equivalence rules generate the options; statistics pick the winner\nThe biggest lever is usually join order and pushing selections down\nAll of it is one EXPLAIN QUERY PLAN away — on any SQLite database, from Python\nPractice: join-cost problems in the homework and discussion sections — trace tiny joins and count the operations yourself"
+    "text": "Wrap-Up\n\nProcessing: every operator has several algorithms, each with a cost formula\n\nselection: scan the file vs. walk an index — the index wins once the data is big\njoins: nested loops vs. index probes on the inner — a 650× spread on the same query &lt;!—\n\nWhole expressions: materialize (always works, pays temp I/O) vs. pipeline (cheap, but blocking operators cut it) —-&gt;\nOptimization: equivalence rules generate the options; statistics pick the winner\nThe most useful transformations are usually join order and pushing selections down\nWe can see what is done using EXPLAIN QUERY PLAN on any SQLite database, from Python\nPractice: join-cost problems in the homework and discussion sections — trace tiny joins and count the operations yourself"
   },
   {
     "objectID": "L11-Txns2.html#from-the-last-lecture",
