@@ -6,8 +6,8 @@
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
-  <meta name="generator" content="quarto-1.10.18">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.19">
 
   <meta name="author" content="Data Science 310">
   <title>DS310 – A First Look at Transactions</title>
@@ -269,7 +269,7 @@ Data Science 310
 <section id="why-do-we-need-transactions" class="slide level2">
 <h2>Why Do We Need Transactions?</h2>
 <ul>
-<li>To prevent problems stemming from system failures.
+<li>One reason is to prevent problems stemming from system failures.
 <ul>
 <li>example: a balance transfer</li>
 </ul></li>
@@ -283,7 +283,7 @@ Data Science 310
 <section id="why-do-we-need-transactions-cont." class="slide level2">
 <h2>Why Do We Need Transactions? (cont.)</h2>
 <ul>
-<li>To ensure that operations performed by different users don’t overlap in problematic ways.
+<li>Another reason is to ensure that operations performed by different users don’t overlap in problematic ways.
 <ul>
 <li>example: this should <em>not</em> be allowed</li>
 </ul></li>
@@ -305,6 +305,15 @@ Data Science 310
 <span id="cb4-4"><a aria-label="4"></a>if (balance1 + balance2 &lt; min)</span>
 <span id="cb4-5"><a aria-label="5"></a>    write(balance1 - fee)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div></div>
+<div class="fragment">
+<ul>
+<li>These problems arise due to <em>concurrency</em> or <em>parallelism.</em>
+<ul>
+<li>Concurrency: multiple processes running on a single CPU and accessing common data</li>
+<li>Parallelism: multiple CPUs running processses and accessing common data</li>
+</ul></li>
+</ul>
+</div>
 </section>
 <section id="acid-properties" class="slide level2">
 <h2>ACID Properties</h2>
@@ -349,8 +358,14 @@ Data Science 310
 <section id="atomicity-and-durability" class="slide level2">
 <h2>Atomicity and Durability</h2>
 <ul>
-<li>These properties are guaranteed by the part of the system that performs logging and recovery.</li>
+<li>To address atomicity and durability, we incorporate a part of the system that performs <em>logging</em> and <em>recovery.</em></li>
 </ul>
+<div class="fragment">
+<ul>
+<li><p>Atomicity and durability are guaranteed by the logging and recovery subsystem.</p></li>
+<li><p>These properties are mainly associated with what happens before and after a system crash.</p></li>
+</ul>
+</div>
 <div class="fragment">
 <ul>
 <li>After a crash, the recovery subsystem:
@@ -401,16 +416,18 @@ Data Science 310
 </figure>
 </div>
 </div>
-<div class="fragment sub">
+<div class="fragment">
 <ul>
-<li>doesn’t make sense for performance reasons. why?</li>
+<li><p>This is <em>not desirable</em> for performance reasons.</p></li>
+<li><p>One system is <em>forced to wait</em> - preventing progress.</p></li>
 </ul>
 </div>
 </section>
 <section id="serializability" class="slide level2">
 <h2>Serializability</h2>
 <ul>
-<li>A <em>serializable schedule</em> is one whose effects are equivalent to the effects of some serial schedule. For example:</li>
+<li><p>A <em>schedule</em> is a specific order of operations.</p></li>
+<li><p>A <em>serializable schedule</em> is one whose effects are equivalent to the effects of some serial schedule. For example:</p></li>
 </ul>
 <div class="r-stack">
 <p><img data-src="images/L10-Txns1/serializability-1.png" style="width:85.0%"></p>
@@ -431,7 +448,7 @@ Data Science 310
 <section id="not-all-schedules-are-serializable" class="slide level2">
 <h2>Not All Schedules Are Serializable!</h2>
 <ul>
-<li>Schedule 1 is a special case.</li>
+<li>Schedule 1 is actually a special case.</li>
 </ul>
 
 <img data-src="images/L10-Txns1/notall-schedules.png" class="quarto-figure quarto-figure-center r-stretch" style="width:82.0%"><div class="fragment sub">
@@ -453,7 +470,11 @@ Data Science 310
 <section id="not-all-schedules-are-serializable-cont." class="slide level2">
 <h2>Not All Schedules Are Serializable! (cont.)</h2>
 <ul>
-<li>If we change T2 so that it uses multiplication, the original interleaving is no longer serializable.</li>
+<li><p>If we change T2 so that it uses multiplication, the original interleaving is no longer serializable.</p>
+<ul>
+<li>addition and multiplication don’t commute with each other!</li>
+</ul></li>
+<li><p>Is there a serial schedule that achieves the same result as 1B?</p></li>
 </ul>
 <div class="r-stack">
 <p><img data-src="images/L10-Txns1/notall-cont-1.png" style="width:90.0%"></p>
@@ -546,20 +567,25 @@ Data Science 310
 </ul>
 <div class="fragment">
 <ul>
+<li>Each time a variable is written, we will consider it to be a new <strong>value</strong>.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
 <li>We focus on the following:
 <ul>
 <li>which transaction is the last one to write each data item
 <ul>
-<li>that’s the version that will be seen after the schedule</li>
+<li>that’s the value that will be seen after the schedule</li>
 </ul></li>
 </ul></li>
 </ul>
 </div>
 <div class="fragment sub" style="margin-left: 1em">
 <ul>
-<li>which version of a data item is read by each transaction
+<li>which value of a data item is read by each transaction
 <ul>
-<li>assume that if a transaction reads a different version, its subsequent behavior might be different</li>
+<li><strong>assume that if a transaction reads a different value, its subsequent behavior might be different</strong></li>
 </ul></li>
 </ul>
 </div>
@@ -609,7 +635,7 @@ Data Science 310
 </div>
 <div class="fragment sub" data-fragment-index="7">
 <ul>
-<li><span style="color:#0000ee;">swapping them doesn’t affect the value of B that txns see</span></li>
+<li><span style="color:#0000ee;">swapping them doesn’t affect the value of B that either transaction sees</span></li>
 </ul>
 </div>
 </div><div class="column" style="width:30%;">

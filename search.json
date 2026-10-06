@@ -1271,14 +1271,14 @@
     "href": "L10-Txns1.html#why-do-we-need-transactions",
     "title": "A First Look at Transactions",
     "section": "Why Do We Need Transactions?",
-    "text": "Why Do We Need Transactions?\n\nTo prevent problems stemming from system failures.\n\nexample: a balance transfer\n\n\nread balance1\nwrite(balance1 - 500)\nCRASH\nread balance2\nwrite(balance2 + 500)"
+    "text": "Why Do We Need Transactions?\n\nOne reason is to prevent problems stemming from system failures.\n\nexample: a balance transfer\n\n\nread balance1\nwrite(balance1 - 500)\nCRASH\nread balance2\nwrite(balance2 + 500)"
   },
   {
     "objectID": "L10-Txns1.html#why-do-we-need-transactions-cont.",
     "href": "L10-Txns1.html#why-do-we-need-transactions-cont.",
     "title": "A First Look at Transactions",
     "section": "Why Do We Need Transactions? (cont.)",
-    "text": "Why Do We Need Transactions? (cont.)\n\nTo ensure that operations performed by different users don’t overlap in problematic ways.\n\nexample: this should not be allowed\n\n\n\n\nuser 1\nread balance1\nwrite(balance1 - 500)\n\n\n\nread balance2\nwrite(balance2 + 500)\n\nuser 2\nread balance1\nread balance2\nif (balance1 + balance2 &lt; min)\n    write(balance1 - fee)"
+    "text": "Why Do We Need Transactions? (cont.)\n\nAnother reason is to ensure that operations performed by different users don’t overlap in problematic ways.\n\nexample: this should not be allowed\n\n\n\n\nuser 1\nread balance1\nwrite(balance1 - 500)\n\n\n\nread balance2\nwrite(balance2 + 500)\n\nuser 2\nread balance1\nread balance2\nif (balance1 + balance2 &lt; min)\n    write(balance1 - fee)\n\n\n\nThese problems arise due to concurrency or parallelism.\n\nConcurrency: multiple processes running on a single CPU and accessing common data\nParallelism: multiple CPUs running processses and accessing common data"
   },
   {
     "objectID": "L10-Txns1.html#acid-properties",
@@ -1292,35 +1292,35 @@
     "href": "L10-Txns1.html#atomicity-and-durability",
     "title": "A First Look at Transactions",
     "section": "Atomicity and Durability",
-    "text": "Atomicity and Durability\n\nThese properties are guaranteed by the part of the system that performs logging and recovery.\n\n\n\nAfter a crash, the recovery subsystem:\n\nredoes as needed all changes by committed txns\nundoes as needed all changes by uncommitted txns\n\nrestoring the old values of the changed data items\n\n\n\n\n\n\nWe’ll look more at logging and recovery later in the semester."
+    "text": "Atomicity and Durability\n\nTo address atomicity and durability, we incorporate a part of the system that performs logging and recovery.\n\n\n\nAtomicity and durability are guaranteed by the logging and recovery subsystem.\nThese properties are mainly associated with what happens before and after a system crash.\n\n\n\n\nAfter a crash, the recovery subsystem:\n\nredoes as needed all changes by committed txns\nundoes as needed all changes by uncommitted txns\n\nrestoring the old values of the changed data items\n\n\n\n\n\n\nWe’ll look more at logging and recovery later in the semester."
   },
   {
     "objectID": "L10-Txns1.html#isolation",
     "href": "L10-Txns1.html#isolation",
     "title": "A First Look at Transactions",
     "section": "Isolation",
-    "text": "Isolation\n\nTo guarantee isolation, the DBMS has to prevent problematic interleavings like the one we saw earlier:\n\n\n\ntransaction T1\nread balance1\nwrite(balance1 - 500)\n\n\nread balance2\nwrite(balance2 + 500)\n\ntransaction T2\n\nread balance1\nread balance2\nif (balance1 + balance2 &lt; min)\n    write(balance1 - fee)\n\n\n\nOne possibility: enforce a serial schedule (no interleaving).\n\n\n\n\n\n\n\n\n\ndoesn’t make sense for performance reasons. why?"
+    "text": "Isolation\n\nTo guarantee isolation, the DBMS has to prevent problematic interleavings like the one we saw earlier:\n\n\n\ntransaction T1\nread balance1\nwrite(balance1 - 500)\n\n\nread balance2\nwrite(balance2 + 500)\n\ntransaction T2\n\nread balance1\nread balance2\nif (balance1 + balance2 &lt; min)\n    write(balance1 - fee)\n\n\n\nOne possibility: enforce a serial schedule (no interleaving).\n\n\n\n\n\n\n\n\n\nThis is not desirable for performance reasons.\nOne system is forced to wait - preventing progress."
   },
   {
     "objectID": "L10-Txns1.html#serializability",
     "href": "L10-Txns1.html#serializability",
     "title": "A First Look at Transactions",
     "section": "Serializability",
-    "text": "Serializability\n\nA serializable schedule is one whose effects are equivalent to the effects of some serial schedule. For example:\n\n\n\n\n\n\n\n\n\n\n\n\n\nBecause the effects of schedule 1 are equivalent to the effects of a serial schedule (schedule 2), schedule 1 is serializable."
+    "text": "Serializability\n\nA schedule is a specific order of operations.\nA serializable schedule is one whose effects are equivalent to the effects of some serial schedule. For example:\n\n\n\n\n\n\n\n\n\n\n\n\n\nBecause the effects of schedule 1 are equivalent to the effects of a serial schedule (schedule 2), schedule 1 is serializable."
   },
   {
     "objectID": "L10-Txns1.html#not-all-schedules-are-serializable",
     "href": "L10-Txns1.html#not-all-schedules-are-serializable",
     "title": "A First Look at Transactions",
     "section": "Not All Schedules Are Serializable!",
-    "text": "Not All Schedules Are Serializable!\n\nSchedule 1 is a special case.\n\n\n\n\nboth T1 and T2 use addition to change the values of X and Y\n\n\n\n\naddition is commutative\n\n\n\n\nthus, the order in which T1 and T2 make their changes doesn’t matter!"
+    "text": "Not All Schedules Are Serializable!\n\nSchedule 1 is actually a special case.\n\n\n\n\nboth T1 and T2 use addition to change the values of X and Y\n\n\n\n\naddition is commutative\n\n\n\n\nthus, the order in which T1 and T2 make their changes doesn’t matter!"
   },
   {
     "objectID": "L10-Txns1.html#not-all-schedules-are-serializable-cont.",
     "href": "L10-Txns1.html#not-all-schedules-are-serializable-cont.",
     "title": "A First Look at Transactions",
     "section": "Not All Schedules Are Serializable! (cont.)",
-    "text": "Not All Schedules Are Serializable! (cont.)\n\nIf we change T2 so that it uses multiplication, the original interleaving is no longer serializable.\n\n\n\n\n\n\n\n\n\n\nBecause effects of schedule 1B are not equivalent to the effects of any serial schedule of T1 + T2B, schedule 1B is not serializable."
+    "text": "Not All Schedules Are Serializable! (cont.)\n\nIf we change T2 so that it uses multiplication, the original interleaving is no longer serializable.\n\naddition and multiplication don’t commute with each other!\n\nIs there a serial schedule that achieves the same result as 1B?\n\n\n\n\n\n\n\n\n\n\nBecause effects of schedule 1B are not equivalent to the effects of any serial schedule of T1 + T2B, schedule 1B is not serializable."
   },
   {
     "objectID": "L10-Txns1.html#conventions-for-schedules",
@@ -1348,14 +1348,14 @@
     "href": "L10-Txns1.html#serializability-of-abstract-schedules",
     "title": "A First Look at Transactions",
     "section": "Serializability of Abstract Schedules",
-    "text": "Serializability of Abstract Schedules\n\nHow can we determine if an abstract schedule is serializable?\n\ngiven that we don’t know the exact nature of the changes made to the data\n\n\n\n\nWe focus on the following:\n\nwhich transaction is the last one to write each data item\n\nthat’s the version that will be seen after the schedule\n\n\n\n\n\n\nwhich version of a data item is read by each transaction\n\nassume that if a transaction reads a different version, its subsequent behavior might be different"
+    "text": "Serializability of Abstract Schedules\n\nHow can we determine if an abstract schedule is serializable?\n\ngiven that we don’t know the exact nature of the changes made to the data\n\n\n\n\nEach time a variable is written, we will consider it to be a new value.\n\n\n\n\nWe focus on the following:\n\nwhich transaction is the last one to write each data item\n\nthat’s the value that will be seen after the schedule\n\n\n\n\n\n\nwhich value of a data item is read by each transaction\n\nassume that if a transaction reads a different value, its subsequent behavior might be different"
   },
   {
     "objectID": "L10-Txns1.html#conflicts-in-schedules",
     "href": "L10-Txns1.html#conflicts-in-schedules",
     "title": "A First Look at Transactions",
     "section": "Conflicts in Schedules",
-    "text": "Conflicts in Schedules\n\nA conflict is a pair of actions that can’t be swapped without potentially changing the behavior of one or more transactions.\n\n\n\n\n\nExamples in the schedule at right:\n\n\n\n\nw1(A) and r2(A)\n\nswapping them leads T2 to read a different value of A\n\n\n\n\n\nthis may cause T2 to behave differently\n\n\n\n\nw2(B) and w1(B)\n\nswapping them means later readers of B will see a different value of B\n\n\n\n\n\nthis may cause them to behave differently\n\n\n\n\nr1(B) and r2(B) do not conflict. why?\n\n\n\n\nswapping them doesn’t affect the value of B that txns see"
+    "text": "Conflicts in Schedules\n\nA conflict is a pair of actions that can’t be swapped without potentially changing the behavior of one or more transactions.\n\n\n\n\n\nExamples in the schedule at right:\n\n\n\n\nw1(A) and r2(A)\n\nswapping them leads T2 to read a different value of A\n\n\n\n\n\nthis may cause T2 to behave differently\n\n\n\n\nw2(B) and w1(B)\n\nswapping them means later readers of B will see a different value of B\n\n\n\n\n\nthis may cause them to behave differently\n\n\n\n\nr1(B) and r2(B) do not conflict. why?\n\n\n\n\nswapping them doesn’t affect the value of B that either transaction sees"
   },
   {
     "objectID": "L10-Txns1.html#which-actions-conflict",
