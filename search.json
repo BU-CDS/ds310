@@ -1649,7 +1649,7 @@
     "href": "L06-Storage.html#representing-null-values",
     "title": "Storage Fundamentals",
     "section": "Representing Null Values",
-    "text": "Representing Null Values\n\nOption 1: add an “out-of-band” value for every data type\n\ncon: need to increase the size of most data types, or reduce the range of possible values\n\n\n\n\nOption 2: use per-record metadata\n\nexample: use a special offset (e.g., -1)"
+    "text": "Representing Null Values\n\nOption 1: add an “out-of-band” value for every data type\n\ncon: need to increase the size of most data types, or reduce the range of possible values\n\n\n\n\nOption 2: use per-record metadata\n\nexample: use a special offset (e.g., -1)\n\n\n\n\nwhen num_majors is NULL:\n\n\n\n\n\n\n\n\n\nwhen name is NULL and num_majors is 200:"
   },
   {
     "objectID": "L06-Storage.html#which-is-the-correct-record-header",
