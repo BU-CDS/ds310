@@ -462,7 +462,17 @@ less efficient than options 1 and 2 if the length changes. why? [in addition to 
 - Option 2: use per-record metadata
     - example: use a special offset (e.g., -1)
 
-![](images/L06-Storage/null-rec.png){width="58%" fig-align="center"}
+::: {.fragment .sub}
+- when *num_majors* is NULL:
+
+![](images/L06-Storage/null-rec.png){width="55%" fig-align="center"}
+:::
+
+::: {.fragment .sub}
+- when *name* is NULL and *num_majors* is 200:
+
+![](images/L06-Storage/null-rec-name.svg){width="55%" fig-align="center"}
+:::
 :::
 
 ## Which is the correct record header?
