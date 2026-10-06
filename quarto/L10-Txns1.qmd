@@ -54,7 +54,7 @@ write(balance2 + 500)
 
 ## Why Do We Need Transactions?
 
-- To prevent problems stemming from system failures.
+- One reason is to prevent problems stemming from system failures.
     - example: a balance transfer
 
 ```text
@@ -67,7 +67,7 @@ write(balance2 + 500)
 
 ## Why Do We Need Transactions? (cont.)
 
-- To ensure that operations performed by different users don't overlap in problematic ways.
+- Another reason is to ensure that operations performed by different users don't overlap in problematic ways.
     - example: this should *not* be allowed
 
 :::: {.columns}
@@ -94,6 +94,14 @@ if (balance1 + balance2 < min)
 ```
 :::
 ::::
+
+::: {.fragment}
+
+- These problems arise due to _concurrency_ or _parallelism._
+    - Concurrency: multiple processes running on a single CPU and accessing common data
+    - Parallelism: multiple CPUs running processses and accessing common data
+
+::: 
 
 ## ACID Properties
 
@@ -124,7 +132,13 @@ if (balance1 + balance2 < min)
 
 ## Atomicity and Durability
 
-- These properties are guaranteed by the part of the system that performs logging and recovery.
+- To address atomicity and durability, we incorporate a part of the system that performs _logging_ and _recovery._
+
+::: {.fragment}
+- Atomicity and durability are guaranteed by the logging and recovery subsystem.
+
+- These properties are mainly associated with what happens before and after a system crash.
+:::
 
 ::: {.fragment}
 - After a crash, the recovery subsystem:
@@ -172,11 +186,15 @@ if (balance1 + balance2 < min)
 ![](images/L10-Txns1/isolation-serial.png){width="62%" fig-align="center"}
 :::
 
-::: {.fragment .sub}
-- doesn't make sense for performance reasons. why?
+::: {.fragment}
+- This is _not desirable_ for performance reasons. 
+
+- One system is _forced to wait_  - preventing progress.
 :::
 
 ## Serializability
+
+- A _schedule_ is a specific order of operations.
 
 - A *serializable schedule* is one whose effects are equivalent to the effects of some serial schedule. For example:
 
@@ -204,7 +222,7 @@ if (balance1 + balance2 < min)
 
 ## Not All Schedules Are Serializable!
 
-- Schedule 1 is a special case.
+- Schedule 1 is actually a special case.
 
 ![](images/L10-Txns1/notall-schedules.png){width="82%" fig-align="center"}
 
@@ -223,6 +241,10 @@ if (balance1 + balance2 < min)
 ## Not All Schedules Are Serializable! (cont.)
 
 - If we change T2 so that it uses multiplication, the original interleaving is no longer serializable.
+
+    - addition and multiplication don't commute with each other!
+
+- Is there a serial schedule that achieves the same result as 1B?
 
 ::: {.r-stack}
 ![](images/L10-Txns1/notall-cont-1.png){width="90%"}
@@ -303,14 +325,18 @@ E\.  none of the above
     - given that we don't know the exact nature of the changes made to the data
 
 ::: {.fragment}
+- Each time a variable is written, we will consider it to be a new __value__.
+:::
+
+::: {.fragment}
 - We focus on the following:
     - which transaction is the last one to write each data item
-        - that's the version that will be seen after the schedule
+        - that's the value that will be seen after the schedule
 :::
 
 ::: {.fragment .sub style="margin-left: 1em"}
-- which version of a data item is read by each transaction
-    - assume that if a transaction reads a different version, its subsequent behavior might be different
+- which value of a data item is read by each transaction
+    - __assume that if a transaction reads a different value, its subsequent behavior might be different__
 :::
 
 ## Conflicts in Schedules
@@ -346,7 +372,7 @@ E\.  none of the above
 :::
 
 ::: {.fragment .sub fragment-index=7}
-- [swapping them doesn't affect the value of B that txns see]{style="color:#0000ee;"}
+- [swapping them doesn't affect the value of B that either transaction sees]{style="color:#0000ee;"}
 :::
 :::
 
