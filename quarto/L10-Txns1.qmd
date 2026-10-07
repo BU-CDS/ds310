@@ -137,6 +137,12 @@ if (balance1 + balance2 < min)
 - We'll look more at logging and recovery later in the semester.
 :::
 
+## Why Let Transactions Overlap?
+
+{{< include _includes/anim-player.html >}}
+
+{{< include _includes/L10-overlap.html >}}
+
 ## Isolation
 
 - To guarantee isolation, the DBMS has to prevent problematic interleavings like the one we saw earlier:
