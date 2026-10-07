@@ -1,0 +1,124 @@
+```{=html}
+<!--
+  Small companion diagram for "Locking Basics" in L11 (included by
+  L11-Txns2.qmd, under the schedule table). Same visual language as
+  images/L11-Txns2/lock-concept.svg on the previous slide, but it follows the
+  slide's fragment steps, showing the state of X's lock after each one:
+
+    start    T1 holds the lock on X                    (l(X); r(X))
+    step 1   T2 requests the lock                      (l(X))
+    step 2   the request is denied; T2 must wait
+    step 3   T1 unlocks X; T2 is still waiting         (w(X); u(X))
+    step 4   the lock is granted to T2                 (l(X) granted; ...)
+
+  No script: each state is a reveal.js fragment whose data-fragment-index
+  matches the step it belongs to (fade-out = shown until that step,
+  fade-in-then-out = shown only during it).
+-->
+<style>
+#lock-steps {
+  display: block; width: 100%; height: auto; margin: 0.9em auto 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#lock-steps text { text-anchor: middle; }
+#lock-steps .t1 { color: #3a5fcd; }    /* T1 blue, T2 orange, as on the previous slide */
+#lock-steps .t2 { color: #cc6600; }
+#lock-steps .free { color: #999; }
+
+#lock-steps .db { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#lock-steps .db-label { fill: #444; font-size: 19px; }
+#lock-steps .item { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#lock-steps .item-name { fill: #000; font-size: 34px; font-weight: 500; }
+#lock-steps .txn rect { fill: currentColor; fill-opacity: 0.1; stroke: currentColor; stroke-width: 3; }
+#lock-steps .txn text { fill: currentColor; font-size: 30px; font-weight: 700; }
+
+#lock-steps .line { fill: none; stroke: currentColor; stroke-width: 4; }
+#lock-steps .tip { fill: currentColor; }
+#lock-steps .stop { stroke: currentColor; stroke-width: 6; stroke-linecap: round; }
+#lock-steps .says { fill: currentColor; font-size: 20px; font-style: italic; }
+#lock-steps .means { fill: #333; font-size: 19px; }
+#lock-steps .state { fill: currentColor; font-size: 19px; font-style: italic; }
+#lock-steps .state.free { fill: #777; }
+
+/* A PDF export shows every fragment at once, so keep only the final state there. */
+.print-pdf #lock-steps .fragment.fade-out,
+.print-pdf #lock-steps .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="lock-steps" viewBox="0 0 720 172" role="img"
+     aria-label="The lock on element X, step by step. At first transaction T1 holds the lock and can access X. Then T2 requests the lock; the request is denied and T2 must wait. T1 unlocks X while T2 is still waiting. Finally the lock is granted to T2, which can now access X.">
+  <!-- Shapes drawn more than once. They are styled with attributes because
+       the stylesheet's "#lock-steps ..." rules do not reach inside <use>;
+       currentColor picks up the colour of whichever group uses them. -->
+  <defs>
+    <g id="ls-locked">
+      <path d="M379,81 V69 a13,13 0 0 1 26,0 V81" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect x="370" y="80" width="44" height="34" rx="6" fill="currentColor"/>
+      <circle cx="392" cy="93" r="4.5" fill="#fff"/><rect x="390" y="93" width="4" height="12" rx="1.5" fill="#fff"/>
+    </g>
+    <g id="ls-unlocked">
+      <path d="M379,81 V61 a13,13 0 0 1 26,0 V70" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect x="370" y="80" width="44" height="34" rx="6" fill="currentColor"/>
+      <circle cx="392" cy="93" r="4.5" fill="#fff"/><rect x="390" y="93" width="4" height="12" rx="1.5" fill="#fff"/>
+    </g>
+    <!-- T2 reaching for X without holding its lock -->
+    <g id="ls-wants">
+      <path d="M620,82 H464" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="9 7"/>
+      <path d="M448,82 l16,-8.5 v17 z" fill="currentColor"/>
+    </g>
+  </defs>
+
+  <!-- always there: the element and the two transactions -->
+  <rect class="db" x="260" y="6" width="200" height="158" rx="14"/>
+  <text class="db-label" x="360" y="31">database element</text>
+  <rect class="item" x="295" y="44" width="130" height="76" rx="8"/>
+  <text class="item-name" x="332" y="95">X</text>
+  <g class="txn t1"><rect x="8" y="47" width="90" height="70" rx="12"/><text x="53" y="93">T<tspan dy="7" font-size="70%">1</tspan></text></g>
+  <g class="txn t2"><rect x="622" y="47" width="90" height="70" rx="12"/><text x="667" y="93">T<tspan dy="7" font-size="70%">2</tspan></text></g>
+
+  <!-- until step 3: T1 holds the lock -->
+  <g class="t1 fragment fade-out" data-fragment-index="3">
+    <path class="line" d="M100,82 H282"/>
+    <path class="tip" d="M295,82 l-16,-8.5 v17 z"/>
+    <text class="says" x="179" y="66">holds the lock</text>
+    <text class="means" x="179" y="106">can access X</text>
+    <use href="#ls-locked"/>
+    <text class="state" x="360" y="146">locked by T<tspan dy="5" font-size="70%">1</tspan></text>
+  </g>
+
+  <!-- step 1: T2 asks for the lock -->
+  <g class="t2 fragment fade-in-then-out" data-fragment-index="1">
+    <use href="#ls-wants"/>
+    <text class="says" x="541" y="66">requests the lock</text>
+  </g>
+
+  <!-- step 2: the request is denied -->
+  <g class="t2 fragment fade-in-then-out" data-fragment-index="2">
+    <use href="#ls-wants"/>
+    <path class="stop" d="M438,64 V100"/>
+    <text class="says" x="541" y="66">request denied</text>
+    <text class="means" x="541" y="106">must wait</text>
+  </g>
+
+  <!-- step 3: T1 unlocks X; T2 has not been given the lock yet -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <text class="says t1" x="179" y="88">unlocks X</text>
+    <use class="free" href="#ls-unlocked"/>
+    <text class="state free" x="360" y="146">unlocked</text>
+    <g class="t2">
+      <use href="#ls-wants"/>
+      <text class="says" x="541" y="66">still waiting</text>
+    </g>
+  </g>
+
+  <!-- step 4: the lock is granted to T2 -->
+  <g class="t2 fragment" data-fragment-index="4">
+    <path class="line" d="M620,82 H438"/>
+    <path class="tip" d="M425,82 l16,-8.5 v17 z"/>
+    <text class="says" x="541" y="66">lock granted</text>
+    <text class="means" x="541" y="106">can access X</text>
+    <use href="#ls-locked"/>
+    <text class="state" x="360" y="146">locked by T<tspan dy="5" font-size="70%">2</tspan></text>
+  </g>
+</svg>
+```

@@ -1,0 +1,209 @@
+```{=html}
+<!--
+  Opening animation for L11 (included by L11-Txns2.qmd).
+
+  Two processes each run a transaction against one shared database, at the
+  same time. Their operations interleave into the schedule that the next
+  slide recaps:  r1(A); r2(B); w1(A); r2(A); w2(A).
+
+  Playback (Start / Pause button, rewind on leaving the slide, final frame in
+  a PDF export) comes from anim-player.html, which the deck includes first.
+  To change the schedule, edit OPS below.
+-->
+<style>
+/* shared time axis and the data items' timelines */
+#ctx-anim .item-line { stroke: #999; stroke-width: 2; stroke-dasharray: 5 7; }
+#ctx-anim .axis { stroke: #888; stroke-width: 2.5; }
+#ctx-anim .axis-tip { fill: #888; }
+#ctx-anim .axis-label { fill: #777; font-size: 21px; font-style: italic; }
+
+/* database */
+#ctx-anim .db-body, #ctx-anim .db-top { stroke: #555; stroke-width: 2.5; }
+#ctx-anim .db-body { fill: #eeece6; }
+#ctx-anim .db-top { fill: #f8f7f3; }
+#ctx-anim .db-label { fill: #444; font-size: 22px; }
+#ctx-anim .item { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#ctx-anim .item-name { fill: #000; font-size: 28px; font-weight: 500; }
+#ctx-anim .flash { opacity: 0; fill: var(--c); stroke: var(--c); stroke-width: 6; }
+#ctx-anim .flash.r { fill-opacity: 0.15; }
+#ctx-anim .flash.w { fill-opacity: 0.7; }
+
+/* processes and their timelines */
+#ctx-anim .proc rect { fill: var(--c); fill-opacity: 0.1; stroke: var(--c); stroke-width: 3; }
+#ctx-anim .proc-name { fill: var(--c); font-size: 30px; font-weight: 700; }
+#ctx-anim .proc-does { fill: #333; font-size: 22px; }
+#ctx-anim .life { stroke: var(--c); stroke-width: 8; stroke-dasharray: 1; }
+#ctx-anim .head { opacity: 0; }
+#ctx-anim .head circle { fill: var(--c); }
+#ctx-anim .head .ring {
+  fill: none; stroke: var(--c); stroke-width: 3; stroke-dasharray: 22 9.4;
+  transform-box: fill-box; transform-origin: center;
+  animation: ctx-spin 1.4s linear infinite;
+}
+@keyframes ctx-spin { to { transform: rotate(360deg); } }
+#ctx-anim:not([data-state="playing"]) .ring { animation-play-state: paused; }
+
+/* one read or write */
+#ctx-anim .chip { transform-box: fill-box; transform-origin: center; }
+#ctx-anim .chip rect { fill: #fff; stroke: var(--c); stroke-width: 3; }
+#ctx-anim .chip text { fill: var(--c); font-size: 30px; font-weight: 500; }
+#ctx-anim .flow { stroke: var(--c); stroke-width: 3; stroke-dasharray: 1; }
+#ctx-anim .flow-tip { fill: var(--c); }
+#ctx-anim .mark { stroke: var(--c); stroke-width: 3; }
+#ctx-anim .mark.r { fill: #fff; }
+#ctx-anim .mark.w { fill: var(--c); }
+#ctx-anim .verb { fill: var(--c); font-size: 20px; font-style: italic; }
+
+/* resulting schedule */
+#ctx-anim .sched-box { fill: #f6f4ee; stroke: #cfcabd; stroke-width: 2; }
+#ctx-anim .sched-label { fill: #333; font-size: 28px; }
+#ctx-anim .tok { fill: var(--c); font-size: 32px; font-weight: 500; }
+</style>
+
+<svg id="ctx-anim" class="anim-fig" viewBox="0 0 1200 700" role="img"
+     aria-label="Animation: Process 1 runs transaction T1 (read A, write A) while Process 2 runs transaction T2 (read B, read A, write A) against the same database. Their operations interleave to give the schedule r1(A); r2(B); w1(A); r2(A); w2(A)."></svg>
+
+<script>
+(function () {
+  const svg = document.getElementById('ctx-anim');
+
+  // ---- What to show: the schedule from the next slide, in time order ----
+  const OPS = [
+    { txn: 1, op: 'r', item: 'A' },
+    { txn: 2, op: 'r', item: 'B' },
+    { txn: 1, op: 'w', item: 'A' },
+    { txn: 2, op: 'r', item: 'A' },
+    { txn: 2, op: 'w', item: 'A' },
+  ];
+
+  // ---- Layout, in SVG units (the viewBox is 1200 x 700) ----
+  const LANE = { 1: 230, 2: 970 };        // x of each process's timeline
+  const ITEM = { A: 555, B: 645 };        // x of each data item's timeline
+  const TOP = 110, ROW0 = 180, ROW = 80;  // timelines start at TOP; one row per operation
+  const END = ROW0 + (OPS.length - 1) * ROW + 60;
+  const SCHED_Y = 655, TOK0 = 440, TOK = 125;
+  const rowY = i => ROW0 + i * ROW;
+  const tokX = i => TOK0 + i * TOK;
+
+  // ---- Timing, in seconds ----
+  const T_START = 0.4;                    // both processes start running
+  const T_ROW = 2.0;                      // gap between consecutive operations
+  const at = y => T_START + (y - TOP) * T_ROW / ROW;   // when the timelines reach y
+  const T_END = at(END);
+
+  // ---- Draw the final frame ----
+  const sub = n => `<tspan dy="7" font-size="70%">${n}</tspan>`;
+  const midY = (150 + END) / 2;
+  let h = '';
+
+  h += `<g class="guides">`;
+  for (const x of Object.values(ITEM)) h += `<path class="item-line" d="M${x},112 V${END + 10}"/>`;
+  h += `<path class="axis" d="M40,150 V${END}"/>
+        <path class="axis-tip" d="M40,${END + 14} l-7,-14 h14 z"/>
+        <text class="axis-label" x="26" y="${midY}" transform="rotate(-90 26 ${midY})">time</text>
+      </g>`;
+
+  h += `<g class="db">
+        <path class="db-body" d="M475,22 V112 a125,14 0 0 0 250,0 V22"/>
+        <ellipse class="db-top" cx="600" cy="22" rx="125" ry="14"/>
+        <text class="db-label" x="600" y="61">Database</text>`;
+  for (const [name, x] of Object.entries(ITEM)) {
+    const box = `x="${x - 28}" y="70" width="56" height="42" rx="6"`;
+    h += `<rect class="item" ${box}/>`;
+    OPS.forEach((o, i) => {
+      if (o.item === name) h += `<rect class="flash ${o.op} t${o.txn}" data-op="${i}" ${box}/>`;
+    });
+    h += `<text class="item-name" x="${x}" y="101">${name}</text>`;
+  }
+  h += `</g>`;
+
+  for (const t of [1, 2]) {
+    const x = LANE[t];
+    h += `<g class="proc t${t}">
+          <rect x="${x - 150}" y="14" width="300" height="96" rx="14"/>
+          <text class="proc-name" x="${x}" y="54">Process ${t}</text>
+          <text class="proc-does" x="${x}" y="90">running transaction T${sub(t)}</text>
+        </g>
+        <path class="life t${t}" pathLength="1" d="M${x},${TOP} V${END}"/>
+        <g class="head t${t}">
+          <circle cx="${x}" cy="${TOP}" r="13"/>
+          <circle class="ring" cx="${x}" cy="${TOP}" r="20"/>
+        </g>`;
+  }
+
+  OPS.forEach((o, i) => {
+    const y = rowY(i), lane = LANE[o.txn], item = ITEM[o.item];
+    const side = Math.sign(lane - item);             // +1 if the process is right of the item
+    const pEnd = lane - side * 60, dEnd = item + side * 9;
+    // arrows follow the data: a read flows to the process, a write to the database
+    const [from, tip] = o.op === 'r' ? [dEnd, pEnd] : [pEnd, dEnd];
+    const dir = Math.sign(tip - from);
+    h += `<g class="op t${o.txn}" data-op="${i}">
+          <path class="flow" pathLength="1" d="M${from},${y} H${tip - dir * 12}"/>
+          <path class="flow-tip" d="M${tip},${y} l${-dir * 15},-7.5 v15 z"/>
+          <circle class="mark ${o.op}" cx="${item}" cy="${y}" r="7"/>
+          <text class="verb" x="${pEnd - side * 90}" y="${y - 11}">${o.op === 'r' ? 'read' : 'write'}</text>
+          <g class="chip">
+            <rect x="${lane - 55}" y="${y - 23}" width="110" height="46" rx="10"/>
+            <text x="${lane}" y="${y + 10.5}">${o.op}(${o.item})</text>
+          </g>
+        </g>`;
+  });
+
+  h += `<g class="sched">
+        <rect class="sched-box" x="190" y="606" width="820" height="76" rx="12"/>
+        <text class="sched-label" x="275" y="${SCHED_Y}">Schedule:</text>
+      </g>`;
+  OPS.forEach((o, i) => {
+    const sep = i < OPS.length - 1 ? ';' : '';
+    h += `<text class="tok t${o.txn}" data-op="${i}" x="${tokX(i)}" y="${SCHED_Y}">${o.op}${sub(o.txn)}<tspan dy="-7">(${o.item})${sep}</tspan></text>`;
+  });
+  svg.innerHTML = h;
+
+  // ---- Timeline: [element, keyframes, start, duration, extra options] ----
+  const $ = sel => svg.querySelector(sel);
+  const $$ = sel => svg.querySelectorAll(sel);
+  const timeline = [];
+  const add = (el, frames, start, dur, opts) => timeline.push([el, frames, start, dur, opts]);
+  const fadeIn = [{ opacity: 0 }, { opacity: 1 }];
+  const draw = [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }];
+
+  // both processes run, side by side, for the whole stretch
+  const run = T_END - T_START;
+  $$('.life').forEach(el => add(el, draw, T_START, run));
+  $$('.head').forEach(el => {
+    add(el, [{ transform: 'translateY(0)' }, { transform: `translateY(${END - TOP}px)` }], T_START, run);
+    add(el, [{ opacity: 0 }, { opacity: 1, offset: 0.03 }, { opacity: 1, offset: 0.97 }, { opacity: 0 }],
+      T_START - 0.3, run + 0.6);
+  });
+
+  // each operation fires as its process's timeline reaches it
+  OPS.forEach((o, i) => {
+    const t = at(rowY(i)), g = $(`.op[data-op="${i}"]`), read = o.op === 'r';
+    add(g.querySelector('.chip'),
+      [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }],
+      t - 0.1, 0.4, { easing: 'cubic-bezier(.3,1.5,.6,1)' });
+    add(g.querySelector('.verb'), fadeIn, t + 0.2, 0.3);
+    add(g.querySelector('.flow'), draw, t + 0.2, 0.55, { easing: 'ease-in-out' });
+    add(g.querySelector('.flow-tip'), fadeIn, t + 0.7, 0.12);
+    add(g.querySelector('.mark'), fadeIn, read ? t + 0.05 : t + 0.75, 0.15);
+    add($(`.flash[data-op="${i}"]`),
+      [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 0 }],
+      read ? t : t + 0.7, 1.0);
+  });
+
+  // the operations, read off in time order, are the schedule
+  add($('.sched'), fadeIn, T_END + 0.2, 0.4);
+  OPS.forEach((o, i) => {
+    const dx = LANE[o.txn] - tokX(i), dy = rowY(i) + 10 - SCHED_Y;
+    add($(`.tok[data-op="${i}"]`),
+      [{ opacity: 0, transform: `translate(${dx}px, ${dy}px)` },
+       { opacity: 1, offset: 0.25 },
+       { opacity: 1, transform: 'translate(0px, 0px)' }],
+      T_END + 0.6 + i * 0.4, 0.7, { easing: 'ease-in-out' });
+  });
+
+  animPlayer(svg, timeline);
+})();
+</script>
+```

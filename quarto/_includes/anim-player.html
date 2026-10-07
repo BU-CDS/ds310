@@ -1,0 +1,101 @@
+```{=html}
+<!--
+  Shared player for the slide animations in this folder. Include it in a deck
+  once, before the first animation fragment.
+
+  An animation is an <svg class="anim-fig"> whose markup is its final frame,
+  plus a timeline of Web Animations that build up to that frame. The player
+  adds a button at the bottom left of the figure and is the only thing that
+  runs the timeline:
+    - nothing moves until Start is clicked; the button then pauses and
+      resumes the run, and replays it once it has finished
+    - leaving the slide rewinds to the opening frame
+    - a PDF export gets the final frame and no button
+  While running, the svg carries data-state="playing" (otherwise "idle",
+  "paused" or "done"), which fragments can use in their own CSS.
+-->
+<style>
+.anim-fig {
+  display: block; width: 100%; height: auto; margin: 0 auto;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-user-select: none; user-select: none;
+}
+.anim-fig text { text-anchor: middle; }
+.anim-fig .t1 { --c: #3a5fcd; }   /* T1: blue   (set-b in custom.scss) */
+.anim-fig .t2 { --c: #cc6600; }   /* T2: orange (set-e in custom.scss) */
+
+/* start / pause button */
+.anim-fig .btn { cursor: pointer; }
+.anim-fig .btn rect { fill: #fff; stroke: #888; stroke-width: 2; }
+.anim-fig .btn:hover rect { fill: #f1efe9; }
+.anim-fig .btn path { fill: #444; }
+.anim-fig .btn text { fill: #333; font-size: 22px; }
+.anim-fig[data-state="playing"] .icon-play,
+.anim-fig:not([data-state="playing"]) .icon-pause { display: none; }
+</style>
+
+<script>
+// animPlayer(svg, timeline)
+//   timeline: [[element, keyframes, start, duration, extra options], ...], times in seconds
+window.animPlayer = function (svg, timeline) {
+  // A PDF export keeps the final frame and has no use for the button.
+  if (/print-pdf/.test(location.search)) return;
+
+  // The button is an SVG group, not a <button>, so a click never takes
+  // keyboard focus away from reveal.js.
+  svg.insertAdjacentHTML('beforeend',
+    `<g class="btn" role="button" transform="translate(16 ${svg.viewBox.baseVal.height - 80})">
+       <rect width="150" height="48" rx="24"/>
+       <path class="icon-play" d="M22,13 l19,11 l-19,11 z"/>
+       <path class="icon-pause" d="M21,14 h7 v20 h-7 z M34,14 h7 v20 h-7 z"/>
+       <text x="92" y="32"></text>
+     </g>`);
+  const btn = svg.querySelector('.btn');
+  const LABEL = { idle: 'Start', playing: 'Pause', paused: 'Resume', done: 'Replay' };
+  const last = timeline.reduce((best, [, , start, dur], i, all) =>
+    start + dur > all[best][2] + all[best][3] ? i : best, 0);
+  let anims = [], state;
+
+  function setState(s) {
+    state = s;
+    svg.dataset.state = s;                 // the CSS picks the icon from this
+    btn.querySelector('text').textContent = LABEL[s];
+    btn.setAttribute('aria-label', LABEL[s] + ' animation');
+  }
+  // (Re)build every animation, held on its first frame.
+  function load() {
+    anims.forEach(a => a.cancel());
+    anims = timeline.map(([el, frames, start, dur, opts]) => {
+      const a = el.animate(frames, { delay: start * 1000, duration: dur * 1000, fill: 'both', ...opts });
+      a.pause();
+      return a;
+    });
+    anims[last].onfinish = () => setState('done');
+    setState('idle');
+  }
+  // Only touch animations still in flight: play() on a finished one would rewind it.
+  function pause() {
+    anims.forEach(a => { if (a.playState === 'running') a.pause(); });
+    setState('paused');
+  }
+  function resume() {
+    anims.forEach(a => { if (a.playState === 'paused') a.play(); });
+    setState('playing');
+  }
+
+  load();
+  btn.addEventListener('click', () => {
+    if (state === 'playing') return pause();
+    if (state === 'done') load();
+    resume();
+  });
+  // Rewind when reveal.js moves off this slide (it marks the current one "present").
+  const slide = svg.closest('section');
+  if (slide) {
+    new MutationObserver(() => {
+      if (!slide.classList.contains('present') && state !== 'idle') load();
+    }).observe(slide, { attributes: true, attributeFilter: ['class'] });
+  }
+};
+</script>
+```

@@ -15,6 +15,12 @@ format:
     chalkboard: true
 ---
 
+## Two Transactions, Running Concurrently
+
+{{< include _includes/anim-player.html >}}
+
+{{< include _includes/L11-concurrent-txns.html >}}
+
 ## From the last lecture…
 
 - We can represent a schedule using a table.
@@ -51,7 +57,13 @@ format:
 
 ::::: {.columns}
 :::: {.column width="52%"}
-[Example:&nbsp; r~2~(A); r~3~(A); r~1~(B); w~4~(A); w~2~(B); r~3~(B)]{.fragment fragment-index=1}
+[Example:&nbsp;
+[r~2~(A)]{.fragment .highlight-current-blue fragment-index=2};
+[r~3~(A)]{.fragment .highlight-current-blue fragment-index=3};
+[r~1~(B)]{.fragment .highlight-current-blue fragment-index=4};
+[[w~4~(A)]{.fragment .highlight-current-blue fragment-index=2}]{.fragment .highlight-current-blue fragment-index=3};
+[[w~2~(B)]{.fragment .highlight-current-blue fragment-index=4}]{.fragment .highlight-current-blue fragment-index=5};
+[r~3~(B)]{.fragment .highlight-current-blue fragment-index=5}]{.fragment fragment-index=1}
 
 [r~2~(A) … w~4~(A)&nbsp; means T2 → T4]{.fragment fragment-index=2}
 
@@ -93,7 +105,15 @@ format:
 ## More Examples
 
 - Determine if the following are conflict serializable:
-    - r~1~(A); r~3~(A); r~1~(B); w~2~(A); r~4~(A); w~2~(B); w~3~(C); w~4~(C); r~1~(C)
+    - [r~1~(A)]{.fragment .highlight-current-blue fragment-index=1};
+      [r~3~(A)]{.fragment .highlight-current-blue fragment-index=2};
+      [r~1~(B)]{.fragment .highlight-current-blue fragment-index=3};
+      [[[w~2~(A)]{.fragment .highlight-current-blue fragment-index=1}]{.fragment .highlight-current-blue fragment-index=2}]{.fragment .highlight-current-blue fragment-index=4};
+      [r~4~(A)]{.fragment .highlight-current-blue fragment-index=4};
+      [w~2~(B)]{.fragment .highlight-current-blue fragment-index=3};
+      [[w~3~(C)]{.fragment .highlight-current-blue fragment-index=5}]{.fragment .highlight-current-blue fragment-index=6};
+      [[w~4~(C)]{.fragment .highlight-current-blue fragment-index=5}]{.fragment .highlight-current-blue fragment-index=7};
+      [[r~1~(C)]{.fragment .highlight-current-blue fragment-index=6}]{.fragment .highlight-current-blue fragment-index=7}
 
 ::::: {.columns}
 :::: {.column width="50%"}
@@ -138,7 +158,13 @@ format:
 ## More Examples
 
 - Determine if the following are conflict serializable:
-    - r~1~(A); w~3~(A); w~4~(A); w~2~(B); r~2~(B); r~1~(B); r~4~(B)
+    - [[r~1~(A)]{.fragment .highlight-current-blue fragment-index=1}]{.fragment .highlight-current-blue fragment-index=2};
+      [[w~3~(A)]{.fragment .highlight-current-blue fragment-index=1}]{.fragment .highlight-current-blue fragment-index=3};
+      [[w~4~(A)]{.fragment .highlight-current-blue fragment-index=2}]{.fragment .highlight-current-blue fragment-index=3};
+      [[w~2~(B)]{.fragment .highlight-current-blue fragment-index=4}]{.fragment .highlight-current-blue fragment-index=5};
+      r~2~(B);
+      [r~1~(B)]{.fragment .highlight-current-blue fragment-index=4};
+      [r~4~(B)]{.fragment .highlight-current-blue fragment-index=5}
 
 ::::: {.columns}
 :::: {.column width="50%"}
@@ -181,7 +207,15 @@ format:
 ## Is This Schedule Conflict Serializable?
 
 - Draw the precedence graph to find out!
-    - w~1~(A); r~2~(B); r~2~(A); r~4~(A); w~2~(B); r~4~(B); w~4~(C); r~3~(D); w~3~(C)
+    - [[w~1~(A)]{.fragment .highlight-current-blue fragment-index=1}]{.fragment .highlight-current-blue fragment-index=2};
+      r~2~(B);
+      [r~2~(A)]{.fragment .highlight-current-blue fragment-index=1};
+      [r~4~(A)]{.fragment .highlight-current-blue fragment-index=2};
+      [w~2~(B)]{.fragment .highlight-current-blue fragment-index=3};
+      [r~4~(B)]{.fragment .highlight-current-blue fragment-index=3};
+      [w~4~(C)]{.fragment .highlight-current-blue fragment-index=4};
+      r~3~(D);
+      [w~3~(C)]{.fragment .highlight-current-blue fragment-index=4}
 
 ::::: {.columns}
 :::: {.column width="48%"}
@@ -320,11 +354,21 @@ w~4~(C) … w~3~(C)&nbsp; means T4 → T3
     - in SQL: ROLLBACK WORK *or* ROLLBACK
 :::
 
+## Interaction of Isolation and Durability
+
+- Durability is the ability of the system to ensure that committed transactions are permanently recorded and cannot be lost or corrupted.
+
+- This is achieved by writing the data to a durable storage medium, such as a hard disk or solid-state drive.
+
+- The system must ensure that every committed transaction is durable and every aborted or rolled back transaction has no effect.
+
+- This can interact with isolation. 
+
 ## Recoverability
 
 ::::: {.columns}
 :::: {.column width="66%"}
-- While serializability is important, it isn't enough for full isolation.
+- While serializability is important, it isn't enough for full isolation when we take into account durability.
 
 - Consider the serializable schedule at right.
     - includes "c" actions that indicate when the transactions commit
@@ -498,6 +542,8 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
     - each record
     - possibly even each collection
 
+![](images/L11-Txns2/lock-concept.svg){.nostretch width="94%" fig-align="center" fig-alt="Each database element has its own lock. Element A is locked by transaction T1, which can read and write A. Transaction T2 also wants A and must wait for the lock. Element B is unlocked."}
+
 ## Locking Basics
 
 ::::: {.columns}
@@ -536,6 +582,8 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 
 ![](images/L11-Txns2/locking-5.png){.fragment fragment-index=4 width="100%"}
 :::
+
+{{< include _includes/L11-lock-steps.html >}}
 ::::
 :::::
 
@@ -551,6 +599,12 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 ![](images/L11-Txns2/lockser-2.png){.fragment width="60%"}
 
 ![](images/L11-Txns2/lockser-3.png){.fragment width="60%"}
+:::
+
+::: {.fragment}
+- The problem is that T1 released its lock on `bal1` "too soon".
+
+- Notice that T1 acquired a lock on `bal2` later; this suggests that the transaction was not "done" when it released the lock on `bal1`.
 :::
 
 ## Two-Phase Locking (2PL)
@@ -594,23 +648,27 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 
 - Consider schedules involving only two transactions. To get one that is ***not*** conflict serializable, we need:
 
+::: {style="margin-left: 1.25em"}
 1) at least one conflict that requires T1 → T2
+:::
 
-::: {.fragment .sub fragment-index=1}
+::: {.fragment .sub fragment-index=1 style="margin-left: 2em"}
 - T1 operates first on the data item in this conflict
 :::
 
-::: {.fragment .sub fragment-index=2}
+::: {.fragment .sub fragment-index=2 style="margin-left: 2em"}
 - T1 must unlock it before T2 can lock it: &nbsp;[u~1~(A) .. l~2~(A)]{style="color:#0000ff;"}
 :::
 
-2) at least one conflict that requires T2 → T1
+::: {style="margin-left: 1.25em"}
+  2) at least one conflict that requires T2 → T1
+:::
 
-::: {.fragment .sub fragment-index=3}
+::: {.fragment .sub fragment-index=3 style="margin-left: 2em"}
 - T2 operates first on the data item in this conflict
 :::
 
-::: {.fragment .sub fragment-index=4}
+::: {.fragment .sub fragment-index=4 style="margin-left: 2em"}
 - T2 must unlock it before T1 can lock it: &nbsp;[u~2~(B) .. l~1~(B)]{style="color:#c00;"}
 :::
 
@@ -632,10 +690,24 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 
 ## Extra Practice
 
-- Is the schedule at right: &emsp;[*(page 202)*]{style="font-size:0.7em; color:#666;"}
-
 ::::: {.columns}
-:::: {.column width="55%"}
+:::: {.column width="43%"}
+![](images/L11-Txns2/practice2-table.png){width="42%" fig-align="center"}
+
+::: {.r-stack}
+![](images/L11-Txns2/practice2-matrix-1.png){.fragment fragment-index=4 width="100%"}
+
+![](images/L11-Txns2/practice2-matrix-2.png){.fragment fragment-index=7 width="100%"}
+
+![](images/L11-Txns2/practice2-matrix-3.png){.fragment fragment-index=8 width="100%"}
+
+![](images/L11-Txns2/practice2-matrix-4.png){.fragment fragment-index=9 width="100%"}
+:::
+::::
+
+:::: {.column .tight width="57%"}
+- Is the schedule at left: <!--- &emsp;[*(page 202)*]{style="font-size:0.7em; color:#666;"} -->
+
 - conflict serializable?
 
 ::: {.fragment .sub fragment-index=1}
@@ -664,20 +736,6 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 
 ::: {.fragment .sub fragment-index=6}
 - [no, because of dirty read. if T1 is rolled back after T2 reads A, T2 must be, too!]{style="color:#0000ff;"}
-:::
-::::
-
-:::: {.column width="45%"}
-![](images/L11-Txns2/practice2-table.png){width="40%" fig-align="center"}
-
-::: {.r-stack}
-![](images/L11-Txns2/practice2-matrix-1.png){.fragment fragment-index=4 width="90%"}
-
-![](images/L11-Txns2/practice2-matrix-2.png){.fragment fragment-index=7 width="90%"}
-
-![](images/L11-Txns2/practice2-matrix-3.png){.fragment fragment-index=8 width="90%"}
-
-![](images/L11-Txns2/practice2-matrix-4.png){.fragment fragment-index=9 width="90%"}
 :::
 ::::
 :::::

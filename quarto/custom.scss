@@ -70,6 +70,14 @@ $presentation-h2-font-size: 1.6em;
 .reveal .set-e { color: #cc6600; }   // E — orange
 
 .reveal .fragment.highlight-blue.visible { color: #3a5fcd; }
+// Highlight that lasts only while its fragment step is the current one, in
+// the blue of the arrow being added to the graph (reveal's default is a
+// lighter #1b91ff). An operation that belongs to several steps is wrapped in
+// one such span per step (used by the precedence-graph examples in
+// L11-Txns2.qmd).
+.reveal .slides section .fragment.highlight-current-blue.current-fragment {
+  color: #0000ff;
+}
 // Sub-bullet continuation revealed as its own fragment: keep the
 // second-level indent and bullet style at normal font size
 // (used by L03-RA-SQL.qmd; additive, no effect on other decks).
@@ -79,6 +87,14 @@ $presentation-h2-font-size: 1.6em;
 }
 .reveal .sub ul {
   list-style-type: "– ";
+}
+
+// Long run of question / answer bullets that has to fit one slide: drop the
+// gap reveal leaves after every list, keeping the per-item spacing
+// (used by L11-Txns2.qmd, the closing "Extra Practice"). The ".slide" is
+// needed to outrank the ".reveal .slide ul" rule Quarto inlines in each deck.
+.reveal .slide .tight ul {
+  margin-bottom: 0;
 }
 
 // Large code block that should fill the slide rather than sit in a

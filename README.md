@@ -18,6 +18,7 @@ quarto/
   _quarto.yml        # project config: render list, navbar, shared revealjs options
   custom.scss        # slide theme overrides
   images/            # figures referenced by the decks
+  _includes/         # raw-HTML fragments (e.g. animations) pulled into decks with {{< include >}}
   _site/             # local build output (generated; not the published site)
 .github/workflows/publish.yml   # CI that renders and publishes the site
 ```
