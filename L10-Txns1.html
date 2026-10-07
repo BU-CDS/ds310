@@ -101,7 +101,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-dc0433d14bc236474b88ea02b4df45c8.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-29952e135c8b1ca24e749628ccb74fd0.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -383,6 +383,283 @@ Data Science 310
 <li>We’ll look more at logging and recovery later in the semester.</li>
 </ul>
 </div>
+</section>
+<section id="why-let-transactions-overlap" class="slide level2">
+<h2>Why Let Transactions Overlap?</h2>
+<!--
+  Shared player for the slide animations in this folder. Include it in a deck
+  once, before the first animation fragment.
+
+  An animation is an <svg class="anim-fig"> whose markup is its final frame,
+  plus a timeline of Web Animations that build up to that frame. The player
+  adds a button at the bottom left of the figure and is the only thing that
+  runs the timeline:
+    - nothing moves until Start is clicked; the button then pauses and
+      resumes the run, and replays it once it has finished
+    - leaving the slide rewinds to the opening frame
+    - a PDF export gets the final frame and no button
+  While running, the svg carries data-state="playing" (otherwise "idle",
+  "paused" or "done"), which fragments can use in their own CSS.
+-->
+<style>
+.anim-fig {
+  display: block; width: 100%; height: auto; margin: 0 auto;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-user-select: none; user-select: none;
+}
+.anim-fig text { text-anchor: middle; }
+.anim-fig .t1 { --c: #3a5fcd; }   /* T1: blue   (set-b in custom.scss) */
+.anim-fig .t2 { --c: #cc6600; }   /* T2: orange (set-e in custom.scss) */
+
+/* start / pause button */
+.anim-fig .btn { cursor: pointer; }
+.anim-fig .btn rect { fill: #fff; stroke: #888; stroke-width: 2; }
+.anim-fig .btn:hover rect { fill: #f1efe9; }
+.anim-fig .btn path { fill: #444; }
+.anim-fig .btn text { fill: #333; font-size: 22px; }
+.anim-fig[data-state="playing"] .icon-play,
+.anim-fig:not([data-state="playing"]) .icon-pause { display: none; }
+</style>
+
+<script>
+// animPlayer(svg, timeline)
+//   timeline: [[element, keyframes, start, duration, extra options], ...], times in seconds
+window.animPlayer = function (svg, timeline) {
+  // A PDF export keeps the final frame and has no use for the button.
+  if (/print-pdf/.test(location.search)) return;
+
+  // The button is an SVG group, not a <button>, so a click never takes
+  // keyboard focus away from reveal.js.
+  svg.insertAdjacentHTML('beforeend',
+    `<g class="btn" role="button" transform="translate(16 ${svg.viewBox.baseVal.height - 80})">
+       <rect width="150" height="48" rx="24"/>
+       <path class="icon-play" d="M22,13 l19,11 l-19,11 z"/>
+       <path class="icon-pause" d="M21,14 h7 v20 h-7 z M34,14 h7 v20 h-7 z"/>
+       <text x="92" y="32"></text>
+     </g>`);
+  const btn = svg.querySelector('.btn');
+  const LABEL = { idle: 'Start', playing: 'Pause', paused: 'Resume', done: 'Replay' };
+  const last = timeline.reduce((best, [, , start, dur], i, all) =>
+    start + dur > all[best][2] + all[best][3] ? i : best, 0);
+  let anims = [], state;
+
+  function setState(s) {
+    state = s;
+    svg.dataset.state = s;                 // the CSS picks the icon from this
+    btn.querySelector('text').textContent = LABEL[s];
+    btn.setAttribute('aria-label', LABEL[s] + ' animation');
+  }
+  // (Re)build every animation, held on its first frame.
+  function load() {
+    anims.forEach(a => a.cancel());
+    anims = timeline.map(([el, frames, start, dur, opts]) => {
+      const a = el.animate(frames, { delay: start * 1000, duration: dur * 1000, fill: 'both', ...opts });
+      a.pause();
+      return a;
+    });
+    anims[last].onfinish = () => setState('done');
+    setState('idle');
+  }
+  // Only touch animations still in flight: play() on a finished one would rewind it.
+  function pause() {
+    anims.forEach(a => { if (a.playState === 'running') a.pause(); });
+    setState('paused');
+  }
+  function resume() {
+    anims.forEach(a => { if (a.playState === 'paused') a.play(); });
+    setState('playing');
+  }
+
+  load();
+  btn.addEventListener('click', () => {
+    if (state === 'playing') return pause();
+    if (state === 'done') load();
+    resume();
+  });
+  // Rewind when reveal.js moves off this slide (it marks the current one "present").
+  const slide = svg.closest('section');
+  if (slide) {
+    new MutationObserver(() => {
+      if (!slide.classList.contains('present') && state !== 'idle') load();
+    }).observe(slide, { attributes: true, attributeFilter: ['class'] });
+  }
+};
+</script>
+<!--
+  Motivation animation for L10 (included by L10-Txns1.qmd, before "Isolation"):
+  why let transactions overlap in time at all?
+
+  Two transactions each need one slow disk read followed by a little CPU work.
+  T2 arrives one time unit after T1. Both panels run on the same clock:
+    Serial       T2 may not start until T1 has finished      -> done at t = 10
+    Interleaved  T2 starts while T1 is waiting for the disk  -> done at t = 6
+  The disk waits overlap; the CPU work never does.
+
+  Playback (Start / Pause button, rewind on leaving the slide, final frame in
+  a PDF export) comes from anim-player.html, which the deck includes first.
+  To change the story, edit PANELS below.
+-->
+<style>
+/* time axis and the sweeping "now" line */
+#ovl-anim .axis, #ovl-anim .tick { stroke: #888; stroke-width: 2.5; }
+#ovl-anim .axis-tip { fill: #888; }
+#ovl-anim .tick-num { fill: #777; font-size: 18px; text-anchor: end; }
+#ovl-anim .axis-label { fill: #777; font-size: 21px; font-style: italic; }
+#ovl-anim .now { opacity: 0; }
+#ovl-anim .now path { stroke: #7c1717; stroke-width: 2.5; }
+#ovl-anim .now circle { fill: #7c1717; }
+
+/* the two panels */
+#ovl-anim .frame { fill: none; stroke: #cfcabd; stroke-width: 2; }
+#ovl-anim .title { fill: #000; font-size: 28px; font-weight: 700; }
+#ovl-anim .subtitle { fill: #555; font-size: 20px; }
+#ovl-anim .col { fill: var(--c); font-size: 26px; font-weight: 700; }
+
+/* what a transaction is doing */
+#ovl-anim .block.disk { fill: var(--c); fill-opacity: 0.16; stroke: var(--c); stroke-width: 2.5; }
+#ovl-anim .block.cpu { fill: var(--c); }
+#ovl-anim .block.blocked { stroke: #999; stroke-width: 2; stroke-dasharray: 6 5; }
+#ovl-anim .label .name { fill: var(--c); font-size: 24px; font-weight: 700; }
+#ovl-anim .label .what { fill: #555; font-size: 18px; font-style: italic; }
+#ovl-anim .label.cpu text { fill: #fff; font-size: 22px; font-weight: 700; }
+#ovl-anim .label.blocked text { fill: #666; font-size: 20px; font-style: italic; }
+
+/* hides whatever has not happened yet; shrinks away downward as time passes */
+#ovl-anim .cover {
+  fill: #fff; transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(0);
+}
+
+/* results */
+#ovl-anim .done path { stroke: #222; stroke-width: 3; }
+#ovl-anim .done text { fill: #222; font-size: 22px; font-weight: 700; }
+#ovl-anim .note path { fill: none; stroke: #555; stroke-width: 2.5; }
+#ovl-anim .note text { fill: #444; font-size: 20px; font-style: italic; text-anchor: start; }
+#ovl-anim .note.saved path { stroke: #1a8a1a; }
+#ovl-anim .note.saved text { fill: #1a8a1a; font-size: 22px; font-style: normal; font-weight: 700; }
+</style>
+
+<svg id="ovl-anim" class="anim-fig" viewbox="0 0 1200 700" role="img" aria-label="Animation comparing two ways to run transactions T1 and T2, each of which waits 4 time units for a disk read and then computes for 1. Serial: T2 waits for T1 to finish, and both are done at time 10. Interleaved: T2 starts while T1 waits for the disk, the two disk reads overlap, and both are done at time 6."></svg>
+
+<script>
+(function () {
+  const svg = document.getElementById('ovl-anim');
+
+  // ---- What to show: what each transaction is doing when, in time units ----
+  //   disk = waiting for a disk read, cpu = computing, blocked = not allowed to start
+  const PANELS = [
+    { title: 'Serial', sub: 'one transaction at a time', left: 90, done: 10,
+      blocks: [
+        { txn: 1, kind: 'disk', from: 0, to: 4, item: 'A' },
+        { txn: 1, kind: 'cpu', from: 4, to: 5 },
+        { txn: 2, kind: 'blocked', from: 1, to: 5, on: 1 },
+        { txn: 2, kind: 'disk', from: 5, to: 9, item: 'B' },
+        { txn: 2, kind: 'cpu', from: 9, to: 10 },
+      ] },
+    { title: 'Interleaved', sub: 'transactions may overlap', left: 560, done: 6,
+      blocks: [
+        { txn: 1, kind: 'disk', from: 0, to: 4, item: 'A' },
+        { txn: 1, kind: 'cpu', from: 4, to: 5 },
+        { txn: 2, kind: 'disk', from: 1, to: 5, item: 'B' },
+        { txn: 2, kind: 'cpu', from: 5, to: 6 },
+      ] },
+  ];
+  const OVERLAP = [1, 4];                 // interleaved: both disk reads are in progress
+  const [SLOW, FAST] = PANELS.map(p => p.done);
+  const SPAN = Math.max(SLOW, FAST);      // length of the time axis
+
+  // ---- Layout, in SVG units (the viewBox is 1200 x 700) ----
+  const TOP = 126, U = 44;                // y of t = 0; height of one time unit
+  const PANEL_W = 420, W = 170;           // panel and block widths
+  const NOTE_X = 1000;                    // annotations sit right of the second panel
+  const y = t => TOP + t * U;
+  const colX = (p, txn) => p.left + (txn === 1 ? 110 : 310);
+
+  // ---- Timing, in seconds ----
+  const T_START = 0.4;                    // the clock starts
+  const T_UNIT = 1.25;                    // one time unit
+  const at = t => T_START + t * T_UNIT;
+
+  // ---- Draw the final frame ----
+  const sub = n => `<tspan dy="7" font-size="70%">${n}</tspan>`;
+  const midY = (a, b) => (y(a) + y(b)) / 2;
+  let blocks = '', frames = '';
+
+  for (const p of PANELS) {
+    const cx = p.left + PANEL_W / 2;
+    frames += `<rect class="frame" x="${p.left}" y="6" width="${PANEL_W}" height="600" rx="14"/>
+          <text class="title" x="${cx}" y="40">${p.title}</text>
+          <text class="subtitle" x="${cx}" y="68">${p.sub}</text>
+          <text class="col t1" x="${colX(p, 1)}" y="110">T${sub(1)}</text>
+          <text class="col t2" x="${colX(p, 2)}" y="110">T${sub(2)}</text>
+          <g class="done">
+            <path d="M${p.left + 25},${y(p.done)} H${p.left + PANEL_W - 25}"/>
+            <text x="${cx}" y="${y(p.done) + 28}">done at t = ${p.done}</text>
+          </g>`;
+    for (const b of p.blocks) {
+      const x = colX(p, b.txn), y0 = y(b.from);
+      blocks += `<rect class="block ${b.kind} t${b.txn}" x="${x - W / 2}" y="${y0 + 1.5}" width="${W}"
+            height="${(b.to - b.from) * U - 3}" rx="8"${b.kind === 'blocked' ? ' fill="url(#ovl-hatch)"' : ''}/>`;
+      const text = {
+        disk: `<text class="name" x="${x}" y="${y0 + 34}">read ${b.item}</text>
+               <text class="what" x="${x}" y="${y0 + 60}">waiting for disk</text>`,
+        cpu: `<text x="${x}" y="${y0 + U / 2 + 8}">compute</text>`,
+        blocked: `<text x="${x}" y="${y0 + 34}">waiting for T${sub(b.on)}</text>`,
+      }[b.kind];
+      blocks += `<g class="label ${b.kind} t${b.txn}">${text}</g>`;
+    }
+  }
+
+  const bracket = (a, b) => `M${NOTE_X - 8},${y(a) + 4} h8 V${y(b) - 4} h-8`;
+  let h = `<defs>
+        <pattern id="ovl-hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <rect width="10" height="10" fill="#f5f5f5"/><rect width="4" height="10" fill="#dcdcdc"/>
+        </pattern>
+      </defs>
+      <path class="axis" d="M56,${y(0)} V${y(SPAN)}"/>
+      <path class="axis-tip" d="M56,${y(SPAN) + 14} l-7,-14 h14 z"/>
+      <text class="axis-label" x="16" y="${midY(0, SPAN)}" transform="rotate(-90 16 ${midY(0, SPAN)})">time</text>`;
+  for (let t = 0; t <= SPAN; t++) {
+    h += `<path class="tick" d="M49,${y(t)} h7"/>`;
+    if (t % 2 === 0) h += `<text class="tick-num" x="43" y="${y(t) + 6}">${t}</text>`;
+  }
+  h += blocks
+    + `<rect class="cover" x="96" y="${y(0) - 2}" width="878" height="${SPAN * U + 4}"/>`
+    + frames
+    + `<g class="note overlap">
+        <path d="${bracket(...OVERLAP)}"/>
+        <text x="${NOTE_X + 12}" y="${midY(...OVERLAP) - 6}">both disk reads</text>
+        <text x="${NOTE_X + 12}" y="${midY(...OVERLAP) + 18}">in progress</text>
+      </g>
+      <g class="note saved">
+        <path d="${bracket(FAST, SLOW)}"/>
+        <text x="${NOTE_X + 12}" y="${midY(FAST, SLOW) - 6}">${SLOW - FAST} time units</text>
+        <text x="${NOTE_X + 12}" y="${midY(FAST, SLOW) + 20}">saved</text>
+      </g>
+      <g class="now"><path d="M56,${y(0)} H984"/><circle cx="56" cy="${y(0)}" r="5"/></g>`;
+  svg.innerHTML = h;
+
+  // ---- Timeline: [element, keyframes, start, duration, extra options] ----
+  const $ = sel => svg.querySelector(sel);
+  const $$ = sel => svg.querySelectorAll(sel);
+  const timeline = [];
+  const add = (el, frames, start, dur, opts) => timeline.push([el, frames, start, dur, opts]);
+  const fadeIn = [{ opacity: 0 }, { opacity: 1 }];
+
+  // one clock for both panels: the "now" line sweeps down and uncovers what has happened
+  const run = SPAN * T_UNIT;
+  add($('.cover'), [{ transform: 'scaleY(1)' }, { transform: 'scaleY(0)' }], T_START, run);
+  add($('.now'), [{ transform: 'translateY(0)' }, { transform: `translateY(${SPAN * U}px)` }], T_START, run);
+  add($('.now'), [{ opacity: 0 }, { opacity: 1, offset: 0.03 }, { opacity: 1, offset: 0.97 }, { opacity: 0 }],
+    T_START - 0.3, run + 0.6);
+
+  // each panel is marked as it finishes
+  $$('.done').forEach((el, i) => add(el, fadeIn, at(PANELS[i].done), 0.3));
+  add($('.overlap'), fadeIn, at(OVERLAP[0]) + 0.6, 0.4);
+  add($('.saved'), fadeIn, at(SPAN) + 0.5, 0.5);
+
+  animPlayer(svg, timeline);
+})();
+</script>
 </section>
 <section id="isolation" class="slide level2">
 <h2>Isolation</h2>

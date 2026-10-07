@@ -35,7 +35,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-dc0433d14bc236474b88ea02b4df45c8.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-29952e135c8b1ca24e749628ccb74fd0.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -150,6 +150,314 @@ Data Science 310
 </div>
 
 </section>
+<section id="two-transactions-running-concurrently" class="slide level2">
+<h2>Two Transactions, Running Concurrently</h2>
+<!--
+  Shared player for the slide animations in this folder. Include it in a deck
+  once, before the first animation fragment.
+
+  An animation is an <svg class="anim-fig"> whose markup is its final frame,
+  plus a timeline of Web Animations that build up to that frame. The player
+  adds a button at the bottom left of the figure and is the only thing that
+  runs the timeline:
+    - nothing moves until Start is clicked; the button then pauses and
+      resumes the run, and replays it once it has finished
+    - leaving the slide rewinds to the opening frame
+    - a PDF export gets the final frame and no button
+  While running, the svg carries data-state="playing" (otherwise "idle",
+  "paused" or "done"), which fragments can use in their own CSS.
+-->
+<style>
+.anim-fig {
+  display: block; width: 100%; height: auto; margin: 0 auto;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-user-select: none; user-select: none;
+}
+.anim-fig text { text-anchor: middle; }
+.anim-fig .t1 { --c: #3a5fcd; }   /* T1: blue   (set-b in custom.scss) */
+.anim-fig .t2 { --c: #cc6600; }   /* T2: orange (set-e in custom.scss) */
+
+/* start / pause button */
+.anim-fig .btn { cursor: pointer; }
+.anim-fig .btn rect { fill: #fff; stroke: #888; stroke-width: 2; }
+.anim-fig .btn:hover rect { fill: #f1efe9; }
+.anim-fig .btn path { fill: #444; }
+.anim-fig .btn text { fill: #333; font-size: 22px; }
+.anim-fig[data-state="playing"] .icon-play,
+.anim-fig:not([data-state="playing"]) .icon-pause { display: none; }
+</style>
+
+<script>
+// animPlayer(svg, timeline)
+//   timeline: [[element, keyframes, start, duration, extra options], ...], times in seconds
+window.animPlayer = function (svg, timeline) {
+  // A PDF export keeps the final frame and has no use for the button.
+  if (/print-pdf/.test(location.search)) return;
+
+  // The button is an SVG group, not a <button>, so a click never takes
+  // keyboard focus away from reveal.js.
+  svg.insertAdjacentHTML('beforeend',
+    `<g class="btn" role="button" transform="translate(16 ${svg.viewBox.baseVal.height - 80})">
+       <rect width="150" height="48" rx="24"/>
+       <path class="icon-play" d="M22,13 l19,11 l-19,11 z"/>
+       <path class="icon-pause" d="M21,14 h7 v20 h-7 z M34,14 h7 v20 h-7 z"/>
+       <text x="92" y="32"></text>
+     </g>`);
+  const btn = svg.querySelector('.btn');
+  const LABEL = { idle: 'Start', playing: 'Pause', paused: 'Resume', done: 'Replay' };
+  const last = timeline.reduce((best, [, , start, dur], i, all) =>
+    start + dur > all[best][2] + all[best][3] ? i : best, 0);
+  let anims = [], state;
+
+  function setState(s) {
+    state = s;
+    svg.dataset.state = s;                 // the CSS picks the icon from this
+    btn.querySelector('text').textContent = LABEL[s];
+    btn.setAttribute('aria-label', LABEL[s] + ' animation');
+  }
+  // (Re)build every animation, held on its first frame.
+  function load() {
+    anims.forEach(a => a.cancel());
+    anims = timeline.map(([el, frames, start, dur, opts]) => {
+      const a = el.animate(frames, { delay: start * 1000, duration: dur * 1000, fill: 'both', ...opts });
+      a.pause();
+      return a;
+    });
+    anims[last].onfinish = () => setState('done');
+    setState('idle');
+  }
+  // Only touch animations still in flight: play() on a finished one would rewind it.
+  function pause() {
+    anims.forEach(a => { if (a.playState === 'running') a.pause(); });
+    setState('paused');
+  }
+  function resume() {
+    anims.forEach(a => { if (a.playState === 'paused') a.play(); });
+    setState('playing');
+  }
+
+  load();
+  btn.addEventListener('click', () => {
+    if (state === 'playing') return pause();
+    if (state === 'done') load();
+    resume();
+  });
+  // Rewind when reveal.js moves off this slide (it marks the current one "present").
+  const slide = svg.closest('section');
+  if (slide) {
+    new MutationObserver(() => {
+      if (!slide.classList.contains('present') && state !== 'idle') load();
+    }).observe(slide, { attributes: true, attributeFilter: ['class'] });
+  }
+};
+</script>
+<!--
+  Opening animation for L11 (included by L11-Txns2.qmd).
+
+  Two processes each run a transaction against one shared database, at the
+  same time. Their operations interleave into the schedule that the next
+  slide recaps:  r1(A); r2(B); w1(A); r2(A); w2(A).
+
+  Playback (Start / Pause button, rewind on leaving the slide, final frame in
+  a PDF export) comes from anim-player.html, which the deck includes first.
+  To change the schedule, edit OPS below.
+-->
+<style>
+/* shared time axis and the data items' timelines */
+#ctx-anim .item-line { stroke: #999; stroke-width: 2; stroke-dasharray: 5 7; }
+#ctx-anim .axis { stroke: #888; stroke-width: 2.5; }
+#ctx-anim .axis-tip { fill: #888; }
+#ctx-anim .axis-label { fill: #777; font-size: 21px; font-style: italic; }
+
+/* database */
+#ctx-anim .db-body, #ctx-anim .db-top { stroke: #555; stroke-width: 2.5; }
+#ctx-anim .db-body { fill: #eeece6; }
+#ctx-anim .db-top { fill: #f8f7f3; }
+#ctx-anim .db-label { fill: #444; font-size: 22px; }
+#ctx-anim .item { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#ctx-anim .item-name { fill: #000; font-size: 28px; font-weight: 500; }
+#ctx-anim .flash { opacity: 0; fill: var(--c); stroke: var(--c); stroke-width: 6; }
+#ctx-anim .flash.r { fill-opacity: 0.15; }
+#ctx-anim .flash.w { fill-opacity: 0.7; }
+
+/* processes and their timelines */
+#ctx-anim .proc rect { fill: var(--c); fill-opacity: 0.1; stroke: var(--c); stroke-width: 3; }
+#ctx-anim .proc-name { fill: var(--c); font-size: 30px; font-weight: 700; }
+#ctx-anim .proc-does { fill: #333; font-size: 22px; }
+#ctx-anim .life { stroke: var(--c); stroke-width: 8; stroke-dasharray: 1; }
+#ctx-anim .head { opacity: 0; }
+#ctx-anim .head circle { fill: var(--c); }
+#ctx-anim .head .ring {
+  fill: none; stroke: var(--c); stroke-width: 3; stroke-dasharray: 22 9.4;
+  transform-box: fill-box; transform-origin: center;
+  animation: ctx-spin 1.4s linear infinite;
+}
+@keyframes ctx-spin { to { transform: rotate(360deg); } }
+#ctx-anim:not([data-state="playing"]) .ring { animation-play-state: paused; }
+
+/* one read or write */
+#ctx-anim .chip { transform-box: fill-box; transform-origin: center; }
+#ctx-anim .chip rect { fill: #fff; stroke: var(--c); stroke-width: 3; }
+#ctx-anim .chip text { fill: var(--c); font-size: 30px; font-weight: 500; }
+#ctx-anim .flow { stroke: var(--c); stroke-width: 3; stroke-dasharray: 1; }
+#ctx-anim .flow-tip { fill: var(--c); }
+#ctx-anim .mark { stroke: var(--c); stroke-width: 3; }
+#ctx-anim .mark.r { fill: #fff; }
+#ctx-anim .mark.w { fill: var(--c); }
+#ctx-anim .verb { fill: var(--c); font-size: 20px; font-style: italic; }
+
+/* resulting schedule */
+#ctx-anim .sched-box { fill: #f6f4ee; stroke: #cfcabd; stroke-width: 2; }
+#ctx-anim .sched-label { fill: #333; font-size: 28px; }
+#ctx-anim .tok { fill: var(--c); font-size: 32px; font-weight: 500; }
+</style>
+
+<svg id="ctx-anim" class="anim-fig" viewbox="0 0 1200 700" role="img" aria-label="Animation: Process 1 runs transaction T1 (read A, write A) while Process 2 runs transaction T2 (read B, read A, write A) against the same database. Their operations interleave to give the schedule r1(A); r2(B); w1(A); r2(A); w2(A)."></svg>
+
+<script>
+(function () {
+  const svg = document.getElementById('ctx-anim');
+
+  // ---- What to show: the schedule from the next slide, in time order ----
+  const OPS = [
+    { txn: 1, op: 'r', item: 'A' },
+    { txn: 2, op: 'r', item: 'B' },
+    { txn: 1, op: 'w', item: 'A' },
+    { txn: 2, op: 'r', item: 'A' },
+    { txn: 2, op: 'w', item: 'A' },
+  ];
+
+  // ---- Layout, in SVG units (the viewBox is 1200 x 700) ----
+  const LANE = { 1: 230, 2: 970 };        // x of each process's timeline
+  const ITEM = { A: 555, B: 645 };        // x of each data item's timeline
+  const TOP = 110, ROW0 = 180, ROW = 80;  // timelines start at TOP; one row per operation
+  const END = ROW0 + (OPS.length - 1) * ROW + 60;
+  const SCHED_Y = 655, TOK0 = 440, TOK = 125;
+  const rowY = i => ROW0 + i * ROW;
+  const tokX = i => TOK0 + i * TOK;
+
+  // ---- Timing, in seconds ----
+  const T_START = 0.4;                    // both processes start running
+  const T_ROW = 2.0;                      // gap between consecutive operations
+  const at = y => T_START + (y - TOP) * T_ROW / ROW;   // when the timelines reach y
+  const T_END = at(END);
+
+  // ---- Draw the final frame ----
+  const sub = n => `<tspan dy="7" font-size="70%">${n}</tspan>`;
+  const midY = (150 + END) / 2;
+  let h = '';
+
+  h += `<g class="guides">`;
+  for (const x of Object.values(ITEM)) h += `<path class="item-line" d="M${x},112 V${END + 10}"/>`;
+  h += `<path class="axis" d="M40,150 V${END}"/>
+        <path class="axis-tip" d="M40,${END + 14} l-7,-14 h14 z"/>
+        <text class="axis-label" x="26" y="${midY}" transform="rotate(-90 26 ${midY})">time</text>
+      </g>`;
+
+  h += `<g class="db">
+        <path class="db-body" d="M475,22 V112 a125,14 0 0 0 250,0 V22"/>
+        <ellipse class="db-top" cx="600" cy="22" rx="125" ry="14"/>
+        <text class="db-label" x="600" y="61">Database</text>`;
+  for (const [name, x] of Object.entries(ITEM)) {
+    const box = `x="${x - 28}" y="70" width="56" height="42" rx="6"`;
+    h += `<rect class="item" ${box}/>`;
+    OPS.forEach((o, i) => {
+      if (o.item === name) h += `<rect class="flash ${o.op} t${o.txn}" data-op="${i}" ${box}/>`;
+    });
+    h += `<text class="item-name" x="${x}" y="101">${name}</text>`;
+  }
+  h += `</g>`;
+
+  for (const t of [1, 2]) {
+    const x = LANE[t];
+    h += `<g class="proc t${t}">
+          <rect x="${x - 150}" y="14" width="300" height="96" rx="14"/>
+          <text class="proc-name" x="${x}" y="54">Process ${t}</text>
+          <text class="proc-does" x="${x}" y="90">running transaction T${sub(t)}</text>
+        </g>
+        <path class="life t${t}" pathLength="1" d="M${x},${TOP} V${END}"/>
+        <g class="head t${t}">
+          <circle cx="${x}" cy="${TOP}" r="13"/>
+          <circle class="ring" cx="${x}" cy="${TOP}" r="20"/>
+        </g>`;
+  }
+
+  OPS.forEach((o, i) => {
+    const y = rowY(i), lane = LANE[o.txn], item = ITEM[o.item];
+    const side = Math.sign(lane - item);             // +1 if the process is right of the item
+    const pEnd = lane - side * 60, dEnd = item + side * 9;
+    // arrows follow the data: a read flows to the process, a write to the database
+    const [from, tip] = o.op === 'r' ? [dEnd, pEnd] : [pEnd, dEnd];
+    const dir = Math.sign(tip - from);
+    h += `<g class="op t${o.txn}" data-op="${i}">
+          <path class="flow" pathLength="1" d="M${from},${y} H${tip - dir * 12}"/>
+          <path class="flow-tip" d="M${tip},${y} l${-dir * 15},-7.5 v15 z"/>
+          <circle class="mark ${o.op}" cx="${item}" cy="${y}" r="7"/>
+          <text class="verb" x="${pEnd - side * 90}" y="${y - 11}">${o.op === 'r' ? 'read' : 'write'}</text>
+          <g class="chip">
+            <rect x="${lane - 55}" y="${y - 23}" width="110" height="46" rx="10"/>
+            <text x="${lane}" y="${y + 10.5}">${o.op}(${o.item})</text>
+          </g>
+        </g>`;
+  });
+
+  h += `<g class="sched">
+        <rect class="sched-box" x="190" y="606" width="820" height="76" rx="12"/>
+        <text class="sched-label" x="275" y="${SCHED_Y}">Schedule:</text>
+      </g>`;
+  OPS.forEach((o, i) => {
+    const sep = i < OPS.length - 1 ? ';' : '';
+    h += `<text class="tok t${o.txn}" data-op="${i}" x="${tokX(i)}" y="${SCHED_Y}">${o.op}${sub(o.txn)}<tspan dy="-7">(${o.item})${sep}</tspan></text>`;
+  });
+  svg.innerHTML = h;
+
+  // ---- Timeline: [element, keyframes, start, duration, extra options] ----
+  const $ = sel => svg.querySelector(sel);
+  const $$ = sel => svg.querySelectorAll(sel);
+  const timeline = [];
+  const add = (el, frames, start, dur, opts) => timeline.push([el, frames, start, dur, opts]);
+  const fadeIn = [{ opacity: 0 }, { opacity: 1 }];
+  const draw = [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }];
+
+  // both processes run, side by side, for the whole stretch
+  const run = T_END - T_START;
+  $$('.life').forEach(el => add(el, draw, T_START, run));
+  $$('.head').forEach(el => {
+    add(el, [{ transform: 'translateY(0)' }, { transform: `translateY(${END - TOP}px)` }], T_START, run);
+    add(el, [{ opacity: 0 }, { opacity: 1, offset: 0.03 }, { opacity: 1, offset: 0.97 }, { opacity: 0 }],
+      T_START - 0.3, run + 0.6);
+  });
+
+  // each operation fires as its process's timeline reaches it
+  OPS.forEach((o, i) => {
+    const t = at(rowY(i)), g = $(`.op[data-op="${i}"]`), read = o.op === 'r';
+    add(g.querySelector('.chip'),
+      [{ opacity: 0, transform: 'scale(0.4)' }, { opacity: 1, transform: 'scale(1)' }],
+      t - 0.1, 0.4, { easing: 'cubic-bezier(.3,1.5,.6,1)' });
+    add(g.querySelector('.verb'), fadeIn, t + 0.2, 0.3);
+    add(g.querySelector('.flow'), draw, t + 0.2, 0.55, { easing: 'ease-in-out' });
+    add(g.querySelector('.flow-tip'), fadeIn, t + 0.7, 0.12);
+    add(g.querySelector('.mark'), fadeIn, read ? t + 0.05 : t + 0.75, 0.15);
+    add($(`.flash[data-op="${i}"]`),
+      [{ opacity: 0 }, { opacity: 1, offset: 0.25 }, { opacity: 0 }],
+      read ? t : t + 0.7, 1.0);
+  });
+
+  // the operations, read off in time order, are the schedule
+  add($('.sched'), fadeIn, T_END + 0.2, 0.4);
+  OPS.forEach((o, i) => {
+    const dx = LANE[o.txn] - tokX(i), dy = rowY(i) + 10 - SCHED_Y;
+    add($(`.tok[data-op="${i}"]`),
+      [{ opacity: 0, transform: `translate(${dx}px, ${dy}px)` },
+       { opacity: 1, offset: 0.25 },
+       { opacity: 1, transform: 'translate(0px, 0px)' }],
+      T_END + 0.6 + i * 0.4, 0.7, { easing: 'ease-in-out' });
+  });
+
+  animPlayer(svg, timeline);
+})();
+</script>
+</section>
 <section id="from-the-last-lecture" class="slide level2">
 <h2>From the last lecture…</h2>
 <ul>
@@ -201,7 +509,7 @@ Data Science 310
 </ul>
 <div class="columns">
 <div class="column" style="width:52%;">
-<p><span class="fragment" data-fragment-index="1">Example:&nbsp; r<sub>2</sub>(A); r<sub>3</sub>(A); r<sub>1</sub>(B); w<sub>4</sub>(A); w<sub>2</sub>(B); r<sub>3</sub>(B)</span></p>
+<p><span class="fragment" data-fragment-index="1">Example:&nbsp; <span class="fragment highlight-current-blue" data-fragment-index="2">r<sub>2</sub>(A)</span>; <span class="fragment highlight-current-blue" data-fragment-index="3">r<sub>3</sub>(A)</span>; <span class="fragment highlight-current-blue" data-fragment-index="4">r<sub>1</sub>(B)</span>; <span class="fragment highlight-current-blue" data-fragment-index="3"><span class="fragment highlight-current-blue" data-fragment-index="2">w<sub>4</sub>(A)</span></span>; <span class="fragment highlight-current-blue" data-fragment-index="5"><span class="fragment highlight-current-blue" data-fragment-index="4">w<sub>2</sub>(B)</span></span>; <span class="fragment highlight-current-blue" data-fragment-index="5">r<sub>3</sub>(B)</span></span></p>
 <p><span class="fragment" data-fragment-index="2">r<sub>2</sub>(A) … w<sub>4</sub>(A)&nbsp; means T2 → T4</span></p>
 <p><span class="fragment" data-fragment-index="3">r<sub>3</sub>(A) … w<sub>4</sub>(A)&nbsp; means T3 → T4</span></p>
 <p><span class="fragment" data-fragment-index="4">r<sub>1</sub>(B) … w<sub>2</sub>(B)&nbsp; means T1 → T2</span></p>
@@ -239,7 +547,7 @@ Data Science 310
 <ul>
 <li>Determine if the following are conflict serializable:
 <ul>
-<li>r<sub>1</sub>(A); r<sub>3</sub>(A); r<sub>1</sub>(B); w<sub>2</sub>(A); r<sub>4</sub>(A); w<sub>2</sub>(B); w<sub>3</sub>(C); w<sub>4</sub>(C); r<sub>1</sub>(C)</li>
+<li><span class="fragment highlight-current-blue" data-fragment-index="1">r<sub>1</sub>(A)</span>; <span class="fragment highlight-current-blue" data-fragment-index="2">r<sub>3</sub>(A)</span>; <span class="fragment highlight-current-blue" data-fragment-index="3">r<sub>1</sub>(B)</span>; <span class="fragment highlight-current-blue" data-fragment-index="4"><span class="fragment highlight-current-blue" data-fragment-index="2"><span class="fragment highlight-current-blue" data-fragment-index="1">w<sub>2</sub>(A)</span></span></span>; <span class="fragment highlight-current-blue" data-fragment-index="4">r<sub>4</sub>(A)</span>; <span class="fragment highlight-current-blue" data-fragment-index="3">w<sub>2</sub>(B)</span>; <span class="fragment highlight-current-blue" data-fragment-index="6"><span class="fragment highlight-current-blue" data-fragment-index="5">w<sub>3</sub>(C)</span></span>; <span class="fragment highlight-current-blue" data-fragment-index="7"><span class="fragment highlight-current-blue" data-fragment-index="5">w<sub>4</sub>(C)</span></span>; <span class="fragment highlight-current-blue" data-fragment-index="7"><span class="fragment highlight-current-blue" data-fragment-index="6">r<sub>1</sub>(C)</span></span></li>
 </ul></li>
 </ul>
 <div class="columns">
@@ -270,7 +578,7 @@ Data Science 310
 <ul>
 <li>Determine if the following are conflict serializable:
 <ul>
-<li>r<sub>1</sub>(A); w<sub>3</sub>(A); w<sub>4</sub>(A); w<sub>2</sub>(B); r<sub>2</sub>(B); r<sub>1</sub>(B); r<sub>4</sub>(B)</li>
+<li><span class="fragment highlight-current-blue" data-fragment-index="2"><span class="fragment highlight-current-blue" data-fragment-index="1">r<sub>1</sub>(A)</span></span>; <span class="fragment highlight-current-blue" data-fragment-index="3"><span class="fragment highlight-current-blue" data-fragment-index="1">w<sub>3</sub>(A)</span></span>; <span class="fragment highlight-current-blue" data-fragment-index="3"><span class="fragment highlight-current-blue" data-fragment-index="2">w<sub>4</sub>(A)</span></span>; <span class="fragment highlight-current-blue" data-fragment-index="5"><span class="fragment highlight-current-blue" data-fragment-index="4">w<sub>2</sub>(B)</span></span>; r<sub>2</sub>(B); <span class="fragment highlight-current-blue" data-fragment-index="4">r<sub>1</sub>(B)</span>; <span class="fragment highlight-current-blue" data-fragment-index="5">r<sub>4</sub>(B)</span></li>
 </ul></li>
 </ul>
 <div class="columns">
@@ -300,7 +608,7 @@ Data Science 310
 <ul>
 <li>Draw the precedence graph to find out!
 <ul>
-<li>w<sub>1</sub>(A); r<sub>2</sub>(B); r<sub>2</sub>(A); r<sub>4</sub>(A); w<sub>2</sub>(B); r<sub>4</sub>(B); w<sub>4</sub>(C); r<sub>3</sub>(D); w<sub>3</sub>(C)</li>
+<li><span class="fragment highlight-current-blue" data-fragment-index="2"><span class="fragment highlight-current-blue" data-fragment-index="1">w<sub>1</sub>(A)</span></span>; r<sub>2</sub>(B); <span class="fragment highlight-current-blue" data-fragment-index="1">r<sub>2</sub>(A)</span>; <span class="fragment highlight-current-blue" data-fragment-index="2">r<sub>4</sub>(A)</span>; <span class="fragment highlight-current-blue" data-fragment-index="3">w<sub>2</sub>(B)</span>; <span class="fragment highlight-current-blue" data-fragment-index="3">r<sub>4</sub>(B)</span>; <span class="fragment highlight-current-blue" data-fragment-index="4">w<sub>4</sub>(C)</span>; r<sub>3</sub>(D); <span class="fragment highlight-current-blue" data-fragment-index="4">w<sub>3</sub>(C)</span></li>
 </ul></li>
 </ul>
 <div class="columns">
@@ -445,12 +753,21 @@ Data Science 310
 </ul>
 </div>
 </section>
+<section id="interaction-of-isolation-and-durability" class="slide level2">
+<h2>Interaction of Isolation and Durability</h2>
+<ul>
+<li><p>Durability is the ability of the system to ensure that committed transactions are permanently recorded and cannot be lost or corrupted.</p></li>
+<li><p>This is achieved by writing the data to a durable storage medium, such as a hard disk or solid-state drive.</p></li>
+<li><p>The system must ensure that every committed transaction is durable and every aborted or rolled back transaction has no effect.</p></li>
+<li><p>This can interact with isolation.</p></li>
+</ul>
+</section>
 <section id="recoverability" class="slide level2">
 <h2>Recoverability</h2>
 <div class="columns">
 <div class="column" style="width:66%;">
 <ul>
-<li><p>While serializability is important, it isn’t enough for full isolation.</p></li>
+<li><p>While serializability is important, it isn’t enough for full isolation when we take into account durability.</p></li>
 <li><p>Consider the serializable schedule at right.</p>
 <ul>
 <li>includes “c” actions that indicate when the transactions commit</li>
@@ -651,6 +968,11 @@ Data Science 310
 <li>possibly even each collection</li>
 </ul></li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L11-Txns2/lock-concept.svg" class="quarto-figure quarto-figure-center" style="width:94.0%" alt="Each database element has its own lock. Element A is locked by transaction T1, which can read and write A. Transaction T2 also wants A and must wait for the lock. Element B is unlocked."></p>
+</figure>
+</div>
 </section>
 <section id="locking-basics" class="slide level2">
 <h2>Locking Basics</h2>
@@ -694,6 +1016,127 @@ Data Science 310
 <p><img data-src="images/L11-Txns2/locking-4.png" class="fragment" style="width:100.0%" data-fragment-index="3"></p>
 <p><img data-src="images/L11-Txns2/locking-5.png" class="fragment" style="width:100.0%" data-fragment-index="4"></p>
 </div>
+<!--
+  Small companion diagram for "Locking Basics" in L11 (included by
+  L11-Txns2.qmd, under the schedule table). Same visual language as
+  images/L11-Txns2/lock-concept.svg on the previous slide, but it follows the
+  slide's fragment steps, showing the state of X's lock after each one:
+
+    start    T1 holds the lock on X                    (l(X); r(X))
+    step 1   T2 requests the lock                      (l(X))
+    step 2   the request is denied; T2 must wait
+    step 3   T1 unlocks X; T2 is still waiting         (w(X); u(X))
+    step 4   the lock is granted to T2                 (l(X) granted; ...)
+
+  No script: each state is a reveal.js fragment whose data-fragment-index
+  matches the step it belongs to (fade-out = shown until that step,
+  fade-in-then-out = shown only during it).
+-->
+<style>
+#lock-steps {
+  display: block; width: 100%; height: auto; margin: 0.9em auto 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#lock-steps text { text-anchor: middle; }
+#lock-steps .t1 { color: #3a5fcd; }    /* T1 blue, T2 orange, as on the previous slide */
+#lock-steps .t2 { color: #cc6600; }
+#lock-steps .free { color: #999; }
+
+#lock-steps .db { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#lock-steps .db-label { fill: #444; font-size: 19px; }
+#lock-steps .item { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#lock-steps .item-name { fill: #000; font-size: 34px; font-weight: 500; }
+#lock-steps .txn rect { fill: currentColor; fill-opacity: 0.1; stroke: currentColor; stroke-width: 3; }
+#lock-steps .txn text { fill: currentColor; font-size: 30px; font-weight: 700; }
+
+#lock-steps .line { fill: none; stroke: currentColor; stroke-width: 4; }
+#lock-steps .tip { fill: currentColor; }
+#lock-steps .stop { stroke: currentColor; stroke-width: 6; stroke-linecap: round; }
+#lock-steps .says { fill: currentColor; font-size: 20px; font-style: italic; }
+#lock-steps .means { fill: #333; font-size: 19px; }
+#lock-steps .state { fill: currentColor; font-size: 19px; font-style: italic; }
+#lock-steps .state.free { fill: #777; }
+
+/* A PDF export shows every fragment at once, so keep only the final state there. */
+.print-pdf #lock-steps .fragment.fade-out,
+.print-pdf #lock-steps .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="lock-steps" viewbox="0 0 720 172" role="img" aria-label="The lock on element X, step by step. At first transaction T1 holds the lock and can access X. Then T2 requests the lock; the request is denied and T2 must wait. T1 unlocks X while T2 is still waiting. Finally the lock is granted to T2, which can now access X.">
+  <!-- Shapes drawn more than once. They are styled with attributes because
+       the stylesheet's "#lock-steps ..." rules do not reach inside <use>;
+       currentColor picks up the colour of whichever group uses them. -->
+  <defs>
+    <g id="ls-locked">
+      <path d="M379,81 V69 a13,13 0 0 1 26,0 V81" fill="none" stroke="currentColor" stroke-width="6"></path>
+      <rect x="370" y="80" width="44" height="34" rx="6" fill="currentColor"></rect>
+      <circle cx="392" cy="93" r="4.5" fill="#fff"></circle><rect x="390" y="93" width="4" height="12" rx="1.5" fill="#fff"></rect>
+    </g>
+    <g id="ls-unlocked">
+      <path d="M379,81 V61 a13,13 0 0 1 26,0 V70" fill="none" stroke="currentColor" stroke-width="6"></path>
+      <rect x="370" y="80" width="44" height="34" rx="6" fill="currentColor"></rect>
+      <circle cx="392" cy="93" r="4.5" fill="#fff"></circle><rect x="390" y="93" width="4" height="12" rx="1.5" fill="#fff"></rect>
+    </g>
+    <!-- T2 reaching for X without holding its lock -->
+    <g id="ls-wants">
+      <path d="M620,82 H464" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="9 7"></path>
+      <path d="M448,82 l16,-8.5 v17 z" fill="currentColor"></path>
+    </g>
+  </defs>
+
+  <!-- always there: the element and the two transactions -->
+  <rect class="db" x="260" y="6" width="200" height="158" rx="14"></rect>
+  <text class="db-label" x="360" y="31">database element</text>
+  <rect class="item" x="295" y="44" width="130" height="76" rx="8"></rect>
+  <text class="item-name" x="332" y="95">X</text>
+  <g class="txn t1"><rect x="8" y="47" width="90" height="70" rx="12"></rect><text x="53" y="93">T<tspan dy="7" font-size="70%">1</tspan></text></g>
+  <g class="txn t2"><rect x="622" y="47" width="90" height="70" rx="12"></rect><text x="667" y="93">T<tspan dy="7" font-size="70%">2</tspan></text></g>
+
+  <!-- until step 3: T1 holds the lock -->
+  <g class="t1 fragment fade-out" data-fragment-index="3">
+    <path class="line" d="M100,82 H282"></path>
+    <path class="tip" d="M295,82 l-16,-8.5 v17 z"></path>
+    <text class="says" x="179" y="66">holds the lock</text>
+    <text class="means" x="179" y="106">can access X</text>
+    <use href="#ls-locked"></use>
+    <text class="state" x="360" y="146">locked by T<tspan dy="5" font-size="70%">1</tspan></text>
+  </g>
+
+  <!-- step 1: T2 asks for the lock -->
+  <g class="t2 fragment fade-in-then-out" data-fragment-index="1">
+    <use href="#ls-wants"></use>
+    <text class="says" x="541" y="66">requests the lock</text>
+  </g>
+
+  <!-- step 2: the request is denied -->
+  <g class="t2 fragment fade-in-then-out" data-fragment-index="2">
+    <use href="#ls-wants"></use>
+    <path class="stop" d="M438,64 V100"></path>
+    <text class="says" x="541" y="66">request denied</text>
+    <text class="means" x="541" y="106">must wait</text>
+  </g>
+
+  <!-- step 3: T1 unlocks X; T2 has not been given the lock yet -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <text class="says t1" x="179" y="88">unlocks X</text>
+    <use class="free" href="#ls-unlocked"></use>
+    <text class="state free" x="360" y="146">unlocked</text>
+    <g class="t2">
+      <use href="#ls-wants"></use>
+      <text class="says" x="541" y="66">still waiting</text>
+    </g>
+  </g>
+
+  <!-- step 4: the lock is granted to T2 -->
+  <g class="t2 fragment" data-fragment-index="4">
+    <path class="line" d="M620,82 H438"></path>
+    <path class="tip" d="M425,82 l16,-8.5 v17 z"></path>
+    <text class="says" x="541" y="66">lock granted</text>
+    <text class="means" x="541" y="106">can access X</text>
+    <use href="#ls-locked"></use>
+    <text class="state" x="360" y="146">locked by T<tspan dy="5" font-size="70%">2</tspan></text>
+  </g>
+</svg>
 </div></div>
 </section>
 <section id="locking-and-serializability" class="slide level2">
@@ -706,6 +1149,12 @@ Data Science 310
 <p><img data-src="images/L11-Txns2/lockser-1.png" style="width:60.0%"></p>
 <p><img data-src="images/L11-Txns2/lockser-2.png" class="fragment" style="width:60.0%"></p>
 <p><img data-src="images/L11-Txns2/lockser-3.png" class="fragment" style="width:60.0%"></p>
+</div>
+<div class="fragment">
+<ul>
+<li><p>The problem is that T1 released its lock on <code>bal1</code> “too soon”.</p></li>
+<li><p>Notice that T1 acquired a lock on <code>bal2</code> later; this suggests that the transaction was not “done” when it released the lock on <code>bal1</code>.</p></li>
+</ul>
 </div>
 </section>
 <section id="two-phase-locking-2pl" class="slide level2">
@@ -762,28 +1211,32 @@ Data Science 310
 <ul>
 <li>Consider schedules involving only two transactions. To get one that is <strong><em>not</em></strong> conflict serializable, we need:</li>
 </ul>
+<div style="margin-left: 1.25em">
 <ol type="1">
 <li>at least one conflict that requires T1 → T2</li>
 </ol>
-<div class="fragment sub" data-fragment-index="1">
+</div>
+<div class="fragment sub" data-fragment-index="1" style="margin-left: 2em">
 <ul>
 <li>T1 operates first on the data item in this conflict</li>
 </ul>
 </div>
-<div class="fragment sub" data-fragment-index="2">
+<div class="fragment sub" data-fragment-index="2" style="margin-left: 2em">
 <ul>
 <li>T1 must unlock it before T2 can lock it: &nbsp;<span style="color:#0000ff;">u<sub>1</sub>(A) .. l<sub>2</sub>(A)</span></li>
 </ul>
 </div>
+<div style="margin-left: 1.25em">
 <ol start="2" type="1">
 <li>at least one conflict that requires T2 → T1</li>
 </ol>
-<div class="fragment sub" data-fragment-index="3">
+</div>
+<div class="fragment sub" data-fragment-index="3" style="margin-left: 2em">
 <ul>
 <li>T2 operates first on the data item in this conflict</li>
 </ul>
 </div>
-<div class="fragment sub" data-fragment-index="4">
+<div class="fragment sub" data-fragment-index="4" style="margin-left: 2em">
 <ul>
 <li>T2 must unlock it before T1 can lock it: &nbsp;<span style="color:#c00;">u<sub>2</sub>(B) .. l<sub>1</sub>(B)</span></li>
 </ul>
@@ -803,13 +1256,23 @@ Data Science 310
 </section>
 <section id="extra-practice-1" class="slide level2">
 <h2>Extra Practice</h2>
-<ul>
-<li>Is the schedule at right:  <span style="font-size:0.7em; color:#666;"><em>(page 202)</em></span></li>
-</ul>
 <div class="columns">
-<div class="column" style="width:55%;">
+<div class="column" style="width:43%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L11-Txns2/practice2-table.png" class="quarto-figure quarto-figure-center" style="width:42.0%"></p>
+</figure>
+</div>
+<div class="r-stack">
+<p><img data-src="images/L11-Txns2/practice2-matrix-1.png" class="fragment" style="width:100.0%" data-fragment-index="4"></p>
+<p><img data-src="images/L11-Txns2/practice2-matrix-2.png" class="fragment" style="width:100.0%" data-fragment-index="7"></p>
+<p><img data-src="images/L11-Txns2/practice2-matrix-3.png" class="fragment" style="width:100.0%" data-fragment-index="8"></p>
+<p><img data-src="images/L11-Txns2/practice2-matrix-4.png" class="fragment" style="width:100.0%" data-fragment-index="9"></p>
+</div>
+</div><div class="column tight" style="width:57%;">
 <ul>
-<li>conflict serializable?</li>
+<li><p>Is the schedule at left: <!--- &emsp;[*(page 202)*]{style="font-size:0.7em; color:#666;"} --></p></li>
+<li><p>conflict serializable?</p></li>
 </ul>
 <div class="fragment sub" data-fragment-index="1">
 <ul>
@@ -846,18 +1309,6 @@ Data Science 310
 <ul>
 <li><span style="color:#0000ff;">no, because of dirty read. if T1 is rolled back after T2 reads A, T2 must be, too!</span></li>
 </ul>
-</div>
-</div><div class="column" style="width:45%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="images/L11-Txns2/practice2-table.png" class="quarto-figure quarto-figure-center" style="width:40.0%"></p>
-</figure>
-</div>
-<div class="r-stack">
-<p><img data-src="images/L11-Txns2/practice2-matrix-1.png" class="fragment" style="width:90.0%" data-fragment-index="4"></p>
-<p><img data-src="images/L11-Txns2/practice2-matrix-2.png" class="fragment" style="width:90.0%" data-fragment-index="7"></p>
-<p><img data-src="images/L11-Txns2/practice2-matrix-3.png" class="fragment" style="width:90.0%" data-fragment-index="8"></p>
-<p><img data-src="images/L11-Txns2/practice2-matrix-4.png" class="fragment" style="width:90.0%" data-fragment-index="9"></p>
 </div>
 </div></div>
 

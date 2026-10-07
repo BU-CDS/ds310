@@ -1295,6 +1295,13 @@
     "text": "Atomicity and Durability\n\nTo address atomicity and durability, we incorporate a part of the system that performs logging and recovery.\n\n\n\nAtomicity and durability are guaranteed by the logging and recovery subsystem.\nThese properties are mainly associated with what happens before and after a system crash.\n\n\n\n\nAfter a crash, the recovery subsystem:\n\nredoes as needed all changes by committed txns\nundoes as needed all changes by uncommitted txns\n\nrestoring the old values of the changed data items\n\n\n\n\n\n\nWe’ll look more at logging and recovery later in the semester."
   },
   {
+    "objectID": "L10-Txns1.html#why-let-transactions-overlap",
+    "href": "L10-Txns1.html#why-let-transactions-overlap",
+    "title": "A First Look at Transactions",
+    "section": "Why Let Transactions Overlap?",
+    "text": "Why Let Transactions Overlap?"
+  },
+  {
     "objectID": "L10-Txns1.html#isolation",
     "href": "L10-Txns1.html#isolation",
     "title": "A First Look at Transactions",
@@ -3654,6 +3661,13 @@
     "text": "Wrap-Up\n\nProcessing: every operator has several algorithms, each with a cost formula\n\nselection: scan the file vs. walk an index — the index wins once the data is big\njoins: nested loops vs. index probes on the inner — a 650× spread on the same query\n\nOptimization: equivalence rules generate the options; statistics pick the winner\nThe most useful transformations are usually join order and pushing selections down\nWe can see what is done using EXPLAIN QUERY PLAN on any SQLite database, from Python\nPractice: join-cost problems in the homework and discussion sections — trace tiny joins and count the operations yourself"
   },
   {
+    "objectID": "L11-Txns2.html#two-transactions-running-concurrently",
+    "href": "L11-Txns2.html#two-transactions-running-concurrently",
+    "title": "Transactions and Schedules, Part II",
+    "section": "Two Transactions, Running Concurrently",
+    "text": "Two Transactions, Running Concurrently"
+  },
+  {
     "objectID": "L11-Txns2.html#from-the-last-lecture",
     "href": "L11-Txns2.html#from-the-last-lecture",
     "title": "Transactions and Schedules, Part II",
@@ -3717,11 +3731,18 @@
     "text": "Executing a Transaction\n\nIssue a command indicating the start of the transaction.\n\nin SQL: BEGIN WORK or START TRANSACTION\n\n\n\n\nPerform the operations in the transaction.\n\nin SQL: a set of SQL commands (SELECT, UPDATE, etc.)\n\n\n\n\n\nEnd the transaction in one of two ways:\n\ncommit it: make all of its results visible and persistent\n\nall of the changes happen\nin SQL: COMMIT WORK or COMMIT\n\n\n\n\n\n\nabort it: undo all of its changes, returning the system to its state before the transaction began\n\nnone of the changes happen\nin SQL: ROLLBACK WORK or ROLLBACK"
   },
   {
+    "objectID": "L11-Txns2.html#interaction-of-isolation-and-durability",
+    "href": "L11-Txns2.html#interaction-of-isolation-and-durability",
+    "title": "Transactions and Schedules, Part II",
+    "section": "Interaction of Isolation and Durability",
+    "text": "Interaction of Isolation and Durability\n\nDurability is the ability of the system to ensure that committed transactions are permanently recorded and cannot be lost or corrupted.\nThis is achieved by writing the data to a durable storage medium, such as a hard disk or solid-state drive.\nThe system must ensure that every committed transaction is durable and every aborted or rolled back transaction has no effect.\nThis can interact with isolation."
+  },
+  {
     "objectID": "L11-Txns2.html#recoverability",
     "href": "L11-Txns2.html#recoverability",
     "title": "Transactions and Schedules, Part II",
     "section": "Recoverability",
-    "text": "Recoverability\n\n\n\nWhile serializability is important, it isn’t enough for full isolation.\nConsider the serializable schedule at right.\n\nincludes “c” actions that indicate when the transactions commit\n\n\n\n\nImagine that the system crashes:\n\nafter T1’s commit\nbefore T2’s commit\n\n\n\n\n\nDuring recovery from the crash, the system:\n\nkeeps all of T1’s changes, because it committed before the crash\n\n\n\n\n\nundoes all of T2’s changes, because it didn’t commit before the crash"
+    "text": "Recoverability\n\n\n\nWhile serializability is important, it isn’t enough for full isolation when we take into account durability.\nConsider the serializable schedule at right.\n\nincludes “c” actions that indicate when the transactions commit\n\n\n\n\nImagine that the system crashes:\n\nafter T1’s commit\nbefore T2’s commit\n\n\n\n\n\nDuring recovery from the crash, the system:\n\nkeeps all of T1’s changes, because it committed before the crash\n\n\n\n\n\nundoes all of T2’s changes, because it didn’t commit before the crash"
   },
   {
     "objectID": "L11-Txns2.html#recoverability-cont.",
@@ -3777,14 +3798,14 @@
     "href": "L11-Txns2.html#locking-basics",
     "title": "Transactions and Schedules, Part II",
     "section": "Locking Basics",
-    "text": "Locking Basics\n\n\n\nA transaction must request and acquire a lock for a data element before it can access it.\n\n\n\nIn our initial scheme, every lock can be held by only one txn at a time.\n\n\n\n\nAs necessary, the DBMS:\n\ndenies lock requests for elements that are currently locked\nmakes the requesting transaction wait\n\n\n\n\n\nA transaction unlocks an element when it’s done with it.\n\n\n\n\nAfter the unlock, the DBMS can grant the lock to a waiting txn.\n\nwe’ll show a second lock request when the lock is granted"
+    "text": "Locking Basics\n\n\n\nA transaction must request and acquire a lock for a data element before it can access it.\n\n\n\nIn our initial scheme, every lock can be held by only one txn at a time.\n\n\n\n\nAs necessary, the DBMS:\n\ndenies lock requests for elements that are currently locked\nmakes the requesting transaction wait\n\n\n\n\n\nA transaction unlocks an element when it’s done with it.\n\n\n\n\nAfter the unlock, the DBMS can grant the lock to a waiting txn.\n\nwe’ll show a second lock request when the lock is granted\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n  \n    \n      \n      \n      \n    \n    \n      \n      \n      \n    \n    \n    \n      \n      \n    \n  \n\n  \n  \n  database element\n  \n  X\n  T1\n  T2\n\n  \n  \n    \n    \n    holds the lock\n    can access X\n    \n    locked by T1\n  \n\n  \n  \n    \n    requests the lock\n  \n\n  \n  \n    \n    \n    request denied\n    must wait\n  \n\n  \n  \n    unlocks X\n    \n    unlocked\n    \n      \n      still waiting\n    \n  \n\n  \n  \n    \n    \n    lock granted\n    can access X\n    \n    locked by T2"
   },
   {
     "objectID": "L11-Txns2.html#locking-and-serializability",
     "href": "L11-Txns2.html#locking-and-serializability",
     "title": "Transactions and Schedules, Part II",
     "section": "Locking and Serializability",
-    "text": "Locking and Serializability\n\nJust having locks isn’t enough to guarantee serializability.\nExample: our problematic schedule can still be carried out."
+    "text": "Locking and Serializability\n\nJust having locks isn’t enough to guarantee serializability.\nExample: our problematic schedule can still be carried out.\n\n\n\n\n\n\n\n\nThe problem is that T1 released its lock on bal1 “too soon”.\nNotice that T1 acquired a lock on bal2 later; this suggests that the transaction was not “done” when it released the lock on bal1."
   },
   {
     "objectID": "L11-Txns2.html#two-phase-locking-2pl",
@@ -3805,14 +3826,14 @@
     "href": "L11-Txns2.html#an-informal-argument-for-2pls-correctness",
     "title": "Transactions and Schedules, Part II",
     "section": "An Informal Argument for 2PL’s Correctness",
-    "text": "An Informal Argument for 2PL’s Correctness\n\nConsider schedules involving only two transactions. To get one that is not conflict serializable, we need:\n\n\nat least one conflict that requires T1 → T2\n\n\n\nT1 operates first on the data item in this conflict\n\n\n\n\nT1 must unlock it before T2 can lock it:  u1(A) .. l2(A)\n\n\n\nat least one conflict that requires T2 → T1\n\n\n\nT2 operates first on the data item in this conflict\n\n\n\n\nT2 must unlock it before T1 can lock it:  u2(B) .. l1(B)\n\n\n\n\nConsider all of the ways these pairs of actions could be ordered:"
+    "text": "An Informal Argument for 2PL’s Correctness\n\nConsider schedules involving only two transactions. To get one that is not conflict serializable, we need:\n\n\n\nat least one conflict that requires T1 → T2\n\n\n\n\nT1 operates first on the data item in this conflict\n\n\n\n\nT1 must unlock it before T2 can lock it:  u1(A) .. l2(A)\n\n\n\n\nat least one conflict that requires T2 → T1\n\n\n\n\nT2 operates first on the data item in this conflict\n\n\n\n\nT2 must unlock it before T1 can lock it:  u2(B) .. l1(B)\n\n\n\n\nConsider all of the ways these pairs of actions could be ordered:"
   },
   {
     "objectID": "L11-Txns2.html#extra-practice-1",
     "href": "L11-Txns2.html#extra-practice-1",
     "title": "Transactions and Schedules, Part II",
     "section": "Extra Practice",
-    "text": "Extra Practice\n\nIs the schedule at right:  (page 202)\n\n\n\n\nconflict serializable?\n\n\n\nyes. conflicts are:\nr1(B) … w2(B):  T1 → T2\nw1(A) … r2(A):  T1 → T2\n\n\n\n\n→ equivalent to T1;T2\n\n\n\nserializable?\n\n\n\nyes. conflict serializable → serializable\n\n\n\nrecoverable?\n\n\n\nyes. only dirty read is r2(A). reader (T2) commits after writer (T1), so it’s okay\n\n\n\ncascadeless?\n\n\n\nno, because of dirty read. if T1 is rolled back after T2 reads A, T2 must be, too!"
+    "text": "Extra Practice\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIs the schedule at left: \nconflict serializable?\n\n\n\nyes. conflicts are:\nr1(B) … w2(B):  T1 → T2\nw1(A) … r2(A):  T1 → T2\n\n\n\n\n→ equivalent to T1;T2\n\n\n\nserializable?\n\n\n\nyes. conflict serializable → serializable\n\n\n\nrecoverable?\n\n\n\nyes. only dirty read is r2(A). reader (T2) commits after writer (T1), so it’s okay\n\n\n\ncascadeless?\n\n\n\nno, because of dirty read. if T1 is rolled back after T2 reads A, T2 must be, too!"
   },
   {
     "objectID": "L13-Locking2.html#recall-exclusive-vs.-shared-locks",
