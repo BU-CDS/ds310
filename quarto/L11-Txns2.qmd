@@ -480,6 +480,7 @@ w~4~(C) … w~3~(C)&nbsp; means T4 → T3
 ::: {.fragment}
 - Dirty reads can lead to *cascading rollbacks*.
     - if the writer of the dirty data is rolled back, the reader must be, too
+    - remember that a user can decide to roll back a transaction (this is not just about crashes)
 :::
 
 ## Dirty Reads and Cascading Rollbacks (cont.)
@@ -497,7 +498,7 @@ w~4~(C) … w~3~(C)&nbsp; means T4 → T3
 :::
 
 ::: {.fragment .sub}
-- [if T2 is later rolled back, T1 must be, too.]{style="color:#0000ff;"}
+- [if instead of comitting, T2 is rolled back, then T1 must be, too.]{style="color:#0000ff;"}
 :::
 
 ::: {.fragment}
@@ -506,7 +507,7 @@ w~4~(C) … w~3~(C)&nbsp; means T4 → T3
 
 ## Extra Practice
 
-- What scenarios involving the schedule at right could produce cascading rollbacks?
+- What scenarios involving the schedule below could produce cascading rollbacks?
 
 ![](images/L11-Txns2/cascade-table.png){width="30%" fig-align="center"}
 
@@ -522,10 +523,12 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 
 ## Concurrency Control Goals
 
-- Goals: ensure that schedules of concurrent txns are:
+- Thus we have a number of goals for scheduling concurrent txns.
+
+- We desire that schedules of concurrent txns are:
     - *serializable*: equivalent to some serial schedule
     - *recoverable*: ordered so that the system can safely recover from a crash or undo an aborted transaction
-    - *cascadeless*: ensure that an abort of one transaction does not produce a series of *cascading rollbacks*
+    - *cascadeless*: ensure that an abort (rollback) of one transaction does not produce a series of *cascading rollbacks*
 
 ::: {.fragment}
 - To achieve these goals, we use some type of *concurrency control mechanism*.
@@ -533,14 +536,20 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
     - prevents problematic interleavings
 :::
 
+::: {.fragment}
+- The concurrency control mechanism we will study is _locking._
+:::
+
 ## Locking
 
 - Locking is one way to provide concurrency control.
 
-- Involves associating one or more *locks* with each *database element*.
-    - each page
-    - each record
-    - possibly even each collection
+- Locking involves associating one or more *locks* with each *database element*.
+
+- We can associate a lock with 
+    - a page
+    - a record
+    - possibly even a collection (eg, relation)
 
 ![](images/L11-Txns2/lock-concept.svg){.nostretch width="94%" fig-align="center" fig-alt="Each database element has its own lock. Element A is locked by transaction T1, which can read and write A. Transaction T2 also wants A and must wait for the lock. Element B is unlocked."}
 
@@ -589,32 +598,42 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 
 ## Locking and Serializability
 
-- Just having locks isn't enough to guarantee serializability.
+- We will attempt to use locks to enforce serializability. 
+
+- However, just having locks isn't enough to guarantee serializability.
+    - It matters how the locks are used.
 
 - Example: our problematic schedule can still be carried out.
 
+::::: {.columns}
+:::: {.column width="58%"}
 ::: {.r-stack}
-![](images/L11-Txns2/lockser-1.png){width="60%"}
+![](images/L11-Txns2/lockser-1.png){width="100%"}
 
-![](images/L11-Txns2/lockser-2.png){.fragment width="60%"}
+![](images/L11-Txns2/lockser-2.png){.fragment width="100%"}
 
-![](images/L11-Txns2/lockser-3.png){.fragment width="60%"}
+![](images/L11-Txns2/lockser-3.png){.fragment width="100%"}
 :::
+::::
 
+:::: {.column width="42%"}
 ::: {.fragment}
-- The problem is that T1 released its lock on `bal1` "too soon".
+- The problem is that T1 released its lock on `balance1` "too soon".
 
-- Notice that T1 acquired a lock on `bal2` later; this suggests that the transaction was not "done" when it released the lock on `bal1`.
+- Notice that T1 acquired a lock on `balance2` later; this suggests that the transaction was not "done" when it released the lock on `balance1`.
 :::
+::::
+:::::
 
 ## Two-Phase Locking (2PL)
 
-- One way to ensure serializability is *two-phase locking (2PL)*.
+- One way to fix this problem, so as to ensure serializability, is *two-phase locking (2PL)*.
 
-- 2PL requires that *all* of a txn's lock actions come before *all* its unlock actions.
+- 2PL requires that:
+    - *all* of a txn's lock actions come before *all* its unlock actions.
 
 ::: {.fragment}
-- Two phases:
+- When using 2PL, a transaction always has two phases:
     - lock-acquisition phase: a txn acquires locks, but it doesn't release any
 :::
 
@@ -638,11 +657,17 @@ E\. &nbsp;[all three of the above (A, B and C)]{.fragment .highlight-blue fragme
 
 - 2PL would prevent this interleaving.
 
-![](images/L11-Txns2/twopl-table.png){width="48%" fig-align="center"}
+::::: {.columns}
+:::: {.column width="52%"}
+![](images/L11-Txns2/twopl-table.png){width="78%"}
+::::
 
+:::: {.column width="48%"}
 ::: {.fragment}
 - More generally, 2PL produces conflict serializable schedules.
 :::
+::::
+:::::
 
 ## An Informal Argument for 2PL's Correctness
 
