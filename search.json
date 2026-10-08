@@ -3763,35 +3763,35 @@
     "href": "L11-Txns2.html#dirty-reads-and-cascading-rollbacks",
     "title": "Transactions and Schedules, Part II",
     "section": "Dirty Reads and Cascading Rollbacks",
-    "text": "Dirty Reads and Cascading Rollbacks\n\nDirty data is data written by an uncommitted txn.\n\n\n\nit remains dirty until the txn is either:\n\ncommitted: in which case the data is no longer dirty and it is safe for other txns to read it\n\n\n\n\n\nrolled back: in which case the write of the dirty data is undone\n\n\n\n\nA dirty read is a read of dirty data.\n\n\n\n\nDirty reads can lead to cascading rollbacks.\n\nif the writer of the dirty data is rolled back, the reader must be, too"
+    "text": "Dirty Reads and Cascading Rollbacks\n\nDirty data is data written by an uncommitted txn.\n\n\n\nit remains dirty until the txn is either:\n\ncommitted: in which case the data is no longer dirty and it is safe for other txns to read it\n\n\n\n\n\nrolled back: in which case the write of the dirty data is undone\n\n\n\n\nA dirty read is a read of dirty data.\n\n\n\n\nDirty reads can lead to cascading rollbacks.\n\nif the writer of the dirty data is rolled back, the reader must be, too\nremember that a user can decide to roll back a transaction (this is not just about crashes)"
   },
   {
     "objectID": "L11-Txns2.html#dirty-reads-and-cascading-rollbacks-cont.",
     "href": "L11-Txns2.html#dirty-reads-and-cascading-rollbacks-cont.",
     "title": "Transactions and Schedules, Part II",
     "section": "Dirty Reads and Cascading Rollbacks (cont.)",
-    "text": "Dirty Reads and Cascading Rollbacks (cont.)\n\nWe made our earlier schedule recoverable by switching the order of the commits:\n\n\n\n\nCould the revised schedule lead to a cascading rollback?\n\n\n\n\nyes! T1 performs a dirty read of T2’s write of B.\n\n\n\n\nif T2 is later rolled back, T1 must be, too.\n\n\n\n\nTo get a cascadeless schedule, don’t allow dirty reads."
+    "text": "Dirty Reads and Cascading Rollbacks (cont.)\n\nWe made our earlier schedule recoverable by switching the order of the commits:\n\n\n\n\nCould the revised schedule lead to a cascading rollback?\n\n\n\n\nyes! T1 performs a dirty read of T2’s write of B.\n\n\n\n\nif instead of comitting, T2 is rolled back, then T1 must be, too.\n\n\n\n\nTo get a cascadeless schedule, don’t allow dirty reads."
   },
   {
     "objectID": "L11-Txns2.html#extra-practice",
     "href": "L11-Txns2.html#extra-practice",
     "title": "Transactions and Schedules, Part II",
     "section": "Extra Practice",
-    "text": "Extra Practice\n\nWhat scenarios involving the schedule at right could produce cascading rollbacks?\n\n\nA.  T1 is rolled back sometime after T3 reads A.  yes\nB.  T2 is rolled back sometime after T1 reads B.  yes\nC.  T3 is rolled back sometime after T2 reads C.  yes\nD.  two of the above\nE.  all three of the above (A, B and C)"
+    "text": "Extra Practice\n\nWhat scenarios involving the schedule below could produce cascading rollbacks?\n\n\nA.  T1 is rolled back sometime after T3 reads A.  yes\nB.  T2 is rolled back sometime after T1 reads B.  yes\nC.  T3 is rolled back sometime after T2 reads C.  yes\nD.  two of the above\nE.  all three of the above (A, B and C)"
   },
   {
     "objectID": "L11-Txns2.html#concurrency-control-goals",
     "href": "L11-Txns2.html#concurrency-control-goals",
     "title": "Transactions and Schedules, Part II",
     "section": "Concurrency Control Goals",
-    "text": "Concurrency Control Goals\n\nGoals: ensure that schedules of concurrent txns are:\n\nserializable: equivalent to some serial schedule\nrecoverable: ordered so that the system can safely recover from a crash or undo an aborted transaction\ncascadeless: ensure that an abort of one transaction does not produce a series of cascading rollbacks\n\n\n\n\nTo achieve these goals, we use some type of concurrency control mechanism.\n\ncontrols the actions of concurrent transactions\nprevents problematic interleavings"
+    "text": "Concurrency Control Goals\n\nThus we have a number of goals for scheduling concurrent txns.\nWe desire that schedules of concurrent txns are:\n\nserializable: equivalent to some serial schedule\nrecoverable: ordered so that the system can safely recover from a crash or undo an aborted transaction\ncascadeless: ensure that an abort (rollback) of one transaction does not produce a series of cascading rollbacks\n\n\n\n\nTo achieve these goals, we use some type of concurrency control mechanism.\n\ncontrols the actions of concurrent transactions\nprevents problematic interleavings\n\n\n\n\n\nThe concurrency control mechanism we will study is locking."
   },
   {
     "objectID": "L11-Txns2.html#locking",
     "href": "L11-Txns2.html#locking",
     "title": "Transactions and Schedules, Part II",
     "section": "Locking",
-    "text": "Locking\n\nLocking is one way to provide concurrency control.\nInvolves associating one or more locks with each database element.\n\neach page\neach record\npossibly even each collection"
+    "text": "Locking\n\nLocking is one way to provide concurrency control.\nLocking involves associating one or more locks with each database element.\nWe can associate a lock with\n\na page\na record\npossibly even a collection (eg, relation)"
   },
   {
     "objectID": "L11-Txns2.html#locking-basics",
@@ -3805,21 +3805,21 @@
     "href": "L11-Txns2.html#locking-and-serializability",
     "title": "Transactions and Schedules, Part II",
     "section": "Locking and Serializability",
-    "text": "Locking and Serializability\n\nJust having locks isn’t enough to guarantee serializability.\nExample: our problematic schedule can still be carried out.\n\n\n\n\n\n\n\n\nThe problem is that T1 released its lock on bal1 “too soon”.\nNotice that T1 acquired a lock on bal2 later; this suggests that the transaction was not “done” when it released the lock on bal1."
+    "text": "Locking and Serializability\n\nWe will attempt to use locks to enforce serializability.\nHowever, just having locks isn’t enough to guarantee serializability.\n\nIt matters how the locks are used.\n\nExample: our problematic schedule can still be carried out.\n\n\n\n\n\n\n\n\n\n\n\nThe problem is that T1 released its lock on balance1 “too soon”.\nNotice that T1 acquired a lock on balance2 later; this suggests that the transaction was not “done” when it released the lock on balance1."
   },
   {
     "objectID": "L11-Txns2.html#two-phase-locking-2pl",
     "href": "L11-Txns2.html#two-phase-locking-2pl",
     "title": "Transactions and Schedules, Part II",
     "section": "Two-Phase Locking (2PL)",
-    "text": "Two-Phase Locking (2PL)\n\nOne way to ensure serializability is two-phase locking (2PL).\n2PL requires that all of a txn’s lock actions come before all its unlock actions.\n\n\n\nTwo phases:\n\nlock-acquisition phase: a txn acquires locks, but it doesn’t release any\n\n\n\n\n\nlock-release phase: once a txn releases a lock, it can’t acquire any new ones\n\n\n\n\nReads and writes can occur in both phases.\n\nprovided that a txn holds the necessary locks\n\n\n\n\n\n2PL is per-transaction.\n\none txn could be in its lock-release phase while another txn is still in its lock-acquisition phase"
+    "text": "Two-Phase Locking (2PL)\n\nOne way to fix this problem, so as to ensure serializability, is two-phase locking (2PL).\n2PL requires that:\n\nall of a txn’s lock actions come before all its unlock actions.\n\n\n\n\nWhen using 2PL, a transaction always has two phases:\n\nlock-acquisition phase: a txn acquires locks, but it doesn’t release any\n\n\n\n\n\nlock-release phase: once a txn releases a lock, it can’t acquire any new ones\n\n\n\n\nReads and writes can occur in both phases.\n\nprovided that a txn holds the necessary locks\n\n\n\n\n\n2PL is per-transaction.\n\none txn could be in its lock-release phase while another txn is still in its lock-acquisition phase"
   },
   {
     "objectID": "L11-Txns2.html#two-phase-locking-2pl-cont.",
     "href": "L11-Txns2.html#two-phase-locking-2pl-cont.",
     "title": "Transactions and Schedules, Part II",
     "section": "Two-Phase Locking (2PL) (cont.)",
-    "text": "Two-Phase Locking (2PL) (cont.)\n\nIn our earlier example, T1 does not follow the 2PL rule.\n2PL would prevent this interleaving.\n\n\n\n\nMore generally, 2PL produces conflict serializable schedules."
+    "text": "Two-Phase Locking (2PL) (cont.)\n\nIn our earlier example, T1 does not follow the 2PL rule.\n2PL would prevent this interleaving.\n\n\n\n\n\n\n\nMore generally, 2PL produces conflict serializable schedules."
   },
   {
     "objectID": "L11-Txns2.html#an-informal-argument-for-2pls-correctness",

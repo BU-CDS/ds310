@@ -894,6 +894,7 @@ window.animPlayer = function (svg, timeline) {
 <li>Dirty reads can lead to <em>cascading rollbacks</em>.
 <ul>
 <li>if the writer of the dirty data is rolled back, the reader must be, too</li>
+<li>remember that a user can decide to roll back a transaction (this is not just about crashes)</li>
 </ul></li>
 </ul>
 </div>
@@ -916,7 +917,7 @@ window.animPlayer = function (svg, timeline) {
 </div>
 <div class="fragment sub">
 <ul>
-<li><span style="color:#0000ff;">if T2 is later rolled back, T1 must be, too.</span></li>
+<li><span style="color:#0000ff;">if instead of comitting, T2 is rolled back, then T1 must be, too.</span></li>
 </ul>
 </div>
 <div class="fragment">
@@ -928,7 +929,7 @@ window.animPlayer = function (svg, timeline) {
 <section id="extra-practice" class="slide level2">
 <h2>Extra Practice</h2>
 <ul>
-<li>What scenarios involving the schedule at right could produce cascading rollbacks?</li>
+<li>What scenarios involving the schedule below could produce cascading rollbacks?</li>
 </ul>
 
 <img data-src="images/L11-Txns2/cascade-table.png" class="quarto-figure quarto-figure-center r-stretch" style="width:30.0%"><p>A. &nbsp;T1 is rolled back sometime after T3 reads A.  <span class="fragment" data-fragment-index="1" style="color:#008000; font-weight:bold;">yes</span></p>
@@ -940,11 +941,12 @@ window.animPlayer = function (svg, timeline) {
 <section id="concurrency-control-goals" class="slide level2">
 <h2>Concurrency Control Goals</h2>
 <ul>
-<li>Goals: ensure that schedules of concurrent txns are:
+<li><p>Thus we have a number of goals for scheduling concurrent txns.</p></li>
+<li><p>We desire that schedules of concurrent txns are:</p>
 <ul>
 <li><em>serializable</em>: equivalent to some serial schedule</li>
 <li><em>recoverable</em>: ordered so that the system can safely recover from a crash or undo an aborted transaction</li>
-<li><em>cascadeless</em>: ensure that an abort of one transaction does not produce a series of <em>cascading rollbacks</em></li>
+<li><em>cascadeless</em>: ensure that an abort (rollback) of one transaction does not produce a series of <em>cascading rollbacks</em></li>
 </ul></li>
 </ul>
 <div class="fragment">
@@ -956,16 +958,22 @@ window.animPlayer = function (svg, timeline) {
 </ul></li>
 </ul>
 </div>
+<div class="fragment">
+<ul>
+<li>The concurrency control mechanism we will study is <em>locking.</em></li>
+</ul>
+</div>
 </section>
 <section id="locking" class="slide level2">
 <h2>Locking</h2>
 <ul>
 <li><p>Locking is one way to provide concurrency control.</p></li>
-<li><p>Involves associating one or more <em>locks</em> with each <em>database element</em>.</p>
+<li><p>Locking involves associating one or more <em>locks</em> with each <em>database element</em>.</p></li>
+<li><p>We can associate a lock with</p>
 <ul>
-<li>each page</li>
-<li>each record</li>
-<li>possibly even each collection</li>
+<li>a page</li>
+<li>a record</li>
+<li>possibly even a collection (eg, relation)</li>
 </ul></li>
 </ul>
 <div class="quarto-figure quarto-figure-center">
@@ -1142,30 +1150,41 @@ window.animPlayer = function (svg, timeline) {
 <section id="locking-and-serializability" class="slide level2">
 <h2>Locking and Serializability</h2>
 <ul>
-<li><p>Just having locks isn’t enough to guarantee serializability.</p></li>
+<li><p>We will attempt to use locks to enforce serializability.</p></li>
+<li><p>However, just having locks isn’t enough to guarantee serializability.</p>
+<ul>
+<li>It matters how the locks are used.</li>
+</ul></li>
 <li><p>Example: our problematic schedule can still be carried out.</p></li>
 </ul>
+<div class="columns">
+<div class="column" style="width:58%;">
 <div class="r-stack">
-<p><img data-src="images/L11-Txns2/lockser-1.png" style="width:60.0%"></p>
-<p><img data-src="images/L11-Txns2/lockser-2.png" class="fragment" style="width:60.0%"></p>
-<p><img data-src="images/L11-Txns2/lockser-3.png" class="fragment" style="width:60.0%"></p>
+<p><img data-src="images/L11-Txns2/lockser-1.png" style="width:100.0%"></p>
+<p><img data-src="images/L11-Txns2/lockser-2.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L11-Txns2/lockser-3.png" class="fragment" style="width:100.0%"></p>
 </div>
+</div><div class="column" style="width:42%;">
 <div class="fragment">
 <ul>
-<li><p>The problem is that T1 released its lock on <code>bal1</code> “too soon”.</p></li>
-<li><p>Notice that T1 acquired a lock on <code>bal2</code> later; this suggests that the transaction was not “done” when it released the lock on <code>bal1</code>.</p></li>
+<li><p>The problem is that T1 released its lock on <code>balance1</code> “too soon”.</p></li>
+<li><p>Notice that T1 acquired a lock on <code>balance2</code> later; this suggests that the transaction was not “done” when it released the lock on <code>balance1</code>.</p></li>
 </ul>
 </div>
+</div></div>
 </section>
 <section id="two-phase-locking-2pl" class="slide level2">
 <h2>Two-Phase Locking (2PL)</h2>
 <ul>
-<li><p>One way to ensure serializability is <em>two-phase locking (2PL)</em>.</p></li>
-<li><p>2PL requires that <em>all</em> of a txn’s lock actions come before <em>all</em> its unlock actions.</p></li>
+<li><p>One way to fix this problem, so as to ensure serializability, is <em>two-phase locking (2PL)</em>.</p></li>
+<li><p>2PL requires that:</p>
+<ul>
+<li><em>all</em> of a txn’s lock actions come before <em>all</em> its unlock actions.</li>
+</ul></li>
 </ul>
 <div class="fragment">
 <ul>
-<li>Two phases:
+<li>When using 2PL, a transaction always has two phases:
 <ul>
 <li>lock-acquisition phase: a txn acquires locks, but it doesn’t release any</li>
 </ul></li>
@@ -1199,12 +1218,16 @@ window.animPlayer = function (svg, timeline) {
 <li><p>In our earlier example, T1 does <em>not</em> follow the 2PL rule.</p></li>
 <li><p>2PL would prevent this interleaving.</p></li>
 </ul>
-
-<img data-src="images/L11-Txns2/twopl-table.png" class="quarto-figure quarto-figure-center r-stretch" style="width:48.0%"><div class="fragment">
+<div class="columns">
+<div class="column" style="width:52%;">
+<p><img data-src="images/L11-Txns2/twopl-table.png" style="width:78.0%"></p>
+</div><div class="column" style="width:48%;">
+<div class="fragment">
 <ul>
 <li>More generally, 2PL produces conflict serializable schedules.</li>
 </ul>
 </div>
+</div></div>
 </section>
 <section id="an-informal-argument-for-2pls-correctness" class="slide level2 scrollable">
 <h2>An Informal Argument for 2PL’s Correctness</h2>
