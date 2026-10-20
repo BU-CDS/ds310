@@ -1131,21 +1131,21 @@
     "href": "L12-Locking.html#locking",
     "title": "Concurrency Control: Locking",
     "section": "Locking",
-    "text": "Locking\n\nLocking is one way to provide concurrency control.\nInvolves associating one or more locks with each database element.\n\neach page\neach record\npossibly even each collection"
+    "text": "Locking\n\nLocking is one way to provide concurrency control.\nLocking involves associating one or more locks with each database element.\nWe can associate a lock with\n\na page\na record\npossibly even a collection (eg, relation)"
   },
   {
     "objectID": "L12-Locking.html#locking-basics",
     "href": "L12-Locking.html#locking-basics",
     "title": "Concurrency Control: Locking",
     "section": "Locking Basics",
-    "text": "Locking Basics\n\n\n\nA transaction must request and acquire a lock for a data element before it can access it.\n\n\n\nIn our initial scheme, every lock can be held by only one txn at a time.\n\n\n\n\nAs necessary, the DBMS:\n\ndenies lock requests for elements that are currently locked\nmakes the requesting transaction wait\n\n\n\n\n\nA transaction unlocks an element when it’s done with it.\n\n\n\n\nAfter the unlock, the DBMS can grant the lock to a waiting txn.\n\nwe’ll show a second lock request when the lock is granted"
+    "text": "Locking Basics\n\n\n\nA transaction must request and acquire a lock for a data element before it can access it.\n\n\n\nIn our initial scheme, every lock can be held by only one txn at a time.\n\n\n\n\nAs necessary, the DBMS:\n\ndenies lock requests for elements that are currently locked\nmakes the requesting transaction wait\n\n\n\n\n\nA transaction unlocks an element when it’s done with it.\n\n\n\n\nAfter the unlock, the DBMS can grant the lock to a waiting txn.\n\nwe’ll show a second lock request when the lock is granted\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n  \n    \n      \n      \n      \n    \n    \n      \n      \n      \n    \n    \n    \n      \n      \n    \n  \n\n  \n  \n  database element\n  \n  X\n  T1\n  T2\n\n  \n  \n    \n    \n    holds the lock\n    can access X\n    \n    locked by T1\n  \n\n  \n  \n    \n    requests the lock\n  \n\n  \n  \n    \n    \n    request denied\n    must wait\n  \n\n  \n  \n    unlocks X\n    \n    unlocked\n    \n      \n      still waiting\n    \n  \n\n  \n  \n    \n    \n    lock granted\n    can access X\n    \n    locked by T2"
   },
   {
     "objectID": "L12-Locking.html#locking-and-serializability",
     "href": "L12-Locking.html#locking-and-serializability",
     "title": "Concurrency Control: Locking",
     "section": "Locking and Serializability",
-    "text": "Locking and Serializability\n\nJust having locks isn’t enough to guarantee serializability.\nExample: our problematic schedule can still be carried out."
+    "text": "Locking and Serializability\n\nWe will attempt to use locks to enforce serializability.\nHowever, just having locks isn’t enough to guarantee serializability.\n\nIt matters how the locks are used.\n\nExample: our problematic schedule can still be carried out.\n\n\n\n\n\n\n\n\n\n\nThe problem is that T1 released its lock on balance1 “too soon”.\nNotice that T1 acquired a lock on balance2 later; this suggests that the transaction was not “done” when it released the lock on balance1."
   },
   {
     "objectID": "L12-Locking.html#two-phase-locking-2pl",
@@ -1159,7 +1159,7 @@
     "href": "L12-Locking.html#two-phase-locking-2pl-cont.",
     "title": "Concurrency Control: Locking",
     "section": "Two-Phase Locking (2PL) (cont.)",
-    "text": "Two-Phase Locking (2PL) (cont.)\n\nIn our earlier example, T1 does not follow the 2PL rule.\n\n2PL would prevent this interleaving.\n\n\n\n\n\nMore generally, 2PL produces conflict serializable schedules."
+    "text": "Two-Phase Locking (2PL) (cont.)\n\nIn our earlier example, T1 does not follow the 2PL rule.\n\n2PL would prevent this interleaving.\n\n\n\n        \n\n\n\nMore generally, 2PL produces conflict serializable schedules."
   },
   {
     "objectID": "L12-Locking.html#an-informal-argument-for-2pls-correctness",
@@ -1187,14 +1187,14 @@
     "href": "L12-Locking.html#the-need-for-different-types-of-locks",
     "title": "Concurrency Control: Locking",
     "section": "The Need for Different Types of Locks",
-    "text": "The Need for Different Types of Locks\n\nWith only one type of lock, overlapping transactions can’t read the same data item, even though two reads don’t conflict.\n\nTwo transactions could be forced to be serialized unnecessarily\nThis can have a negative impact on database performance\n\nTo get around this, use more than one mode of lock."
+    "text": "The Need for Different Types of Locks\n\nRecall that our goal is to allow overlapping transactions to read the same data item, even though two reads don’t conflict.\nWith only one type of lock, overlapping transactions can’t read the same data item, even though they don’t conflict.\n\nTwo transactions could be forced to be serialized unnecessarily\nThis can have a negative impact on database performance\n\nTo get around this, use more than one mode of lock."
   },
   {
     "objectID": "L12-Locking.html#exclusive-vs.-shared-locks",
     "href": "L12-Locking.html#exclusive-vs.-shared-locks",
     "title": "Concurrency Control: Locking",
     "section": "Exclusive vs. Shared Locks",
-    "text": "Exclusive vs. Shared Locks\n\nAn exclusive lock allows a transaction to write or read an item.\n\ngives the txn exclusive access to that item\nonly one txn can hold it at a given time\n\n\n\n\nxli(A) = transaction Ti requests an exclusive lock for A\n\n\n\n\nif another txn holds any lock for A, Ti must wait until that lock is released\n\n\n\n\nA shared lock only allows a transaction to read an item.\n\nmultiple txns can hold a shared lock for the same data item at the same time\n\n\n\n\n\nsli(A) = transaction Ti requests a shared lock for A\n\n\n\n\nif another txn holds an exclusive lock for A, Ti must wait until that lock is released"
+    "text": "Exclusive vs. Shared Locks\n\n\n\nAn exclusive lock allows a transaction to write or read an item.\n\ngives the txn exclusive access to that item\nonly one txn can hold it at a given time\n\n\n\n\nxli(A) = transaction Ti requests an exclusive lock for A\n\n\n\n\nif another txn holds any lock for A, Ti must wait until that lock is released\n\n\n\n\nA shared lock only allows a transaction to read an item.\n\nmultiple txns can hold a shared lock for the same data item at the same time\n\n\n\n\n\nsli(A) = transaction Ti requests a shared lock for A\n\n\n\n\nif another txn holds an exclusive lock for A, Ti must wait until that lock is released\n\n\n\n\n\n\n\n  \n    \n    \n      \n      \n      \n      \n    \n    \n    \n      \n      \n      \n    \n  \n\n  \n  \n  database element\n  \n  A\n\n  \n  \n    \n      \n      T1\n    \n    \n      \n      \n      holds the lock\n      read and write\n      \n      exclusive · only T1\n    \n    one transaction\n    has exclusive access to A\n  \n\n  \n  \n    \n      \n      T1\n    \n    \n    \n    xl1(A)\n    exclusive lock\n    \n    exclusive · only T1\n    T1 requests an exclusive lock\n    only one txn can hold it\n  \n\n  \n  \n    \n      \n        \n        T1\n      \n      \n      \n      xl1(A)\n      holds a lock\n      \n      locked by T1\n    \n    \n      \n        \n        T2\n      \n      \n      request denied\n      must wait\n    \n    T1 already holds a lock on A\n    so T2 waits\n  \n\n  \n  \n    \n      \n        \n        T1\n      \n      \n      \n      shared lock\n      can read A\n      \n    \n    \n      \n        \n        T2\n      \n      \n      \n      shared lock\n      can read A\n      \n    \n    shared · T1 and T2\n    several transactions at once\n    a shared lock allows reading only\n  \n\n  \n  \n    \n      \n        \n        T1\n      \n      \n      \n      sl1(A)\n      can read A\n      \n    \n    \n      \n        \n        T2\n      \n      \n      \n      sl2(A)\n      can read A\n      \n    \n    shared · T1 and T2\n    sl1(A) and sl2(A)\n    both hold a shared lock on A\n  \n\n  \n  \n    \n      \n        \n        T1\n      \n      \n      \n      xl1(A)\n      exclusive lock\n      \n      exclusive · T1\n    \n    \n      \n        \n        T2\n      \n      \n      sl2(A)\n      must wait\n    \n    T1 holds an exclusive lock\n    so T2's shared request waits"
   },
   {
     "objectID": "L12-Locking.html#lock-compatibility-matrix",
@@ -1208,7 +1208,7 @@
     "href": "L12-Locking.html#examples-of-using-shared-and-exclusive-locks",
     "title": "Concurrency Control: Locking",
     "section": "Examples of Using Shared and Exclusive Locks",
-    "text": "Examples of Using Shared and Exclusive Locks\n\nsli(A) = transaction Ti requests a shared lock for A\nxli(A) = transaction Ti requests an exclusive lock for A\nExamples:"
+    "text": "Examples of Using Shared and Exclusive Locks\n\nsli(A) = transaction Ti requests a shared lock for A\nxli(A) = transaction Ti requests an exclusive lock for A\n\n\n\n\n\n  \n    \n      \n      \n      \n      \n    \n    \n      \n      \n      \n      \n    \n  \n\n  \n  \n  element A\n  A\n\n  \n  element B\n  B\n\n  \n  element C\n  C\n\n  \n  \n    \n      \n      \n      exclusive · T2\n    \n    \n      \n      unlocked\n      \n      unlocked\n    \n    T2 holds an exclusive lock on A and writes A\n  \n\n  \n  \n    \n      \n      exclusive · T2\n    \n    \n      \n      \n      shared · T1\n    \n    \n      \n      unlocked\n    \n    T1 takes a shared lock on B and reads B\n  \n\n  \n  \n    \n      \n      exclusive · T2\n      \n    \n    \n      \n    \n    \n    shared · T1 and T2\n    \n      \n      unlocked\n    \n    T2 also takes a shared lock on B and reads B\n  \n\n  \n  \n    \n      \n      exclusive · T2\n      \n    \n    \n      \n      \n    \n    shared · both are reading B\n    \n      \n      unlocked\n    \n    both read B at the same time\n    without shared locks, T2 would wait for T1 to unlock B\n  \n\n  \n  \n    \n      \n      exclusive · T2\n      \n    \n    \n      \n      \n      \n      exclusive · T1\n    \n    shared · T1 and T2\n    T1 locks C exclusively before reading it\n    Why not a shared lock?\n  \n\n  \n  \n    \n      \n      exclusive · T2\n      \n    \n    \n      \n      \n      \n      exclusive · will write C\n    \n    shared · T1 and T2\n    T1 already knows it will write C\n    so it takes the exclusive lock before the read\n  \n\n  \n  \n    \n      \n      \n      unlocked\n    \n    \n      \n      \n      shared · T1 only\n      \n      exclusive · T1\n    \n    T2 unlocks A and B. T1 still holds B and C\n  \n\n  \n  \n    \n      \n      unlocked\n      \n      \n      unlocked\n      \n      \n      unlocked\n    \n    T1 writes C, then unlocks B and C\n    every lock in the example has been released"
   },
   {
     "objectID": "L12-Locking.html#which-requests-are-granted",

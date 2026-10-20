@@ -35,7 +35,7 @@
       vertical-align: middle;
     }
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-29952e135c8b1ca24e749628ccb74fd0.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-1d7f8dd183cd62d13494524ac764d299.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -324,21 +324,27 @@ Data Science 310
 <section id="locking" class="slide level2">
 <h2>Locking</h2>
 <ul>
-<li>Locking is one way to provide concurrency control.</li>
-<li>Involves associating one or more <em>locks</em> with each <em>database element</em>.
+<li><p>Locking is one way to provide concurrency control.</p></li>
+<li><p>Locking involves associating one or more <em>locks</em> with each <em>database element</em>.</p></li>
+<li><p>We can associate a lock with</p>
 <ul>
-<li>each page</li>
-<li>each record</li>
-<li>possibly even each collection</li>
+<li>a page</li>
+<li>a record</li>
+<li>possibly even a collection (eg, relation)</li>
 </ul></li>
 </ul>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L11-Txns2/lock-concept.svg" class="quarto-figure quarto-figure-center" style="width:94.0%" alt="Each database element has its own lock. Element A is locked by transaction T1, which can read and write A. Transaction T2 also wants A and must wait for the lock. Element B is unlocked."></p>
+</figure>
+</div>
 </section>
 <section id="locking-basics" class="slide level2">
 <h2>Locking Basics</h2>
 <div class="columns">
-<div class="column" style="width:55%;">
+<div class="column" style="width:46%;">
 <ul>
-<li>A transaction must <span style="color:#197300;"><em>request and acquire a lock</em></span> for a data element before it can access it.</li>
+<li>A transaction must <span style="color:#008000;"><strong><em>request and acquire a lock</em></strong></span> for a data element before it can access it.</li>
 </ul>
 <div class="fragment" data-fragment-index="1">
 <ul>
@@ -349,46 +355,179 @@ Data Science 310
 <ul>
 <li>As necessary, the DBMS:
 <ul>
-<li><span style="color:#c00;"><em>denies</em></span> lock requests for elements that are currently locked</li>
+<li><span style="color:#c00;"><strong><em>denies</em></strong></span> lock requests for elements that are currently locked</li>
 <li>makes the requesting transaction wait</li>
 </ul></li>
 </ul>
 </div>
 <div class="fragment" data-fragment-index="3">
 <ul>
-<li>A transaction <span style="color:#c000c0;"><em>unlocks an element</em></span> when it’s done with it.</li>
+<li>A transaction <span style="color:#c000c0;"><strong><em>unlocks an element</em></strong></span> when it’s done with it.</li>
 </ul>
 </div>
 <div class="fragment" data-fragment-index="4">
 <ul>
 <li>After the unlock, the DBMS can grant the lock to a waiting txn.
 <ul>
-<li>we’ll show a <span style="color:#3a5fcd;"><em>second lock request</em></span> when the lock is granted</li>
+<li>we’ll show a <span style="color:#0000ff;"><strong><em>second lock request</em></strong></span> when the lock is granted</li>
 </ul></li>
 </ul>
 </div>
-</div><div class="column" style="width:45%;">
+</div><div class="column" style="width:54%;">
 <div class="r-stack">
-<p><img data-src="images/L12-Locking/locking-basics-1.png" style="width:100.0%"></p>
-<p><img data-src="images/L12-Locking/locking-basics-2.png" class="fragment" style="width:100.0%" data-fragment-index="1"></p>
-<p><img data-src="images/L12-Locking/locking-basics-3.png" class="fragment" style="width:100.0%" data-fragment-index="2"></p>
-<p><img data-src="images/L12-Locking/locking-basics-4.png" class="fragment" style="width:100.0%" data-fragment-index="3"></p>
-<p><img data-src="images/L12-Locking/locking-basics-5.png" class="fragment" style="width:100.0%" data-fragment-index="4"></p>
+<p><img data-src="images/L11-Txns2/locking-1.png" style="width:100.0%"></p>
+<p><img data-src="images/L11-Txns2/locking-2.png" class="fragment" style="width:100.0%" data-fragment-index="1"></p>
+<p><img data-src="images/L11-Txns2/locking-3.png" class="fragment" style="width:100.0%" data-fragment-index="2"></p>
+<p><img data-src="images/L11-Txns2/locking-4.png" class="fragment" style="width:100.0%" data-fragment-index="3"></p>
+<p><img data-src="images/L11-Txns2/locking-5.png" class="fragment" style="width:100.0%" data-fragment-index="4"></p>
 </div>
+<!--
+  Small companion diagram for "Locking Basics" in L11 (included by
+  L11-Txns2.qmd, under the schedule table). Same visual language as
+  images/L11-Txns2/lock-concept.svg on the previous slide, but it follows the
+  slide's fragment steps, showing the state of X's lock after each one:
+
+    start    T1 holds the lock on X                    (l(X); r(X))
+    step 1   T2 requests the lock                      (l(X))
+    step 2   the request is denied; T2 must wait
+    step 3   T1 unlocks X; T2 is still waiting         (w(X); u(X))
+    step 4   the lock is granted to T2                 (l(X) granted; ...)
+
+  No script: each state is a reveal.js fragment whose data-fragment-index
+  matches the step it belongs to (fade-out = shown until that step,
+  fade-in-then-out = shown only during it).
+-->
+<style>
+#lock-steps {
+  display: block; width: 100%; height: auto; margin: 0.9em auto 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#lock-steps text { text-anchor: middle; }
+#lock-steps .t1 { color: #3a5fcd; }    /* T1 blue, T2 orange, as on the previous slide */
+#lock-steps .t2 { color: #cc6600; }
+#lock-steps .free { color: #999; }
+
+#lock-steps .db { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#lock-steps .db-label { fill: #444; font-size: 19px; }
+#lock-steps .item { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#lock-steps .item-name { fill: #000; font-size: 34px; font-weight: 500; }
+#lock-steps .txn rect { fill: currentColor; fill-opacity: 0.1; stroke: currentColor; stroke-width: 3; }
+#lock-steps .txn text { fill: currentColor; font-size: 30px; font-weight: 700; }
+
+#lock-steps .line { fill: none; stroke: currentColor; stroke-width: 4; }
+#lock-steps .tip { fill: currentColor; }
+#lock-steps .stop { stroke: currentColor; stroke-width: 6; stroke-linecap: round; }
+#lock-steps .says { fill: currentColor; font-size: 20px; font-style: italic; }
+#lock-steps .means { fill: #333; font-size: 19px; }
+#lock-steps .state { fill: currentColor; font-size: 19px; font-style: italic; }
+#lock-steps .state.free { fill: #777; }
+
+/* A PDF export shows every fragment at once, so keep only the final state there. */
+.print-pdf #lock-steps .fragment.fade-out,
+.print-pdf #lock-steps .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="lock-steps" viewbox="0 0 720 172" role="img" aria-label="The lock on element X, step by step. At first transaction T1 holds the lock and can access X. Then T2 requests the lock; the request is denied and T2 must wait. T1 unlocks X while T2 is still waiting. Finally the lock is granted to T2, which can now access X.">
+  <!-- Shapes drawn more than once. They are styled with attributes because
+       the stylesheet's "#lock-steps ..." rules do not reach inside <use>;
+       currentColor picks up the colour of whichever group uses them. -->
+  <defs>
+    <g id="ls-locked">
+      <path d="M379,81 V69 a13,13 0 0 1 26,0 V81" fill="none" stroke="currentColor" stroke-width="6"></path>
+      <rect x="370" y="80" width="44" height="34" rx="6" fill="currentColor"></rect>
+      <circle cx="392" cy="93" r="4.5" fill="#fff"></circle><rect x="390" y="93" width="4" height="12" rx="1.5" fill="#fff"></rect>
+    </g>
+    <g id="ls-unlocked">
+      <path d="M379,81 V61 a13,13 0 0 1 26,0 V70" fill="none" stroke="currentColor" stroke-width="6"></path>
+      <rect x="370" y="80" width="44" height="34" rx="6" fill="currentColor"></rect>
+      <circle cx="392" cy="93" r="4.5" fill="#fff"></circle><rect x="390" y="93" width="4" height="12" rx="1.5" fill="#fff"></rect>
+    </g>
+    <!-- T2 reaching for X without holding its lock -->
+    <g id="ls-wants">
+      <path d="M620,82 H464" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="9 7"></path>
+      <path d="M448,82 l16,-8.5 v17 z" fill="currentColor"></path>
+    </g>
+  </defs>
+
+  <!-- always there: the element and the two transactions -->
+  <rect class="db" x="260" y="6" width="200" height="158" rx="14"></rect>
+  <text class="db-label" x="360" y="31">database element</text>
+  <rect class="item" x="295" y="44" width="130" height="76" rx="8"></rect>
+  <text class="item-name" x="332" y="95">X</text>
+  <g class="txn t1"><rect x="8" y="47" width="90" height="70" rx="12"></rect><text x="53" y="93">T<tspan dy="7" font-size="70%">1</tspan></text></g>
+  <g class="txn t2"><rect x="622" y="47" width="90" height="70" rx="12"></rect><text x="667" y="93">T<tspan dy="7" font-size="70%">2</tspan></text></g>
+
+  <!-- until step 3: T1 holds the lock -->
+  <g class="t1 fragment fade-out" data-fragment-index="3">
+    <path class="line" d="M100,82 H282"></path>
+    <path class="tip" d="M295,82 l-16,-8.5 v17 z"></path>
+    <text class="says" x="179" y="66">holds the lock</text>
+    <text class="means" x="179" y="106">can access X</text>
+    <use href="#ls-locked"></use>
+    <text class="state" x="360" y="146">locked by T<tspan dy="5" font-size="70%">1</tspan></text>
+  </g>
+
+  <!-- step 1: T2 asks for the lock -->
+  <g class="t2 fragment fade-in-then-out" data-fragment-index="1">
+    <use href="#ls-wants"></use>
+    <text class="says" x="541" y="66">requests the lock</text>
+  </g>
+
+  <!-- step 2: the request is denied -->
+  <g class="t2 fragment fade-in-then-out" data-fragment-index="2">
+    <use href="#ls-wants"></use>
+    <path class="stop" d="M438,64 V100"></path>
+    <text class="says" x="541" y="66">request denied</text>
+    <text class="means" x="541" y="106">must wait</text>
+  </g>
+
+  <!-- step 3: T1 unlocks X; T2 has not been given the lock yet -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <text class="says t1" x="179" y="88">unlocks X</text>
+    <use class="free" href="#ls-unlocked"></use>
+    <text class="state free" x="360" y="146">unlocked</text>
+    <g class="t2">
+      <use href="#ls-wants"></use>
+      <text class="says" x="541" y="66">still waiting</text>
+    </g>
+  </g>
+
+  <!-- step 4: the lock is granted to T2 -->
+  <g class="t2 fragment" data-fragment-index="4">
+    <path class="line" d="M620,82 H438"></path>
+    <path class="tip" d="M425,82 l16,-8.5 v17 z"></path>
+    <text class="says" x="541" y="66">lock granted</text>
+    <text class="means" x="541" y="106">can access X</text>
+    <use href="#ls-locked"></use>
+    <text class="state" x="360" y="146">locked by T<tspan dy="5" font-size="70%">2</tspan></text>
+  </g>
+</svg>
 </div></div>
 </section>
 <section id="locking-and-serializability" class="slide level2">
 <h2>Locking and Serializability</h2>
 <ul>
-<li>Just having locks isn’t enough to guarantee serializability.</li>
+<li>We will attempt to use locks to enforce serializability.</li>
+<li>However, just having locks isn’t enough to guarantee serializability.
+<ul>
+<li>It matters how the locks are used.</li>
+</ul></li>
 <li>Example: our problematic schedule can still be carried out.</li>
 </ul>
+<div class="column" style="width:58%;">
 <div class="r-stack">
-<p><img data-src="images/L12-Locking/lock-ser-1.png" style="width:68.0%"></p>
-<p><img data-src="images/L12-Locking/lock-ser-2.png" class="fragment" style="width:68.0%"></p>
-<p><img data-src="images/L12-Locking/lock-ser-3.png" class="fragment" style="width:68.0%"></p>
+<p><img data-src="images/L12-Locking/lock-ser-1.png" style="width:100.0%"></p>
+<p><img data-src="images/L12-Locking/lock-ser-2.png" class="fragment" style="width:100.0%"></p>
+<p><img data-src="images/L12-Locking/lock-ser-3.png" class="fragment" style="width:100.0%"></p>
 </div>
-</section>
+</div><div class="column" style="width:42%;">
+<div class="fragment">
+<ul>
+<li><p>The problem is that T1 released its lock on <code>balance1</code> “too soon”.</p></li>
+<li><p>Notice that T1 acquired a lock on <code>balance2</code> later; this suggests that the transaction was not “done” when it released the lock on <code>balance1</code>.</p></li>
+</ul>
+</div>
+</div></section>
 <section id="two-phase-locking-2pl" class="slide level2">
 <h2>Two-Phase Locking (2PL)</h2>
 <ul>
@@ -433,8 +572,10 @@ Data Science 310
 <li>2PL would prevent this interleaving.</li>
 </ul></li>
 </ul>
-
-<img data-src="images/L12-Locking/twopl-sched.png" class="quarto-figure quarto-figure-center r-stretch" style="width:52.0%"><div class="fragment">
+<div class="twopl-annot">
+<p><img src="images/L12-Locking/twopl-sched.png" alt="Schedule in which T1 unlocks balance1 and later locks balance2"> <svg viewbox="0 0 825 417" aria-hidden="true"> <defs> <marker id="twopl-arr" viewbox="0 0 10 10" refx="9" refy="5" markerwidth="4.2" markerheight="4.2" orient="auto"> <path d="M 0 0 L 10 5 L 0 10 z" fill="#178a17"></path> </marker> </defs> <path d="M 294 158 C 294 230, 162 240, 162 308" fill="none" stroke="#178a17" stroke-width="6" stroke-linecap="round" marker-end="url(#twopl-arr)"></path> </svg></p>
+</div>
+<div class="fragment">
 <ul>
 <li>More generally, 2PL produces conflict serializable schedules.</li>
 </ul>
@@ -556,16 +697,19 @@ Data Science 310
 <section id="the-need-for-different-types-of-locks" class="slide level2">
 <h2>The Need for Different Types of Locks</h2>
 <ul>
-<li>With only one type of lock, overlapping transactions can’t read the same data item, even though two reads don’t conflict.
+<li class="fragment">Recall that our goal is to allow overlapping transactions to read the same data item, even though two reads don’t conflict.</li>
+<li class="fragment">With only one type of lock, overlapping transactions can’t read the same data item, even though they don’t conflict.
 <ul>
-<li>Two transactions could be forced to be serialized unnecessarily</li>
-<li>This can have a negative impact on database performance</li>
+<li class="fragment">Two transactions could be forced to be serialized unnecessarily</li>
+<li class="fragment">This can have a negative impact on database performance</li>
 </ul></li>
-<li>To get around this, use more than one <em>mode</em> of lock.</li>
+<li class="fragment">To get around this, use more than one <em>mode</em> of lock.</li>
 </ul>
 </section>
 <section id="exclusive-vs.-shared-locks" class="slide level2">
 <h2>Exclusive vs.&nbsp;Shared Locks</h2>
+<div class="columns">
+<div class="column" style="width:58%;">
 <ul>
 <li>An <em>exclusive lock</em> allows a transaction to write or read an item.
 <ul>
@@ -573,17 +717,17 @@ Data Science 310
 <li>only one txn can hold it at a given time</li>
 </ul></li>
 </ul>
-<div class="fragment">
+<div class="fragment" data-fragment-index="1">
 <ul>
 <li>xl<sub>i</sub>(A) = transaction T<sub>i</sub> requests an exclusive lock for A</li>
 </ul>
 </div>
-<div class="fragment sub" style="margin-left:2.4em;">
+<div class="fragment sub" data-fragment-index="2" style="margin-left:2.4em;">
 <ul>
 <li>if another txn holds <em>any</em> lock for A, T<sub>i</sub> must wait until that lock is released</li>
 </ul>
 </div>
-<div class="fragment">
+<div class="fragment" data-fragment-index="3">
 <ul>
 <li>A <em>shared lock</em> only allows a transaction to read an item.
 <ul>
@@ -591,16 +735,246 @@ Data Science 310
 </ul></li>
 </ul>
 </div>
-<div class="fragment">
+<div class="fragment" data-fragment-index="4">
 <ul>
 <li>sl<sub>i</sub>(A) = transaction T<sub>i</sub> requests a shared lock for A</li>
 </ul>
 </div>
-<div class="fragment sub" style="margin-left:2.4em;">
+<div class="fragment sub" data-fragment-index="5" style="margin-left:2.4em;">
 <ul>
 <li>if another txn holds an <em>exclusive</em> lock for A, T<sub>i</sub> must wait until that lock is released</li>
 </ul>
 </div>
+</div><div class="column" style="width:42%;">
+<!--
+  Companion diagram for "Exclusive vs. Shared Locks" in L12-Locking.qmd.
+  Same visual language as images/L11-Txns2/lock-concept.svg and
+  _includes/L11-lock-steps.html: one database element, a padlock, T1 in blue
+  and T2 in orange. Each state is a reveal.js fragment whose
+  data-fragment-index matches the bullet it illustrates:
+
+    start   T1 holds an exclusive lock on A; it can read and write A
+    step 1  that lock is xl1(A)
+    step 2  T2's request is denied, because T1 holds a lock
+    step 3  T1 and T2 both hold shared locks and can both read A
+    step 4  those locks are sl1(A) and sl2(A)
+    step 5  T1's exclusive lock makes T2's shared request wait
+
+  No script. fade-out is shown until its step; fade-in-then-out only during
+  its step; the last state stays visible.
+-->
+<style>
+/* The bullets beside this figure are long. Shrink just this slide so the
+   last fragment still clears the footer; the figure's own type is in px. */
+.reveal .slides section:has(#sx-locks) {
+  font-size: 0.88em;
+}
+.reveal .slides section:has(#sx-locks) h2 {
+  font-size: 1.7em;
+  margin-bottom: 0.25em;
+}
+.reveal .slides section:has(#sx-locks) ul {
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+}
+
+#sx-locks {
+  display: block; width: 100%; height: auto; margin: 1.6em auto 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#sx-locks text { text-anchor: middle; }
+#sx-locks .t1 { color: #3a5fcd; }
+#sx-locks .t2 { color: #cc6600; }
+
+#sx-locks .db { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#sx-locks .db-label { fill: #444; font-size: 18px; }
+#sx-locks .item { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#sx-locks .item-name { fill: #000; font-size: 42px; font-weight: 500; }
+#sx-locks .txn rect { fill: currentColor; fill-opacity: 0.1; stroke: currentColor; stroke-width: 3; }
+#sx-locks .txn text { fill: currentColor; font-size: 30px; font-weight: 700; }
+
+#sx-locks .line { fill: none; stroke: currentColor; stroke-width: 4; }
+#sx-locks .tip { fill: currentColor; }
+#sx-locks .stop { stroke: currentColor; stroke-width: 7; stroke-linecap: round; }
+#sx-locks .says { fill: currentColor; font-size: 20px; font-style: italic; }
+#sx-locks .means { fill: #333; font-size: 16px; }
+#sx-locks .state { fill: currentColor; font-size: 18px; font-style: italic; }
+#sx-locks .rule { fill: #333; font-size: 18px; }
+
+.print-pdf #sx-locks .fragment.fade-out,
+.print-pdf #sx-locks .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="sx-locks" viewbox="0 0 640 400" role="img" aria-label="Lock modes on element A. First transaction T1 holds an exclusive lock and can read and write A. T2 then requests a lock and must wait, because T1 already holds one. Next both transactions hold shared locks and can both read A. Finally T1 holds an exclusive lock again, and T2's shared-lock request must wait.">
+  <defs>
+    <!-- Closed padlock. currentColor comes from the group that uses it. -->
+    <g id="sx-lock">
+      <path d="M9,-13 V-25 a13,13 0 0 1 26,0 V-13" fill="none" stroke="currentColor" stroke-width="6"></path>
+      <rect width="44" height="34" rx="6" fill="currentColor"></rect>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"></circle>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"></rect>
+    </g>
+    <!-- T2 reaching toward A, stopped short of the element -->
+    <g id="sx-wants">
+      <path d="M502,152 H468" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="9 7"></path>
+      <path d="M452,152 l16,-8.5 v17 z" fill="currentColor"></path>
+      <path d="M440,132 V172" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"></path>
+    </g>
+  </defs>
+
+  <!-- always there: element A sits in the database -->
+  <rect class="db" x="175" y="36" width="290" height="250" rx="16"></rect>
+  <text class="db-label" x="320" y="64">database element</text>
+  <rect class="item" x="215" y="82" width="210" height="140" rx="8"></rect>
+  <text class="item-name" x="270" y="168">A</text>
+
+  <!-- start: T1 alone holds an exclusive lock -->
+  <g class="fragment fade-out" data-fragment-index="1">
+    <g class="txn t1">
+      <rect x="12" y="118" width="124" height="68" rx="14"></rect>
+      <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <path class="line" d="M138,152 H200"></path>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"></path>
+      <text class="says" x="74" y="82">holds the lock</text>
+      <text class="means" x="74" y="208">read and write</text>
+      <use href="#sx-lock" transform="translate(340,124)"></use>
+      <text class="state" x="320" y="256">exclusive · only T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <text class="rule" x="320" y="328">one transaction</text>
+    <text class="rule" x="320" y="356">has exclusive access to A</text>
+  </g>
+
+  <!-- step 1: name the exclusive request -->
+  <g class="t1 fragment fade-in-then-out" data-fragment-index="1">
+    <g class="txn">
+      <rect x="12" y="118" width="124" height="68" rx="14"></rect>
+      <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+    </g>
+    <path class="line" d="M138,152 H200"></path>
+    <path class="tip" d="M215,152 l-16,-8.5 v17 z"></path>
+    <text class="says" x="74" y="82">xl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+    <text class="means" x="74" y="208">exclusive lock</text>
+    <use href="#sx-lock" transform="translate(340,124)"></use>
+    <text class="state" x="320" y="256">exclusive · only T<tspan dy="4" font-size="70%">1</tspan></text>
+    <text class="rule" x="320" y="328">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> requests an exclusive lock</tspan></text>
+    <text class="rule" x="320" y="356">only one txn can hold it</text>
+  </g>
+
+  <!-- step 2: any lock already held blocks the next request -->
+  <g class="fragment fade-in-then-out" data-fragment-index="2">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"></rect>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"></path>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"></path>
+      <text class="says" x="74" y="82">xl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="74" y="208">holds a lock</text>
+      <use href="#sx-lock" transform="translate(340,124)"></use>
+      <text class="state" x="320" y="256">locked by T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"></rect>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <use href="#sx-wants"></use>
+      <text class="says" x="566" y="82">request denied</text>
+      <text class="means" x="566" y="208">must wait</text>
+    </g>
+    <text class="rule" x="320" y="328">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> already holds a lock on A</tspan></text>
+    <text class="rule" x="320" y="356">so T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4"> waits</tspan></text>
+  </g>
+
+  <!-- step 3: shared locks let several transactions read -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"></rect>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"></path>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"></path>
+      <text class="says" x="74" y="82">shared lock</text>
+      <text class="means" x="74" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(322,132) scale(0.72)"></use>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"></rect>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <path class="line" d="M502,152 H440"></path>
+      <path class="tip" d="M425,152 l16,-8.5 v17 z"></path>
+      <text class="says" x="566" y="82">shared lock</text>
+      <text class="means" x="566" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(370,132) scale(0.72)"></use>
+    </g>
+    <text class="state" x="320" y="256" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="320" y="328">several transactions at once</text>
+    <text class="rule" x="320" y="356">a shared lock allows reading only</text>
+  </g>
+
+  <!-- step 4: name the shared requests -->
+  <g class="fragment fade-in-then-out" data-fragment-index="4">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"></rect>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"></path>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"></path>
+      <text class="says" x="74" y="82">sl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="74" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(322,132) scale(0.72)"></use>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"></rect>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <path class="line" d="M502,152 H440"></path>
+      <path class="tip" d="M425,152 l16,-8.5 v17 z"></path>
+      <text class="says" x="566" y="82">sl<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="566" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(370,132) scale(0.72)"></use>
+    </g>
+    <text class="state" x="320" y="256" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="320" y="328">sl<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4">(A) and sl</tspan><tspan dy="4" font-size="70%">2</tspan><tspan dy="-4">(A)</tspan></text>
+    <text class="rule" x="320" y="356">both hold a shared lock on A</text>
+  </g>
+
+  <!-- step 5: an exclusive lock blocks a shared request -->
+  <g class="fragment" data-fragment-index="5">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"></rect>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"></path>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"></path>
+      <text class="says" x="74" y="82">xl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="74" y="208">exclusive lock</text>
+      <use href="#sx-lock" transform="translate(340,124)"></use>
+      <text class="state" x="320" y="256">exclusive · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"></rect>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <use href="#sx-wants"></use>
+      <text class="says" x="566" y="82">sl<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="566" y="208">must wait</text>
+    </g>
+    <text class="rule" x="320" y="328">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> holds an exclusive lock</tspan></text>
+    <text class="rule" x="320" y="356">so T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4">'s shared request waits</tspan></text>
+  </g>
+</svg>
+</div></div>
 </section>
 <section id="lock-compatibility-matrix" class="slide level2">
 <h2>Lock Compatibility Matrix</h2>
@@ -608,10 +982,26 @@ Data Science 310
 <li>Used to specify when a lock request for a currently locked item should be granted.</li>
 </ul>
 <div class="r-stack">
-<p><img data-src="images/L12-Locking/compat-1.png" style="width:66.0%"></p>
-<p><img data-src="images/L12-Locking/compat-2.png" class="fragment" style="width:66.0%"></p>
-<p><img data-src="images/L12-Locking/compat-3.png" class="fragment" style="width:66.0%"></p>
-<p><img data-src="images/L12-Locking/compat-4.png" class="fragment" style="width:66.0%"></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L12-Locking/compat-1.png" class="compat-lg quarto-figure quarto-figure-center" style="width:116.0%"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L12-Locking/compat-2.png" class="compat-lg fragment quarto-figure quarto-figure-center" style="width:116.0%"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L12-Locking/compat-3.png" class="compat-lg fragment quarto-figure quarto-figure-center" style="width:116.0%"></p>
+</figure>
+</div>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="images/L12-Locking/compat-4.png" class="compat-lg fragment quarto-figure quarto-figure-center" style="width:116.0%"></p>
+</figure>
+</div>
 </div>
 </section>
 <section id="examples-of-using-shared-and-exclusive-locks" class="slide level2">
@@ -619,17 +1009,229 @@ Data Science 310
 <ul>
 <li>sl<sub>i</sub>(A) = transaction T<sub>i</sub> requests a shared lock for A</li>
 <li>xl<sub>i</sub>(A) = transaction T<sub>i</sub> requests an exclusive lock for A</li>
-<li>Examples:</li>
 </ul>
+<!--
+  Companion diagram for "Examples of Using Shared and Exclusive Locks".
+  Same visual language as the other lock figures: a padlock on each database
+  element, T1 in blue, T2 in orange. Each state matches one frame of the
+  schedule (locks-ex-1.png through locks-ex-8.png):
+
+    start   T2 holds xl(A) and writes A
+    step 1  T1 holds sl(B) and reads B
+    step 2  T2 also holds sl(B) and reads B
+    step 3  both are reading B; a shared lock lets them overlap
+    step 4  T1 holds xl(C) and reads C
+    step 5  T1 took the exclusive lock because it will write C
+    step 6  T2 unlocks A and B
+    step 7  T1 writes C and unlocks B and C
+
+  Fragment indices are written one higher than the reveal step, because
+  Quarto numbers markdown fragment-index from 1 and rewrites this file the
+  same way. fade-out is shown until its step; fade-in-then-out only during
+  its step; the last state stays.
+-->
+<style>
+#ex-locks {
+  display: block; width: 96%; height: auto; margin: 0.15em auto 0.35em;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#ex-locks text { text-anchor: middle; }
+#ex-locks .t1 { color: #3a5fcd; }
+#ex-locks .t2 { color: #cc6600; }
+#ex-locks .free { color: #999; }
+
+#ex-locks .card { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#ex-locks .card-label { fill: #444; font-size: 15px; }
+#ex-locks .item-name { fill: #000; font-size: 40px; font-weight: 500; }
+#ex-locks .state { fill: currentColor; font-size: 16px; font-style: italic; }
+#ex-locks .state.free { fill: #777; }
+#ex-locks .rule { fill: #333; font-size: 20px; }
+#ex-locks .focus { fill: none; stroke: currentColor; stroke-width: 4; }
+
+.print-pdf #ex-locks .fragment.fade-out,
+.print-pdf #ex-locks .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="ex-locks" viewbox="0 0 1080 268" role="img" aria-label="Three database elements, A, B, and C, as the example schedule runs. T2 first holds an exclusive lock on A and writes A. T1 and T2 then both hold shared locks on B and read it. T1 takes an exclusive lock on C before reading C, because T1 will write C. T2 unlocks A and B. T1 writes C and unlocks B and C.">
+  <defs>
+    <g id="ex-lock">
+      <path d="M9,-13 V-25 a13,13 0 0 1 26,0 V-13" fill="none" stroke="currentColor" stroke-width="6"></path>
+      <rect width="44" height="34" rx="6" fill="currentColor"></rect>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"></circle>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"></rect>
+    </g>
+    <g id="ex-lock-open">
+      <path d="M9,-20 V-36 a13,13 0 0 1 26,0 V-26" fill="none" stroke="currentColor" stroke-width="6"></path>
+      <rect width="44" height="34" rx="6" fill="currentColor"></rect>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"></circle>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"></rect>
+    </g>
+  </defs>
+
+  <!-- always there: the three elements -->
+  <rect class="card" x="24" y="10" width="324" height="176" rx="14"></rect>
+  <text class="card-label" x="186" y="34">element A</text>
+  <text class="item-name" x="118" y="118">A</text>
+
+  <rect class="card" x="378" y="10" width="324" height="176" rx="14"></rect>
+  <text class="card-label" x="540" y="34">element B</text>
+  <text class="item-name" x="470" y="118">B</text>
+
+  <rect class="card" x="732" y="10" width="324" height="176" rx="14"></rect>
+  <text class="card-label" x="894" y="34">element C</text>
+  <text class="item-name" x="824" y="118">C</text>
+
+  <!-- start: T2 writes A under an exclusive lock. Matches locks-ex-1. -->
+  <g class="fragment fade-out" data-fragment-index="1">
+    <g class="t2">
+      <rect class="focus" x="24" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+    </g>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(590,78)"></use>
+      <text class="state" x="540" y="158">unlocked</text>
+      <use href="#ex-lock-open" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> holds an exclusive lock on A and writes A</tspan></text>
+  </g>
+
+  <!-- T1 reads B under a shared lock. Matches locks-ex-2. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="1">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t1">
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock" transform="translate(580,78)"></use>
+      <text class="state" x="540" y="158">shared · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> takes a shared lock on B and reads B</tspan></text>
+  </g>
+
+  <!-- T2 also reads B. Matches locks-ex-3. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="2">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"></use>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"></use>
+    </g>
+    <rect class="focus t1" x="378" y="10" width="324" height="176" rx="14"></rect>
+    <text class="state" x="540" y="158" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> also takes a shared lock on B and reads B</tspan></text>
+  </g>
+
+  <!-- The point of the shared locks. Matches locks-ex-4. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"></use>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"></use>
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"></rect>
+    </g>
+    <text class="state" x="540" y="158" fill="#333">shared · both are reading B</text>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="218">both read B at the same time</text>
+    <text class="rule" x="540" y="246">without shared locks, T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> would wait for T</tspan><tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> to unlock B</tspan></text>
+  </g>
+
+  <!-- T1 reads C under an exclusive lock. Matches locks-ex-5. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="4">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"></use>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"></use>
+      <rect class="focus" x="732" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">exclusive · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <text class="state" x="540" y="158" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="540" y="218">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> locks C exclusively before reading it</tspan></text>
+    <text class="rule" x="540" y="246">Why not a shared lock?</text>
+  </g>
+
+  <!-- Because the write is coming. Matches locks-ex-6. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="5">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"></use>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"></use>
+      <rect class="focus" x="732" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">exclusive · will write C</text>
+    </g>
+    <text class="state" x="540" y="158" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="540" y="218">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> already knows it will write C</tspan></text>
+    <text class="rule" x="540" y="246">so it takes the exclusive lock before the read</text>
+  </g>
+
+  <!-- T2 releases A and B. Matches locks-ex-7. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="6">
+    <g class="free">
+      <rect class="focus" x="24" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock-open" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">unlocked</text>
+    </g>
+    <g class="t1">
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock" transform="translate(580,78)"></use>
+      <text class="state" x="540" y="158">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> only</tspan></text>
+      <use href="#ex-lock" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">exclusive · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> unlocks A and B. T</tspan><tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> still holds B and C</tspan></text>
+  </g>
+
+  <!-- T1 writes C and releases B and C. Matches locks-ex-8. -->
+  <g class="fragment" data-fragment-index="7">
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(230,78)"></use>
+      <text class="state" x="186" y="158">unlocked</text>
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock-open" transform="translate(590,78)"></use>
+      <text class="state" x="540" y="158">unlocked</text>
+      <rect class="focus" x="732" y="10" width="324" height="176" rx="14"></rect>
+      <use href="#ex-lock-open" transform="translate(944,78)"></use>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="218">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> writes C, then unlocks B and C</tspan></text>
+    <text class="rule" x="540" y="246">every lock in the example has been released</text>
+  </g>
+</svg>
 <div class="r-stack">
-<p><img data-src="images/L12-Locking/locks-ex-1.png" style="width:85.0%"></p>
-<p><img data-src="images/L12-Locking/locks-ex-2.png" class="fragment" style="width:85.0%"></p>
-<p><img data-src="images/L12-Locking/locks-ex-3.png" class="fragment" style="width:85.0%"></p>
-<p><img data-src="images/L12-Locking/locks-ex-4.png" class="fragment" style="width:85.0%"></p>
-<p><img data-src="images/L12-Locking/locks-ex-5.png" class="fragment" style="width:85.0%"></p>
-<p><img data-src="images/L12-Locking/locks-ex-6.png" class="fragment" style="width:85.0%"></p>
-<p><img data-src="images/L12-Locking/locks-ex-7.png" class="fragment" style="width:85.0%"></p>
-<p><img data-src="images/L12-Locking/locks-ex-8.png" class="fragment" style="width:85.0%"></p>
+<p><img data-src="images/L12-Locking/locks-ex-1.png" style="width:78.0%"></p>
+<p><img data-src="images/L12-Locking/locks-ex-2.png" class="fragment" style="width:78.0%" data-fragment-index="1"></p>
+<p><img data-src="images/L12-Locking/locks-ex-3.png" class="fragment" style="width:78.0%" data-fragment-index="2"></p>
+<p><img data-src="images/L12-Locking/locks-ex-4.png" class="fragment" style="width:78.0%" data-fragment-index="3"></p>
+<p><img data-src="images/L12-Locking/locks-ex-5.png" class="fragment" style="width:78.0%" data-fragment-index="4"></p>
+<p><img data-src="images/L12-Locking/locks-ex-6.png" class="fragment" style="width:78.0%" data-fragment-index="5"></p>
+<p><img data-src="images/L12-Locking/locks-ex-7.png" class="fragment" style="width:78.0%" data-fragment-index="6"></p>
+<p><img data-src="images/L12-Locking/locks-ex-8.png" class="fragment" style="width:78.0%" data-fragment-index="7"></p>
 </div>
 </section>
 <section id="which-requests-are-granted" class="slide level2">
@@ -688,23 +1290,23 @@ Data Science 310
 <section id="takeaways" class="slide level2">
 <h2>Takeaways</h2>
 <ul>
-<li>To build high-performance databases we are concerned with ACID properties:
+<li class="fragment">To build high-performance databases we are concerned with ACID properties:
 <ul>
-<li>Atomicity: transactions should be all-or-nothing
+<li class="fragment">Atomicity: transactions should be all-or-nothing
 <ul>
-<li>We must be able to “roll back” a transaction</li>
+<li class="fragment">We must be able to “roll back” a transaction</li>
 </ul></li>
-<li>Consistency: transactions should leave the database consistent
+<li class="fragment">Consistency: transactions should leave the database consistent
 <ul>
-<li>Eg, must be able to transfer a bank balance correctly</li>
+<li class="fragment">Eg, must be able to transfer a bank balance correctly</li>
 </ul></li>
-<li>Isolation: transactions should not interfere
+<li class="fragment">Isolation: transactions should not interfere
 <ul>
-<li>They must be serializable</li>
+<li class="fragment">They must be serializable</li>
 </ul></li>
-<li>Durability: transactions that are committed must survive a crash
+<li class="fragment">Durability: transactions that are committed must survive a crash
 <ul>
-<li>And, for consistency, they must be recoverable</li>
+<li class="fragment">And, for consistency, they must be recoverable</li>
 </ul></li>
 </ul></li>
 </ul>
@@ -712,22 +1314,22 @@ Data Science 310
 <section id="techniques-for-achieving-acid" class="slide level2">
 <h2>Techniques for achieving ACID</h2>
 <ul>
-<li>We can check serializability using conflicting operations
+<li class="fragment">We can check serializability using conflicting operations
 <ul>
-<li>But to ensure serializability in general, we may use locking</li>
+<li class="fragment">But to ensure serializability in general, we may use locking</li>
 </ul></li>
-<li>To avoid inconsistencies, we must follow a discipline when using locking: acquire all locks before releasing any
+<li class="fragment">To avoid inconsistencies, we must follow a discipline when using locking: acquire all locks before releasing any
 <ul>
-<li>Called 2 Phase Locking</li>
+<li class="fragment">Called 2 Phase Locking</li>
 </ul></li>
-<li>And to avoid inconsistencies, commit order must be recoverable</li>
-<li>Observations:
+<li class="fragment">And to avoid inconsistencies, commit order must be recoverable</li>
+<li class="fragment">Observations:
 <ul>
-<li>Using locking modes (shared, exclusive) allows for overlapping reads</li>
-<li>Dirty reads can be problematic
+<li class="fragment">Using locking modes (shared, exclusive) allows for overlapping reads</li>
+<li class="fragment">Dirty reads can be problematic
 <ul>
-<li>They can lead to cascading rollbacks</li>
-<li>And a txn performing a dirty read must commit after the writer for recoverability</li>
+<li class="fragment">They can lead to cascading rollbacks</li>
+<li class="fragment">And a txn performing a dirty read must commit after the writer for recoverability</li>
 </ul></li>
 </ul></li>
 </ul>
