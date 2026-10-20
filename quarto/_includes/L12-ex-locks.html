@@ -1,0 +1,216 @@
+```{=html}
+<!--
+  Companion diagram for "Examples of Using Shared and Exclusive Locks".
+  Same visual language as the other lock figures: a padlock on each database
+  element, T1 in blue, T2 in orange. Each state matches one frame of the
+  schedule (locks-ex-1.png through locks-ex-8.png):
+
+    start   T2 holds xl(A) and writes A
+    step 1  T1 holds sl(B) and reads B
+    step 2  T2 also holds sl(B) and reads B
+    step 3  both are reading B; a shared lock lets them overlap
+    step 4  T1 holds xl(C) and reads C
+    step 5  T1 took the exclusive lock because it will write C
+    step 6  T2 unlocks A and B
+    step 7  T1 writes C and unlocks B and C
+
+  Fragment indices are written one higher than the reveal step, because
+  Quarto numbers markdown fragment-index from 1 and rewrites this file the
+  same way. fade-out is shown until its step; fade-in-then-out only during
+  its step; the last state stays.
+-->
+<style>
+#ex-locks {
+  display: block; width: 96%; height: auto; margin: 0.15em auto 0.35em;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#ex-locks text { text-anchor: middle; }
+#ex-locks .t1 { color: #3a5fcd; }
+#ex-locks .t2 { color: #cc6600; }
+#ex-locks .free { color: #999; }
+
+#ex-locks .card { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#ex-locks .card-label { fill: #444; font-size: 15px; }
+#ex-locks .item-name { fill: #000; font-size: 40px; font-weight: 500; }
+#ex-locks .state { fill: currentColor; font-size: 16px; font-style: italic; }
+#ex-locks .state.free { fill: #777; }
+#ex-locks .rule { fill: #333; font-size: 20px; }
+#ex-locks .focus { fill: none; stroke: currentColor; stroke-width: 4; }
+
+.print-pdf #ex-locks .fragment.fade-out,
+.print-pdf #ex-locks .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="ex-locks" viewBox="0 0 1080 268" role="img"
+     aria-label="Three database elements, A, B, and C, as the example schedule runs. T2 first holds an exclusive lock on A and writes A. T1 and T2 then both hold shared locks on B and read it. T1 takes an exclusive lock on C before reading C, because T1 will write C. T2 unlocks A and B. T1 writes C and unlocks B and C.">
+  <defs>
+    <g id="ex-lock">
+      <path d="M9,-13 V-25 a13,13 0 0 1 26,0 V-13" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect width="44" height="34" rx="6" fill="currentColor"/>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"/>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"/>
+    </g>
+    <g id="ex-lock-open">
+      <path d="M9,-20 V-36 a13,13 0 0 1 26,0 V-26" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect width="44" height="34" rx="6" fill="currentColor"/>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"/>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"/>
+    </g>
+  </defs>
+
+  <!-- always there: the three elements -->
+  <rect class="card" x="24" y="10" width="324" height="176" rx="14"/>
+  <text class="card-label" x="186" y="34">element A</text>
+  <text class="item-name" x="118" y="118">A</text>
+
+  <rect class="card" x="378" y="10" width="324" height="176" rx="14"/>
+  <text class="card-label" x="540" y="34">element B</text>
+  <text class="item-name" x="470" y="118">B</text>
+
+  <rect class="card" x="732" y="10" width="324" height="176" rx="14"/>
+  <text class="card-label" x="894" y="34">element C</text>
+  <text class="item-name" x="824" y="118">C</text>
+
+  <!-- start: T2 writes A under an exclusive lock. Matches locks-ex-1. -->
+  <g class="fragment fade-out" data-fragment-index="1">
+    <g class="t2">
+      <rect class="focus" x="24" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+    </g>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(590,78)"/>
+      <text class="state" x="540" y="158">unlocked</text>
+      <use href="#ex-lock-open" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> holds an exclusive lock on A and writes A</tspan></text>
+  </g>
+
+  <!-- T1 reads B under a shared lock. Matches locks-ex-2. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="1">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t1">
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock" transform="translate(580,78)"/>
+      <text class="state" x="540" y="158">shared · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> takes a shared lock on B and reads B</tspan></text>
+  </g>
+
+  <!-- T2 also reads B. Matches locks-ex-3. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="2">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"/>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"/>
+    </g>
+    <rect class="focus t1" x="378" y="10" width="324" height="176" rx="14"/>
+    <text class="state" x="540" y="158" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> also takes a shared lock on B and reads B</tspan></text>
+  </g>
+
+  <!-- The point of the shared locks. Matches locks-ex-4. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"/>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"/>
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"/>
+    </g>
+    <text class="state" x="540" y="158" fill="#333">shared · both are reading B</text>
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="218">both read B at the same time</text>
+    <text class="rule" x="540" y="246">without shared locks, T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> would wait for T</tspan><tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> to unlock B</tspan></text>
+  </g>
+
+  <!-- T1 reads C under an exclusive lock. Matches locks-ex-5. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="4">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"/>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"/>
+      <rect class="focus" x="732" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">exclusive · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <text class="state" x="540" y="158" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="540" y="218">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> locks C exclusively before reading it</tspan></text>
+    <text class="rule" x="540" y="246">Why not a shared lock?</text>
+  </g>
+
+  <!-- Because the write is coming. Matches locks-ex-6. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="5">
+    <g class="t2">
+      <use href="#ex-lock" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">exclusive · T<tspan dy="4" font-size="70%">2</tspan></text>
+      <use href="#ex-lock" transform="translate(612,86) scale(0.72)"/>
+    </g>
+    <g class="t1">
+      <use href="#ex-lock" transform="translate(558,86) scale(0.72)"/>
+      <rect class="focus" x="732" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">exclusive · will write C</text>
+    </g>
+    <text class="state" x="540" y="158" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="540" y="218">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> already knows it will write C</tspan></text>
+    <text class="rule" x="540" y="246">so it takes the exclusive lock before the read</text>
+  </g>
+
+  <!-- T2 releases A and B. Matches locks-ex-7. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="6">
+    <g class="free">
+      <rect class="focus" x="24" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock-open" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">unlocked</text>
+    </g>
+    <g class="t1">
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock" transform="translate(580,78)"/>
+      <text class="state" x="540" y="158">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> only</tspan></text>
+      <use href="#ex-lock" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">exclusive · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <text class="rule" x="540" y="224">T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> unlocks A and B. T</tspan><tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> still holds B and C</tspan></text>
+  </g>
+
+  <!-- T1 writes C and releases B and C. Matches locks-ex-8. -->
+  <g class="fragment" data-fragment-index="7">
+    <g class="free">
+      <use href="#ex-lock-open" transform="translate(230,78)"/>
+      <text class="state" x="186" y="158">unlocked</text>
+      <rect class="focus" x="378" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock-open" transform="translate(590,78)"/>
+      <text class="state" x="540" y="158">unlocked</text>
+      <rect class="focus" x="732" y="10" width="324" height="176" rx="14"/>
+      <use href="#ex-lock-open" transform="translate(944,78)"/>
+      <text class="state" x="894" y="158">unlocked</text>
+    </g>
+    <text class="rule" x="540" y="218">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> writes C, then unlocks B and C</tspan></text>
+    <text class="rule" x="540" y="246">every lock in the example has been released</text>
+  </g>
+</svg>
+```

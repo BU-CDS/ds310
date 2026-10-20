@@ -164,17 +164,21 @@ E\.  [all three of the above (A, B and C)]{.fragment .highlight-blue fragment-in
 ## Locking
 
 - Locking is one way to provide concurrency control.
-- Involves associating one or more *locks* with each *database element*.
-    - each page
-    - each record
-    - possibly even each collection
+
+- Locking involves associating one or more *locks* with each *database element*.
+
+- We can associate a lock with 
+    - a page
+    - a record
+    - possibly even a collection (eg, relation)
+
+![](images/L11-Txns2/lock-concept.svg){.nostretch width="94%" fig-align="center" fig-alt="Each database element has its own lock. Element A is locked by transaction T1, which can read and write A. Transaction T2 also wants A and must wait for the lock. Element B is unlocked."}
 
 ## Locking Basics
 
-:::: {.columns}
-
-::: {.column width="55%"}
-- A transaction must [*request and acquire a lock*]{style="color:#197300;"} for a data element before it can access it.
+::::: {.columns}
+:::: {.column width="46%"}
+- A transaction must [***request and acquire a lock***]{style="color:#008000;"} for a data element before it can access it.
 
 ::: {.fragment fragment-index=1}
 - In our initial scheme, every lock can be held by only one txn at a time.
@@ -182,48 +186,62 @@ E\.  [all three of the above (A, B and C)]{.fragment .highlight-blue fragment-in
 
 ::: {.fragment fragment-index=2}
 - As necessary, the DBMS:
-    - [*denies*]{style="color:#c00;"} lock requests for elements that are currently locked
+    - [***denies***]{style="color:#c00;"} lock requests for elements that are currently locked
     - makes the requesting transaction wait
 :::
 
 ::: {.fragment fragment-index=3}
-- A transaction [*unlocks an element*]{style="color:#c000c0;"} when it's done with it.
+- A transaction [***unlocks an element***]{style="color:#c000c0;"} when it's done with it.
 :::
 
 ::: {.fragment fragment-index=4}
 - After the unlock, the DBMS can grant the lock to a waiting txn.
-    - we'll show a [*second lock request*]{style="color:#3a5fcd;"} when the lock is granted
+    - we'll show a [***second lock request***]{style="color:#0000ff;"} when the lock is granted
 :::
-:::
-
-::: {.column width="45%"}
-::: {.r-stack}
-![](images/L12-Locking/locking-basics-1.png){width="100%"}
-
-![](images/L12-Locking/locking-basics-2.png){.fragment fragment-index=1 width="100%"}
-
-![](images/L12-Locking/locking-basics-3.png){.fragment fragment-index=2 width="100%"}
-
-![](images/L12-Locking/locking-basics-4.png){.fragment fragment-index=3 width="100%"}
-
-![](images/L12-Locking/locking-basics-5.png){.fragment fragment-index=4 width="100%"}
-:::
-:::
-
 ::::
+
+:::: {.column width="54%"}
+::: {.r-stack}
+![](images/L11-Txns2/locking-1.png){width="100%"}
+
+![](images/L11-Txns2/locking-2.png){.fragment fragment-index=1 width="100%"}
+
+![](images/L11-Txns2/locking-3.png){.fragment fragment-index=2 width="100%"}
+
+![](images/L11-Txns2/locking-4.png){.fragment fragment-index=3 width="100%"}
+
+![](images/L11-Txns2/locking-5.png){.fragment fragment-index=4 width="100%"}
+:::
+
+{{< include _includes/L11-lock-steps.html >}}
+::::
+:::::
+
 
 ## Locking and Serializability
 
-- Just having locks isn't enough to guarantee serializability.
+- We will attempt to use locks to enforce serializability. 
+- However, just having locks isn't enough to guarantee serializability.
+    - It matters how the locks are used.
 - Example: our problematic schedule can still be carried out.
 
+:::: {.column width="58%"}
 ::: {.r-stack}
-![](images/L12-Locking/lock-ser-1.png){width="68%"}
+![](images/L12-Locking/lock-ser-1.png){width="100%"}
 
-![](images/L12-Locking/lock-ser-2.png){.fragment width="68%"}
+![](images/L12-Locking/lock-ser-2.png){.fragment width="100%"}
 
-![](images/L12-Locking/lock-ser-3.png){.fragment width="68%"}
+![](images/L12-Locking/lock-ser-3.png){.fragment width="100%"}
 :::
+::::
+
+:::: {.column width="42%"}
+::: {.fragment}
+- The problem is that T1 released its lock on `balance1` "too soon".
+
+- Notice that T1 acquired a lock on `balance2` later; this suggests that the transaction was not "done" when it released the lock on `balance1`.
+:::
+::::
 
 ## Two-Phase Locking (2PL)
 
@@ -254,7 +272,17 @@ E\.  [all three of the above (A, B and C)]{.fragment .highlight-blue fragment-in
 - In our earlier example, T1 does *not* follow the 2PL rule.
     - 2PL would prevent this interleaving.
 
-![](images/L12-Locking/twopl-sched.png){width="52%" fig-align="center"}
+<div class="twopl-annot">
+<img src="images/L12-Locking/twopl-sched.png" alt="Schedule in which T1 unlocks balance1 and later locks balance2">
+<svg viewBox="0 0 825 417" aria-hidden="true">
+  <defs>
+    <marker id="twopl-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="4.2" markerHeight="4.2" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#178a17"/>
+    </marker>
+  </defs>
+  <path d="M 294 158 C 294 230, 162 240, 162 308" fill="none" stroke="#178a17" stroke-width="6" stroke-linecap="round" marker-end="url(#twopl-arr)"/>
+</svg>
+</div>
 
 ::: {.fragment}
 - More generally, 2PL produces conflict serializable schedules.
@@ -363,74 +391,86 @@ E\.  [all three of the above (A, B and C)]{.fragment .highlight-blue fragment-in
 
 ## The Need for Different Types of Locks
 
-- With only one type of lock, overlapping transactions can't read the same data item, even though two reads don't conflict.
+::: {.incremental}
+- Recall that our goal is to allow overlapping transactions to read the same data item, even though two reads don't conflict.
+- With only one type of lock, overlapping transactions can't read the same data item, even though they don't conflict.
     - Two transactions could be forced to be serialized unnecessarily
     - This can have a negative impact on database performance
 - To get around this, use more than one *mode* of lock.
+:::
 
 ## Exclusive vs. Shared Locks
 
+::::: {.columns}
+:::: {.column width="58%"}
 - An *exclusive lock* allows a transaction to write or read an item.
     - gives the txn exclusive access to that item
     - only one txn can hold it at a given time
 
-::: {.fragment}
+::: {.fragment fragment-index=1}
 - xl<sub>i</sub>(A) = transaction T<sub>i</sub> requests an exclusive lock for A
 :::
 
-::: {.fragment .sub style="margin-left:2.4em;"}
+::: {.fragment .sub fragment-index=2 style="margin-left:2.4em;"}
 - if another txn holds *any* lock for A, T<sub>i</sub> must wait until that lock is released
 :::
 
-::: {.fragment}
+::: {.fragment fragment-index=3}
 - A *shared lock* only allows a transaction to read an item.
     - multiple txns can hold a shared lock for the same data item at the same time
 :::
 
-::: {.fragment}
+::: {.fragment fragment-index=4}
 - sl<sub>i</sub>(A) = transaction T<sub>i</sub> requests a shared lock for A
 :::
 
-::: {.fragment .sub style="margin-left:2.4em;"}
+::: {.fragment .sub fragment-index=5 style="margin-left:2.4em;"}
 - if another txn holds an *exclusive* lock for A, T<sub>i</sub> must wait until that lock is released
 :::
+::::
+
+:::: {.column width="42%"}
+{{< include _includes/L12-sx-locks.html >}}
+::::
+:::::
 
 ## Lock Compatibility Matrix
 
 - Used to specify when a lock request for a currently locked item should be granted.
 
 ::: {.r-stack}
-![](images/L12-Locking/compat-1.png){width="66%"}
+![](images/L12-Locking/compat-1.png){.compat-lg width="116%" fig-align="center"}
 
-![](images/L12-Locking/compat-2.png){.fragment width="66%"}
+![](images/L12-Locking/compat-2.png){.compat-lg .fragment width="116%" fig-align="center"}
 
-![](images/L12-Locking/compat-3.png){.fragment width="66%"}
+![](images/L12-Locking/compat-3.png){.compat-lg .fragment width="116%" fig-align="center"}
 
-![](images/L12-Locking/compat-4.png){.fragment width="66%"}
+![](images/L12-Locking/compat-4.png){.compat-lg .fragment width="116%" fig-align="center"}
 :::
 
 ## Examples of Using Shared and Exclusive Locks
 
 - sl<sub>i</sub>(A) = transaction T<sub>i</sub> requests a shared lock for A
 - xl<sub>i</sub>(A) = transaction T<sub>i</sub> requests an exclusive lock for A
-- Examples:
+
+{{< include _includes/L12-ex-locks.html >}}
 
 ::: {.r-stack}
-![](images/L12-Locking/locks-ex-1.png){width="85%"}
+![](images/L12-Locking/locks-ex-1.png){width="78%"}
 
-![](images/L12-Locking/locks-ex-2.png){.fragment width="85%"}
+![](images/L12-Locking/locks-ex-2.png){.fragment fragment-index=1 width="78%"}
 
-![](images/L12-Locking/locks-ex-3.png){.fragment width="85%"}
+![](images/L12-Locking/locks-ex-3.png){.fragment fragment-index=2 width="78%"}
 
-![](images/L12-Locking/locks-ex-4.png){.fragment width="85%"}
+![](images/L12-Locking/locks-ex-4.png){.fragment fragment-index=3 width="78%"}
 
-![](images/L12-Locking/locks-ex-5.png){.fragment width="85%"}
+![](images/L12-Locking/locks-ex-5.png){.fragment fragment-index=4 width="78%"}
 
-![](images/L12-Locking/locks-ex-6.png){.fragment width="85%"}
+![](images/L12-Locking/locks-ex-6.png){.fragment fragment-index=5 width="78%"}
 
-![](images/L12-Locking/locks-ex-7.png){.fragment width="85%"}
+![](images/L12-Locking/locks-ex-7.png){.fragment fragment-index=6 width="78%"}
 
-![](images/L12-Locking/locks-ex-8.png){.fragment width="85%"}
+![](images/L12-Locking/locks-ex-8.png){.fragment fragment-index=7 width="78%"}
 :::
 
 ## Which requests are granted?
@@ -477,6 +517,7 @@ E\.  [all three of the above (A, B and C)]{.fragment .highlight-blue fragment-in
 
 ## Takeaways
 
+::: {.incremental}
 - To build high-performance databases we are concerned with ACID properties:
     - Atomicity: transactions should be all-or-nothing
         - We must be able to "roll back" a transaction
@@ -486,9 +527,11 @@ E\.  [all three of the above (A, B and C)]{.fragment .highlight-blue fragment-in
         - They must be serializable
     - Durability: transactions that are committed must survive a crash
         - And, for consistency, they must be recoverable
+:::
 
 ## Techniques for achieving ACID
 
+::: {.incremental}
 - We can check serializability using conflicting operations
     - But to ensure serializability in general, we may use locking
 - To avoid inconsistencies, we must follow a discipline when using locking: acquire all locks before releasing any
@@ -499,3 +542,4 @@ E\.  [all three of the above (A, B and C)]{.fragment .highlight-blue fragment-in
     - Dirty reads can be problematic
         - They can lead to cascading rollbacks
         - And a txn performing a dirty read must commit after the writer for recoverability
+:::
