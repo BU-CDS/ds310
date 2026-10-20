@@ -97,6 +97,37 @@ $presentation-h2-font-size: 1.6em;
   margin-bottom: 0;
 }
 
+// Lock compatibility matrix on L12: shown larger than the deck's usual
+// 95% image cap (66% × 1.75 ≈ 116%).
+.reveal section img.compat-lg {
+  max-width: 116%;
+  max-height: none;
+}
+
+// 2PL counterexample: the schedule PNG plus a green arrow from T1's
+// u(bal1) down to its later l(bal2). The SVG shares the image's viewBox
+// so the arrow stays on those two actions as the figure scales.
+.reveal .twopl-annot {
+  position: relative;
+  width: 52%;
+  margin: 0.3em auto 0;
+}
+.reveal section .twopl-annot img {
+  width: 100%;
+  max-width: none;
+  max-height: none;
+  display: block;
+  margin: 0;
+}
+.reveal .twopl-annot svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
 // Large code block that should fill the slide rather than sit in a
 // small scrolling box: bigger type, and pairs with the deck's
 // code-block-height setting so all lines are visible

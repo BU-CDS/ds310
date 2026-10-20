@@ -1,0 +1,231 @@
+```{=html}
+<!--
+  Companion diagram for "Exclusive vs. Shared Locks" in L12-Locking.qmd.
+  Same visual language as images/L11-Txns2/lock-concept.svg and
+  _includes/L11-lock-steps.html: one database element, a padlock, T1 in blue
+  and T2 in orange. Each state is a reveal.js fragment whose
+  data-fragment-index matches the bullet it illustrates:
+
+    start   T1 holds an exclusive lock on A; it can read and write A
+    step 1  that lock is xl1(A)
+    step 2  T2's request is denied, because T1 holds a lock
+    step 3  T1 and T2 both hold shared locks and can both read A
+    step 4  those locks are sl1(A) and sl2(A)
+    step 5  T1's exclusive lock makes T2's shared request wait
+
+  No script. fade-out is shown until its step; fade-in-then-out only during
+  its step; the last state stays visible.
+-->
+<style>
+/* The bullets beside this figure are long. Shrink just this slide so the
+   last fragment still clears the footer; the figure's own type is in px. */
+.reveal .slides section:has(#sx-locks) {
+  font-size: 0.88em;
+}
+.reveal .slides section:has(#sx-locks) h2 {
+  font-size: 1.7em;
+  margin-bottom: 0.25em;
+}
+.reveal .slides section:has(#sx-locks) ul {
+  margin-top: 0.15em;
+  margin-bottom: 0.15em;
+}
+
+#sx-locks {
+  display: block; width: 100%; height: auto; margin: 1.6em auto 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#sx-locks text { text-anchor: middle; }
+#sx-locks .t1 { color: #3a5fcd; }
+#sx-locks .t2 { color: #cc6600; }
+
+#sx-locks .db { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#sx-locks .db-label { fill: #444; font-size: 18px; }
+#sx-locks .item { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#sx-locks .item-name { fill: #000; font-size: 42px; font-weight: 500; }
+#sx-locks .txn rect { fill: currentColor; fill-opacity: 0.1; stroke: currentColor; stroke-width: 3; }
+#sx-locks .txn text { fill: currentColor; font-size: 30px; font-weight: 700; }
+
+#sx-locks .line { fill: none; stroke: currentColor; stroke-width: 4; }
+#sx-locks .tip { fill: currentColor; }
+#sx-locks .stop { stroke: currentColor; stroke-width: 7; stroke-linecap: round; }
+#sx-locks .says { fill: currentColor; font-size: 20px; font-style: italic; }
+#sx-locks .means { fill: #333; font-size: 16px; }
+#sx-locks .state { fill: currentColor; font-size: 18px; font-style: italic; }
+#sx-locks .rule { fill: #333; font-size: 18px; }
+
+.print-pdf #sx-locks .fragment.fade-out,
+.print-pdf #sx-locks .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="sx-locks" viewBox="0 0 640 400" role="img"
+     aria-label="Lock modes on element A. First transaction T1 holds an exclusive lock and can read and write A. T2 then requests a lock and must wait, because T1 already holds one. Next both transactions hold shared locks and can both read A. Finally T1 holds an exclusive lock again, and T2's shared-lock request must wait.">
+  <defs>
+    <!-- Closed padlock. currentColor comes from the group that uses it. -->
+    <g id="sx-lock">
+      <path d="M9,-13 V-25 a13,13 0 0 1 26,0 V-13" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect width="44" height="34" rx="6" fill="currentColor"/>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"/>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"/>
+    </g>
+    <!-- T2 reaching toward A, stopped short of the element -->
+    <g id="sx-wants">
+      <path d="M502,152 H468" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="9 7"/>
+      <path d="M452,152 l16,-8.5 v17 z" fill="currentColor"/>
+      <path d="M440,132 V172" fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round"/>
+    </g>
+  </defs>
+
+  <!-- always there: element A sits in the database -->
+  <rect class="db" x="175" y="36" width="290" height="250" rx="16"/>
+  <text class="db-label" x="320" y="64">database element</text>
+  <rect class="item" x="215" y="82" width="210" height="140" rx="8"/>
+  <text class="item-name" x="270" y="168">A</text>
+
+  <!-- start: T1 alone holds an exclusive lock -->
+  <g class="fragment fade-out" data-fragment-index="1">
+    <g class="txn t1">
+      <rect x="12" y="118" width="124" height="68" rx="14"/>
+      <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <path class="line" d="M138,152 H200"/>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"/>
+      <text class="says" x="74" y="82">holds the lock</text>
+      <text class="means" x="74" y="208">read and write</text>
+      <use href="#sx-lock" transform="translate(340,124)"/>
+      <text class="state" x="320" y="256">exclusive · only T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <text class="rule" x="320" y="328">one transaction</text>
+    <text class="rule" x="320" y="356">has exclusive access to A</text>
+  </g>
+
+  <!-- step 1: name the exclusive request -->
+  <g class="t1 fragment fade-in-then-out" data-fragment-index="1">
+    <g class="txn">
+      <rect x="12" y="118" width="124" height="68" rx="14"/>
+      <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+    </g>
+    <path class="line" d="M138,152 H200"/>
+    <path class="tip" d="M215,152 l-16,-8.5 v17 z"/>
+    <text class="says" x="74" y="82">xl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+    <text class="means" x="74" y="208">exclusive lock</text>
+    <use href="#sx-lock" transform="translate(340,124)"/>
+    <text class="state" x="320" y="256">exclusive · only T<tspan dy="4" font-size="70%">1</tspan></text>
+    <text class="rule" x="320" y="328">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> requests an exclusive lock</tspan></text>
+    <text class="rule" x="320" y="356">only one txn can hold it</text>
+  </g>
+
+  <!-- step 2: any lock already held blocks the next request -->
+  <g class="fragment fade-in-then-out" data-fragment-index="2">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"/>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"/>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"/>
+      <text class="says" x="74" y="82">xl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="74" y="208">holds a lock</text>
+      <use href="#sx-lock" transform="translate(340,124)"/>
+      <text class="state" x="320" y="256">locked by T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"/>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <use href="#sx-wants"/>
+      <text class="says" x="566" y="82">request denied</text>
+      <text class="means" x="566" y="208">must wait</text>
+    </g>
+    <text class="rule" x="320" y="328">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> already holds a lock on A</tspan></text>
+    <text class="rule" x="320" y="356">so T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4"> waits</tspan></text>
+  </g>
+
+  <!-- step 3: shared locks let several transactions read -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"/>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"/>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"/>
+      <text class="says" x="74" y="82">shared lock</text>
+      <text class="means" x="74" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(322,132) scale(0.72)"/>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"/>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <path class="line" d="M502,152 H440"/>
+      <path class="tip" d="M425,152 l16,-8.5 v17 z"/>
+      <text class="says" x="566" y="82">shared lock</text>
+      <text class="means" x="566" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(370,132) scale(0.72)"/>
+    </g>
+    <text class="state" x="320" y="256" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="320" y="328">several transactions at once</text>
+    <text class="rule" x="320" y="356">a shared lock allows reading only</text>
+  </g>
+
+  <!-- step 4: name the shared requests -->
+  <g class="fragment fade-in-then-out" data-fragment-index="4">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"/>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"/>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"/>
+      <text class="says" x="74" y="82">sl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="74" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(322,132) scale(0.72)"/>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"/>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <path class="line" d="M502,152 H440"/>
+      <path class="tip" d="M425,152 l16,-8.5 v17 z"/>
+      <text class="says" x="566" y="82">sl<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="566" y="208">can read A</text>
+      <use href="#sx-lock" transform="translate(370,132) scale(0.72)"/>
+    </g>
+    <text class="state" x="320" y="256" fill="#333">shared · T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> and T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+    <text class="rule" x="320" y="328">sl<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4">(A) and sl</tspan><tspan dy="4" font-size="70%">2</tspan><tspan dy="-4">(A)</tspan></text>
+    <text class="rule" x="320" y="356">both hold a shared lock on A</text>
+  </g>
+
+  <!-- step 5: an exclusive lock blocks a shared request -->
+  <g class="fragment" data-fragment-index="5">
+    <g class="t1">
+      <g class="txn">
+        <rect x="12" y="118" width="124" height="68" rx="14"/>
+        <text x="74" y="162">T<tspan dy="7" font-size="70%">1</tspan></text>
+      </g>
+      <path class="line" d="M138,152 H200"/>
+      <path class="tip" d="M215,152 l-16,-8.5 v17 z"/>
+      <text class="says" x="74" y="82">xl<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="74" y="208">exclusive lock</text>
+      <use href="#sx-lock" transform="translate(340,124)"/>
+      <text class="state" x="320" y="256">exclusive · T<tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t2">
+      <g class="txn">
+        <rect x="504" y="118" width="124" height="68" rx="14"/>
+        <text x="566" y="162">T<tspan dy="7" font-size="70%">2</tspan></text>
+      </g>
+      <use href="#sx-wants"/>
+      <text class="says" x="566" y="82">sl<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5">(A)</tspan></text>
+      <text class="means" x="566" y="208">must wait</text>
+    </g>
+    <text class="rule" x="320" y="328">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> holds an exclusive lock</tspan></text>
+    <text class="rule" x="320" y="356">so T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4">'s shared request waits</tspan></text>
+  </g>
+</svg>
+```
