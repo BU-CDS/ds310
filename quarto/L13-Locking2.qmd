@@ -31,27 +31,31 @@ format:
 
 ## Recall: Two-phase Locking
 
+::::: {.columns}
+
+:::: {.column width="42%"}
+![](images/L13-Locking2/twophase.png){width="100%"}
+
+::: {.fragment fragment-index=3}
+- Can we impose additional locking rules that ensure recoverability and cascadelessness?
+:::
+::::
+
+:::: {.column width="58%"}
 - 2PL guarantees serializability.
 - Recoverable? Cascadeless?
     - 2PL alone does *not* guarantee either of them.
 - Example: &nbsp;&nbsp; [2PL? yes]{style="color:#3a5fcd;"}
 
-::::: {.columns}
-
-:::: {.column width="40%"}
-![](images/L13-Locking2/twophase.png){width="95%"}
-::::
-
-:::: {.column width="60%"}
 not recoverable. why not?
 
-::: {.fragment}
+::: {.fragment fragment-index=1}
 [r~1~(A) is a dirty read, and reader commits *before* writer.]{style="color:#3a5fcd;"}
 :::
 
 not cascadeless. why not?
 
-::: {.fragment}
+::: {.fragment fragment-index=2}
 [the dirty read. if T2 is rolled back after that read, T1 must be, too.]{style="color:#3a5fcd;"}
 :::
 ::::
@@ -60,7 +64,7 @@ not cascadeless. why not?
 
 ## Strict Locking
 
-- *Strict locking* makes txns hold all *exclusive* locks until they commit or abort.
+- Under *strict locking*, a txns must hold all *exclusive* locks until they commit or abort.
 
 ::: {.fragment .sub}
 - doing so prevents dirty reads, which means schedules will be recoverable and cascadeless
@@ -88,57 +92,65 @@ not cascadeless. why not?
 
 ## Rigorous Locking
 
-- Under strict locking, it's possible to get something like this:
+- Nonetheless, strict locking is not enough to guarantee *serializability.*
+
+- Under strict locking, it's possible to get a schedule that does not correspond to any equivalent serial schedule.
 
 ::: {.r-stack}
-![](images/L13-Locking2/rigorous-1.png){width="88%"}
+![](images/L13-Locking2/rigorous-1.png){width="67%"}
 
-![](images/L13-Locking2/rigorous-4.png){.fragment width="88%"}
+![](images/L13-Locking2/rigorous-4.png){.fragment width="67%"}
 
-![](images/L13-Locking2/rigorous-5.png){.fragment width="88%"}
+![](images/L13-Locking2/rigorous-5.png){.fragment width="67%"}
 
-![](images/L13-Locking2/rigorous-6.png){.fragment width="88%"}
+![](images/L13-Locking2/rigorous-6.png){.fragment width="67%"}
 :::
 
 ::: {.fragment}
-- *Rigorous locking* requires txns to hold *all* locks until commit/abort.
+- *Rigorous locking* requires txns to hold *all* locks until commit/abort. (rigorous + 2PL = **rigorous 2PL**)
 :::
 
 ::: {.fragment}
 - It guarantees that transactions commit in the same order as they would in the equivalent serial schedule.
 :::
 
-::: {.fragment}
-- rigorous + 2PL = **rigorous 2PL**
-:::
-
 ## Deadlock
 
 - Consider the following schedule:
 
+::::: {.columns}
+
+:::: {.column width="58%"}
 ::: {.r-stack}
-![](images/L13-Locking2/deadlock-1.png){width="82%"}
+![](images/L13-Locking2/deadlock-1.png){width="100%"}
 
-![](images/L13-Locking2/deadlock-2.png){.fragment width="82%"}
+![](images/L13-Locking2/deadlock-2.png){.fragment fragment-index=1 width="100%"}
 
-![](images/L13-Locking2/deadlock-3.png){.fragment width="82%"}
+![](images/L13-Locking2/deadlock-3.png){.fragment fragment-index=2 width="100%"}
 
-![](images/L13-Locking2/deadlock-4.png){.fragment width="82%"}
+![](images/L13-Locking2/deadlock-4.png){.fragment fragment-index=3 width="100%"}
 
-![](images/L13-Locking2/deadlock-5.png){.fragment width="82%"}
+![](images/L13-Locking2/deadlock-5.png){.fragment fragment-index=4 width="100%"}
 
-![](images/L13-Locking2/deadlock-6.png){.fragment width="82%"}
+![](images/L13-Locking2/deadlock-6.png){.fragment fragment-index=5 width="100%"}
 :::
+::::
 
-::: {.fragment}
+:::: {.column width="42%"}
+{{< include _includes/L13-deadlock-locks.html >}}
+::::
+
+:::::
+
+::: {.fragment fragment-index=6}
 - This schedule produces *deadlock*.
     - T1 is waiting for T2 to unlock A
     - T2 is waiting for T1 to unlock B
     - neither can make progress!
 :::
 
-::: {.fragment}
-- We'll see later how to deal with this.
+::: {.fragment fragment-index=7}
+- We'll see in a few minutes how to deal with this.
 :::
 
 ## Lock Upgrades
@@ -147,6 +159,9 @@ not cascadeless. why not?
 
 :::: {.column width="47%"}
 - It can be problematic to acquire an exclusive lock earlier than necessary.
+- Consider a transaction that first reads an item and then writes to it (very common pattern).
+- The transaction must acquire an exclusive lock to write the item.
+- But it only needs a shared lock to read the item.
 
 ::: {.fragment fragment-index=4}
 - Instead:
@@ -312,6 +327,8 @@ not cascadeless. why not?
 
 ## Detecting and Handling Deadlocks
 
+- Nonetheless, under any of these locking schemes, we can still get deadlocks.
+    - deadlocks can occur involving only exclusive locks
 - When DBMS detects a deadlock, it rolls back one of the deadlocked transactions.
 
 ::: {.fragment fragment-index=1}
@@ -334,9 +351,9 @@ not cascadeless. why not?
 - a cycle indicates a deadlock
 :::
 
-::: {.fragment fragment-index=6}
-- Example:
-:::
+## Detecting and Handling Deadlocks (cont.)
+
+Here is an example:
 
 ::: {.r-stack}
 ![](images/L13-Locking2/wfg-0.png){.fragment fragment-index=3 width="80%"}
@@ -358,4 +375,10 @@ not cascadeless. why not?
 ![](images/L13-Locking2/wfg-8.png){.fragment fragment-index=13 width="80%"}
 
 ![](images/L13-Locking2/wfg-9.png){.fragment fragment-index=14 width="80%"}
+:::
+
+::: {.fragment}
+- In this situation, the DBMS must 
+   - detect the deadlock
+   - choose one of the transactions to abort (rollback)
 :::

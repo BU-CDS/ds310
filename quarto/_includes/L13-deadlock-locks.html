@@ -1,0 +1,252 @@
+```{=html}
+<!--
+  Companion diagram for the Deadlock slide in L13-Locking2.qmd.
+  Same visual language as the other lock figures: a padlock on each database
+  element, T1 in blue, T2 in orange. Each state matches one frame of the
+  schedule (deadlock-1.png through deadlock-6.png):
+
+    start   T2 holds an exclusive lock on A; B is unlocked
+    step 1  T1 holds a shared lock on B
+    step 2  T2 requests an exclusive lock on B
+    step 3  that request waits, because T1 holds B
+    step 4  T1 requests a shared lock on A, while T2 is still waiting
+    step 5  that request waits too: each holds one lock and waits for the other
+
+  Fragment indices match the schedule images. fade-out is shown until its
+  step; fade-in-then-out only during its step; the last state stays.
+-->
+<style>
+#dlk {
+  display: block; width: 100%; height: auto; margin: 0.15em 0 0;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+#dlk text { text-anchor: middle; }
+#dlk .t1 { color: #3a5fcd; }
+#dlk .t2 { color: #cc6600; }
+#dlk .free { color: #999; }
+#dlk .denied { color: #d40000; }
+
+#dlk .card { fill: #eeece6; stroke: #555; stroke-width: 2.5; }
+#dlk .card-label { fill: #444; font-size: 16px; }
+#dlk .item-name { fill: #000; font-size: 48px; font-weight: 500; }
+#dlk .state { fill: currentColor; font-size: 20px; font-style: italic; }
+#dlk .state.free { fill: #777; }
+#dlk .rule { fill: #333; font-size: 20px; }
+#dlk .focus { fill: none; stroke: currentColor; stroke-width: 4; }
+
+#dlk .txn rect { fill: currentColor; fill-opacity: 0.12; stroke: currentColor; stroke-width: 3; }
+#dlk .txn text { fill: currentColor; font-size: 26px; font-weight: 700; }
+#dlk .line { fill: none; stroke: currentColor; stroke-width: 4; }
+#dlk .tip { fill: currentColor; }
+#dlk .dash { fill: none; stroke: currentColor; stroke-width: 4; stroke-dasharray: 8 6; }
+#dlk .stop { fill: none; stroke: currentColor; stroke-width: 7; stroke-linecap: round; }
+#dlk .ask { fill: currentColor; font-size: 18px; font-weight: 700; }
+
+.print-pdf #dlk .fragment.fade-out,
+.print-pdf #dlk .fragment.fade-in-then-out { display: none; }
+</style>
+
+<svg id="dlk" viewBox="0 0 540 400" role="img"
+     aria-label="Two locks, on A and on B. T2 acquires an exclusive lock on A. T1 acquires a shared lock on B. T2 then waits for B, and T1 waits for A, so each transaction holds one lock and waits for the other.">
+  <defs>
+    <g id="dlk-lock">
+      <path d="M9,-13 V-25 a13,13 0 0 1 26,0 V-13" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect width="44" height="34" rx="6" fill="currentColor"/>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"/>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"/>
+    </g>
+    <g id="dlk-lock-open">
+      <path d="M9,-20 V-36 a13,13 0 0 1 26,0 V-26" fill="none" stroke="currentColor" stroke-width="6"/>
+      <rect width="44" height="34" rx="6" fill="currentColor"/>
+      <circle cx="22" cy="13" r="4.5" fill="#fff"/>
+      <rect x="20" y="13" width="4" height="12" rx="1.5" fill="#fff"/>
+    </g>
+  </defs>
+
+  <!-- always there: the two elements -->
+  <rect class="card" x="8" y="72" width="252" height="188" rx="14"/>
+  <text class="card-label" x="134" y="98">element A</text>
+  <text class="item-name" x="96" y="186">A</text>
+
+  <rect class="card" x="280" y="72" width="252" height="188" rx="14"/>
+  <text class="card-label" x="406" y="98">element B</text>
+  <text class="item-name" x="368" y="186">B</text>
+
+  <!-- start: T2 holds A. Matches deadlock-1. -->
+  <g class="fragment fade-out" data-fragment-index="1">
+    <g class="txn t2">
+      <rect x="84" y="6" width="100" height="46" rx="12"/>
+      <text x="134" y="37">T<tspan dy="6" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t2">
+      <path class="line" d="M134,52 V60"/>
+      <path class="tip" d="M134,72 l-7,-12 h14 z"/>
+      <rect class="focus" x="8" y="72" width="252" height="188" rx="14"/>
+      <use href="#dlk-lock" transform="translate(158,148)"/>
+      <text class="state" x="134" y="236">exclusive · T<tspan dy="5" font-size="70%">2</tspan></text>
+    </g>
+    <g class="free">
+      <use href="#dlk-lock-open" transform="translate(430,148)"/>
+      <text class="state" x="406" y="236">unlocked</text>
+    </g>
+    <text class="rule" x="270" y="318">T<tspan dy="5" font-size="70%">2</tspan><tspan dy="-5"> acquires an exclusive lock on A</tspan></text>
+  </g>
+
+  <!-- T1 takes a shared lock on B. Matches deadlock-2. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="1">
+    <g class="txn t2">
+      <rect x="84" y="6" width="100" height="46" rx="12"/>
+      <text x="134" y="37">T<tspan dy="6" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t2">
+      <path class="line" d="M134,52 V60"/>
+      <path class="tip" d="M134,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(158,148)"/>
+      <text class="state" x="134" y="236">exclusive · T<tspan dy="5" font-size="70%">2</tspan></text>
+    </g>
+    <g class="txn t1">
+      <rect x="356" y="6" width="100" height="46" rx="12"/>
+      <text x="406" y="37">T<tspan dy="6" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <path class="line" d="M406,52 V60"/>
+      <path class="tip" d="M406,72 l-7,-12 h14 z"/>
+      <rect class="focus" x="280" y="72" width="252" height="188" rx="14"/>
+      <use href="#dlk-lock" transform="translate(430,148)"/>
+      <text class="state" x="406" y="236">shared · T<tspan dy="5" font-size="70%">1</tspan></text>
+    </g>
+    <text class="rule" x="270" y="318">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> acquires a shared lock on B</tspan></text>
+  </g>
+
+  <!-- T2 asks for B. Matches deadlock-3. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="2">
+    <g class="txn t2">
+      <rect x="84" y="6" width="100" height="46" rx="12"/>
+      <text x="134" y="37">T<tspan dy="6" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t2">
+      <path class="line" d="M134,52 V60"/>
+      <path class="tip" d="M134,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(158,148)"/>
+      <text class="state" x="134" y="236">exclusive · T<tspan dy="5" font-size="70%">2</tspan></text>
+    </g>
+    <g class="txn t1">
+      <rect x="356" y="6" width="100" height="46" rx="12"/>
+      <text x="406" y="37">T<tspan dy="6" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <path class="line" d="M406,52 V60"/>
+      <path class="tip" d="M406,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(430,148)"/>
+      <text class="state" x="406" y="236">shared · T<tspan dy="5" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t2">
+      <rect class="focus" x="280" y="72" width="252" height="188" rx="14"/>
+      <path class="dash" d="M318,292 H430"/>
+      <path class="tip" d="M446,292 l-16,-8 v16 z"/>
+      <text class="ask" x="406" y="322">T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4"> requests xl(B)</tspan></text>
+    </g>
+  </g>
+
+  <!-- T2's request is denied. Matches deadlock-4. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="3">
+    <g class="txn t2">
+      <rect x="84" y="6" width="100" height="46" rx="12"/>
+      <text x="134" y="37">T<tspan dy="6" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t2">
+      <path class="line" d="M134,52 V60"/>
+      <path class="tip" d="M134,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(158,148)"/>
+      <text class="state" x="134" y="236">exclusive · T<tspan dy="5" font-size="70%">2</tspan></text>
+    </g>
+    <g class="txn t1">
+      <rect x="356" y="6" width="100" height="46" rx="12"/>
+      <text x="406" y="37">T<tspan dy="6" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <path class="line" d="M406,52 V60"/>
+      <path class="tip" d="M406,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(430,148)"/>
+      <text class="state" x="406" y="236">shared · T<tspan dy="5" font-size="70%">1</tspan></text>
+    </g>
+    <g class="denied">
+      <rect class="focus" x="280" y="72" width="252" height="188" rx="14"/>
+      <path class="dash" d="M318,292 H422"/>
+      <path class="stop" d="M434,280 V304"/>
+      <text class="ask" x="406" y="328">T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4"> waits for T</tspan><tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <text class="rule" x="270" y="368">T<tspan dy="5" font-size="70%">1</tspan><tspan dy="-5"> holds B, so the exclusive request waits</tspan></text>
+  </g>
+
+  <!-- T1 asks for A, while T2 is still waiting on B. Matches deadlock-5. -->
+  <g class="fragment fade-in-then-out" data-fragment-index="4">
+    <g class="txn t2">
+      <rect x="84" y="6" width="100" height="46" rx="12"/>
+      <text x="134" y="37">T<tspan dy="6" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t2">
+      <path class="line" d="M134,52 V60"/>
+      <path class="tip" d="M134,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(158,148)"/>
+      <text class="state" x="134" y="236">exclusive · T<tspan dy="5" font-size="70%">2</tspan></text>
+    </g>
+    <g class="txn t1">
+      <rect x="356" y="6" width="100" height="46" rx="12"/>
+      <text x="406" y="37">T<tspan dy="6" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <path class="line" d="M406,52 V60"/>
+      <path class="tip" d="M406,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(430,148)"/>
+      <text class="state" x="406" y="236">shared · T<tspan dy="5" font-size="70%">1</tspan></text>
+    </g>
+    <g class="denied">
+      <path class="dash" d="M318,292 H422"/>
+      <path class="stop" d="M434,280 V304"/>
+      <text class="ask" x="406" y="322">T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4"> waits for T</tspan><tspan dy="4" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <rect class="focus" x="8" y="72" width="252" height="188" rx="14"/>
+      <path class="dash" d="M268,292 H184"/>
+      <path class="tip" d="M168,292 l16,-8 v16 z"/>
+      <text class="ask" x="134" y="322">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> requests sl(A)</tspan></text>
+    </g>
+  </g>
+
+  <!-- Both are waiting. Matches deadlock-6. Stays visible. -->
+  <g class="fragment" data-fragment-index="5">
+    <g class="txn t2">
+      <rect x="84" y="6" width="100" height="46" rx="12"/>
+      <text x="134" y="37">T<tspan dy="6" font-size="70%">2</tspan></text>
+    </g>
+    <g class="t2">
+      <path class="line" d="M134,52 V60"/>
+      <path class="tip" d="M134,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(158,148)"/>
+      <text class="state" x="134" y="236">exclusive · T<tspan dy="5" font-size="70%">2</tspan></text>
+    </g>
+    <g class="txn t1">
+      <rect x="356" y="6" width="100" height="46" rx="12"/>
+      <text x="406" y="37">T<tspan dy="6" font-size="70%">1</tspan></text>
+    </g>
+    <g class="t1">
+      <path class="line" d="M406,52 V60"/>
+      <path class="tip" d="M406,72 l-7,-12 h14 z"/>
+      <use href="#dlk-lock" transform="translate(430,148)"/>
+      <text class="state" x="406" y="236">shared · T<tspan dy="5" font-size="70%">1</tspan></text>
+    </g>
+    <g class="denied">
+      <rect class="focus" x="8" y="72" width="252" height="188" rx="14"/>
+      <rect class="focus" x="280" y="72" width="252" height="188" rx="14"/>
+      <path class="dash" d="M268,292 H184"/>
+      <path class="stop" d="M172,280 V304"/>
+      <text class="ask" x="134" y="322">T<tspan dy="4" font-size="70%">1</tspan><tspan dy="-4"> waits for T</tspan><tspan dy="4" font-size="70%">2</tspan></text>
+      <path class="dash" d="M318,292 H422"/>
+      <path class="stop" d="M434,280 V304"/>
+      <text class="ask" x="406" y="322">T<tspan dy="4" font-size="70%">2</tspan><tspan dy="-4"> waits for T</tspan><tspan dy="4" font-size="70%">1</tspan></text>
+      <text class="rule" x="270" y="368" fill="#d40000">each holds one lock and waits for the other</text>
+    </g>
+  </g>
+</svg>
+```
