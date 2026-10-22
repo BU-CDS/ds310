@@ -3847,35 +3847,35 @@
     "href": "L13-Locking2.html#recall-two-phase-locking",
     "title": "Locking II",
     "section": "Recall: Two-phase Locking",
-    "text": "Recall: Two-phase Locking\n\n2PL guarantees serializability.\nRecoverable? Cascadeless?\n\n2PL alone does not guarantee either of them.\n\nExample:    2PL? yes\n\n\n\n\n\nnot recoverable. why not?\n\nr1(A) is a dirty read, and reader commits before writer.\n\nnot cascadeless. why not?\n\nthe dirty read. if T2 is rolled back after that read, T1 must be, too."
+    "text": "Recall: Two-phase Locking\n\n\n\n\n\nCan we impose additional locking rules that ensure recoverability and cascadelessness?\n\n\n\n\n2PL guarantees serializability.\nRecoverable? Cascadeless?\n\n2PL alone does not guarantee either of them.\n\nExample:    2PL? yes\n\nnot recoverable. why not?\n\nr1(A) is a dirty read, and reader commits before writer.\n\nnot cascadeless. why not?\n\nthe dirty read. if T2 is rolled back after that read, T1 must be, too."
   },
   {
     "objectID": "L13-Locking2.html#strict-locking",
     "href": "L13-Locking2.html#strict-locking",
     "title": "Locking II",
     "section": "Strict Locking",
-    "text": "Strict Locking\n\nStrict locking makes txns hold all exclusive locks until they commit or abort.\n\n\n\ndoing so prevents dirty reads, which means schedules will be recoverable and cascadeless\n\n\n\n\n\n\n\n\n\n\n\n\n\nstrict + 2PL = strict 2PL"
+    "text": "Strict Locking\n\nUnder strict locking, a txns must hold all exclusive locks until they commit or abort.\n\n\n\ndoing so prevents dirty reads, which means schedules will be recoverable and cascadeless\n\n\n\n\n\n\n\n\n\n\n\n\n\nstrict + 2PL = strict 2PL"
   },
   {
     "objectID": "L13-Locking2.html#rigorous-locking",
     "href": "L13-Locking2.html#rigorous-locking",
     "title": "Locking II",
     "section": "Rigorous Locking",
-    "text": "Rigorous Locking\n\nUnder strict locking, it’s possible to get something like this:\n\n\n\n\n\n\n\n\n\nRigorous locking requires txns to hold all locks until commit/abort.\n\n\n\n\nIt guarantees that transactions commit in the same order as they would in the equivalent serial schedule.\n\n\n\n\nrigorous + 2PL = rigorous 2PL"
+    "text": "Rigorous Locking\n\nNonetheless, strict locking is not enough to guarantee serializability.\nUnder strict locking, it’s possible to get a schedule that does not correspond to any equivalent serial schedule.\n\n\n\n\n\n\n\n\n\nRigorous locking requires txns to hold all locks until commit/abort. (rigorous + 2PL = rigorous 2PL)\n\n\n\n\nIt guarantees that transactions commit in the same order as they would in the equivalent serial schedule."
   },
   {
     "objectID": "L13-Locking2.html#deadlock",
     "href": "L13-Locking2.html#deadlock",
     "title": "Locking II",
     "section": "Deadlock",
-    "text": "Deadlock\n\nConsider the following schedule:\n\n\n\n\n\n\n\n\n\n\n\nThis schedule produces deadlock.\n\nT1 is waiting for T2 to unlock A\nT2 is waiting for T1 to unlock B\nneither can make progress!\n\n\n\n\n\nWe’ll see later how to deal with this."
+    "text": "Deadlock\n\nConsider the following schedule:\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  \n    \n      \n      \n      \n      \n    \n    \n      \n      \n      \n      \n    \n  \n\n  \n  \n  element A\n  A\n\n  \n  element B\n  B\n\n  \n  \n    \n      \n      T2\n    \n    \n      \n      \n      \n      \n      exclusive · T2\n    \n    \n      \n      unlocked\n    \n    T2 acquires an exclusive lock on A\n  \n\n  \n  \n    \n      \n      T2\n    \n    \n      \n      \n      \n      exclusive · T2\n    \n    \n      \n      T1\n    \n    \n      \n      \n      \n      \n      shared · T1\n    \n    T1 acquires a shared lock on B\n  \n\n  \n  \n    \n      \n      T2\n    \n    \n      \n      \n      \n      exclusive · T2\n    \n    \n      \n      T1\n    \n    \n      \n      \n      \n      shared · T1\n    \n    \n      \n      \n      \n      T2 requests xl(B)\n    \n  \n\n  \n  \n    \n      \n      T2\n    \n    \n      \n      \n      \n      exclusive · T2\n    \n    \n      \n      T1\n    \n    \n      \n      \n      \n      shared · T1\n    \n    \n      \n      \n      \n      T2 waits for T1\n    \n    T1 holds B, so the exclusive request waits\n  \n\n  \n  \n    \n      \n      T2\n    \n    \n      \n      \n      \n      exclusive · T2\n    \n    \n      \n      T1\n    \n    \n      \n      \n      \n      shared · T1\n    \n    \n      \n      \n      T2 waits for T1\n    \n    \n      \n      \n      \n      T1 requests sl(A)\n    \n  \n\n  \n  \n    \n      \n      T2\n    \n    \n      \n      \n      \n      exclusive · T2\n    \n    \n      \n      T1\n    \n    \n      \n      \n      \n      shared · T1\n    \n    \n      \n      \n      \n      \n      T1 waits for T2\n      \n      \n      T2 waits for T1\n      each holds one lock and waits for the other\n    \n  \n\n\n\n\nThis schedule produces deadlock.\n\nT1 is waiting for T2 to unlock A\nT2 is waiting for T1 to unlock B\nneither can make progress!\n\n\n\n\n\nWe’ll see in a few minutes how to deal with this."
   },
   {
     "objectID": "L13-Locking2.html#lock-upgrades",
     "href": "L13-Locking2.html#lock-upgrades",
     "title": "Locking II",
     "section": "Lock Upgrades",
-    "text": "Lock Upgrades\n\n\n\nIt can be problematic to acquire an exclusive lock earlier than necessary.\n\n\n\nInstead:\n\nacquire a shared lock to read the item\n\n\n\n\n\nupgrade to an exclusive lock when you need to write\n\n\n\n\nmay need to wait to upgrade if others hold shared locks\n\n\n\n\nNote: we’re not releasing the shared lock before acquiring the exclusive one. why not?\n\n\n\n\ndoing so would violate 2PL!"
+    "text": "Lock Upgrades\n\n\n\nIt can be problematic to acquire an exclusive lock earlier than necessary.\nConsider a transaction that first reads an item and then writes to it (very common pattern).\nThe transaction must acquire an exclusive lock to write the item.\nBut it only needs a shared lock to read the item.\n\n\n\nInstead:\n\nacquire a shared lock to read the item\n\n\n\n\n\nupgrade to an exclusive lock when you need to write\n\n\n\n\nmay need to wait to upgrade if others hold shared locks\n\n\n\n\nNote: we’re not releasing the shared lock before acquiring the exclusive one. why not?\n\n\n\n\ndoing so would violate 2PL!"
   },
   {
     "objectID": "L13-Locking2.html#a-possible-problem-with-lock-upgrades",
@@ -3924,7 +3924,14 @@
     "href": "L13-Locking2.html#detecting-and-handling-deadlocks",
     "title": "Locking II",
     "section": "Detecting and Handling Deadlocks",
-    "text": "Detecting and Handling Deadlocks\n\nWhen DBMS detects a deadlock, it rolls back one of the deadlocked transactions.\n\n\n\nHow does it know when there is a deadlock?\n\n\n\n\nCan use a waits-for graph to detect the deadlock.\n\n\n\n\nthe vertices are the transactions\n\n\n\n\nan edge from T1 → T2 means T1 is waiting for T2 to release a lock\n\n\n\n\na cycle indicates a deadlock\n\n\n\n\nExample:"
+    "text": "Detecting and Handling Deadlocks\n\nNonetheless, under any of these locking schemes, we can still get deadlocks.\n\ndeadlocks can occur involving only exclusive locks\n\nWhen DBMS detects a deadlock, it rolls back one of the deadlocked transactions.\n\n\n\nHow does it know when there is a deadlock?\n\n\n\n\nCan use a waits-for graph to detect the deadlock.\n\n\n\n\nthe vertices are the transactions\n\n\n\n\nan edge from T1 → T2 means T1 is waiting for T2 to release a lock\n\n\n\n\na cycle indicates a deadlock"
+  },
+  {
+    "objectID": "L13-Locking2.html#detecting-and-handling-deadlocks-cont.",
+    "href": "L13-Locking2.html#detecting-and-handling-deadlocks-cont.",
+    "title": "Locking II",
+    "section": "Detecting and Handling Deadlocks (cont.)",
+    "text": "Detecting and Handling Deadlocks (cont.)\nHere is an example:\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nIn this situation, the DBMS must\n\ndetect the deadlock\nchoose one of the transactions to abort (rollback)"
   },
   {
     "objectID": "L15-Logging1.html#review-acid-properties",
