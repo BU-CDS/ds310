@@ -99,6 +99,32 @@ $presentation-h2-font-size: 1.6em;
 
 // Lock compatibility matrix on L12: shown larger than the deck's usual
 // 95% image cap (66% × 1.75 ≈ 116%).
+// The theme resets div.columns to inline layout, so a 40/60 pair wraps
+// and the second column drops below the first. Keep this recall slide's
+// schedule and explanation side by side.
+.reveal #recall-two-phase-locking .columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.2em;
+}
+.reveal #recall-two-phase-locking .column {
+  min-width: 0;
+}
+
+// Deadlock slide: the schedule sits on the left and the lock diagram
+// on the right. The theme's inline column layout would wrap the pair.
+.reveal #deadlock .columns {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8em;
+}
+.reveal #deadlock .column {
+  min-width: 0;
+}
+.reveal #deadlock .column img {
+  max-width: 100%;
+}
+
 .reveal section img.compat-lg {
   max-width: 116%;
   max-height: none;
