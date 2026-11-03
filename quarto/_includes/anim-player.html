@@ -68,6 +68,7 @@ window.animPlayer = function (svg, timeline) {
     anims = timeline.map(([el, frames, start, dur, opts]) => {
       const a = el.animate(frames, { delay: start * 1000, duration: dur * 1000, fill: 'both', ...opts });
       a.pause();
+      a.currentTime = 0;                 // hold the opening frame (pause alone can miss)
       return a;
     });
     anims[last].onfinish = () => setState('done');

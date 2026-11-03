@@ -1,0 +1,302 @@
+```{=html}
+<!--
+  Animation for L16 (included by L16-Logging2.qmd, after "Redo-Only Logging"):
+  how redo-only logging actually moves data.
+
+  Same simplified T1/T2 example as the undo-only animation, with the
+  complementary rules:
+
+    1. update records store only the new value
+    2. WAL: log records are forced to disk; changed pages stay in memory
+    3. at commit: write/force the commit record; pages may go to disk after
+       that, but are not forced — we crash before they do, so redo is needed
+    4. uncommitted pages cannot go to disk (no undo info) — no steal
+    5. recovery: backward pass builds the commit list (no undos), then a
+       forward pass redoes T1
+
+  Playback comes from anim-player.html, already included earlier in this deck.
+
+  Markup is the final frame. Each element gets at most one animation, so
+  fill: 'both' (applied by the player) does not fight itself during delays.
+-->
+<style>
+#rol-anim .panel { fill: #fff; stroke: #cfcabd; stroke-width: 2; }
+#rol-anim .panel-title { fill: #000; font-size: 24px; font-weight: 700; }
+
+#rol-anim .card { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#rol-anim .iname { fill: #000; font-size: 22px; font-weight: 700; }
+#rol-anim .ival { fill: #222; font-size: 28px; }
+#rol-anim .dirty-tag { fill: #c00; font-size: 15px; font-style: italic; }
+#rol-anim .lost { fill: #999; font-size: 22px; font-style: italic; }
+
+#rol-anim .cap { fill: #3a5fcd; font-size: 23px; }
+#rol-anim .cap.alert { fill: #7c1717; font-weight: 700; }
+#rol-anim .cap.ok { fill: #1a8a1a; }
+
+#rol-anim .log-head { fill: #ccccff; stroke: #000; stroke-width: 2; }
+#rol-anim .log-row { fill: #fff; stroke: #000; stroke-width: 1.5; }
+#rol-anim .log-title { fill: #000; font-size: 22px; font-weight: 700; text-anchor: start; }
+#rol-anim .hcell { fill: #000; font-size: 18px; font-style: italic; }
+#rol-anim .lsn { fill: #000; font-size: 20px; }
+#rol-anim .rec { fill: #000; font-size: 20px; text-anchor: start; }
+#rol-anim .rec.t1, #rol-anim .lsn.t1 { fill: #3a5fcd; }
+#rol-anim .rec.t2, #rol-anim .lsn.t2 { fill: #cc6600; }
+#rol-anim .on-disk { fill: #1a8a1a; font-size: 16px; font-style: italic; }
+#rol-anim .recov { fill: #000; font-size: 18px; text-anchor: start; }
+#rol-anim .recov.redo { fill: #1a8a1a; font-weight: 700; }
+#rol-anim .recov.commit { fill: #3a5fcd; font-weight: 700; }
+
+#rol-anim .nogo-line { fill: none; stroke: #cc6600; stroke-width: 3; stroke-dasharray: 8 6; }
+#rol-anim .nogo-x { stroke: #c00; stroke-width: 4; stroke-linecap: round; fill: none; }
+
+#rol-anim .flash { fill: #1a8a1a; fill-opacity: 0.22; pointer-events: none; }
+#rol-anim .crash-veil { fill: #7c1717; }
+#rol-anim .crash-label { fill: #7c1717; font-size: 36px; font-weight: 700; }
+
+#rol-anim .clist-box { fill: #eef2fb; stroke: #3a5fcd; stroke-width: 2; }
+#rol-anim .clist-t { fill: #3a5fcd; font-size: 18px; font-weight: 700; text-anchor: start; }
+
+#rol-anim .pass.back { fill: none; stroke: #c00; stroke-width: 3; }
+#rol-anim .pass-tip.back { fill: #c00; }
+#rol-anim .pass.fwd { fill: none; stroke: #1a8a1a; stroke-width: 3; }
+#rol-anim .pass-tip.fwd { fill: #1a8a1a; }
+</style>
+
+<svg id="rol-anim" class="anim-fig" viewBox="0 0 1200 700" role="img"
+     aria-label="Animation of redo-only logging. T1 updates D1 and D2; those log records store only the new values and are forced to disk, but the pages stay in memory. T1 commits. T2 updates D3, which cannot go to disk. After a crash, recovery walks the log backward to build the commit list, then forward to redo T1. T2 needs no undo because its pages never reached disk."></svg>
+
+<script>
+(function () {
+  const svg = document.getElementById('rol-anim');
+
+  const ITEMS = [
+    { id: 'D1', init: 3000, written: 2500 },
+    { id: 'D2', init: 1000, written: 1500 },
+    { id: 'D3', init: 7200, written: 6780 },
+  ];
+  const LOG = [
+    { lsn: 100, txn: 1, rec: 'txn: 1; BEGIN',              back: 'skip',          fwd: 'skip' },
+    { lsn: 150, txn: 1, rec: 'txn: 1; item: D1; new: 2500', back: 'skip',          fwd: 'redo D1=2500' },
+    { lsn: 225, txn: 1, rec: 'txn: 1; item: D2; new: 1500', back: 'skip',          fwd: 'redo D2=1500' },
+    { lsn: 300, txn: 1, rec: 'txn: 1; COMMIT',              back: 'T1 committed',  fwd: 'skip' },
+    { lsn: 350, txn: 2, rec: 'txn: 2; BEGIN',              back: 'skip',          fwd: 'skip' },
+    { lsn: 400, txn: 2, rec: 'txn: 2; item: D3; new: 6780', back: 'skip',          fwd: 'skip' },
+  ];
+  const CAPS = [
+    { id: 'c0', cls: '',     text: 'Same running example. Update records store only the new value.' },
+    { id: 'c1', cls: '',     text: 'T1 writes D1 and D2. The log records the new values — not the old ones.' },
+    { id: 'c2', cls: '',     text: 'WAL: force those log records to disk. Changed pages stay in memory.' },
+    { id: 'c3', cls: '',     text: 'At commit: write/force COMMIT. Pages may go to disk after this — we don’t force them.' },
+    { id: 'c4', cls: '',     text: 'T2 writes D3. Uncommitted pages cannot go to disk (no undo info).' },
+    { id: 'c5', cls: 'alert', text: 'Crash! Cache is lost. Disk still has the original values — T1 never reached it.' },
+    { id: 'c6', cls: 'ok',   text: 'Backward pass: commit list only (no undos). Forward pass: redo T1.' },
+  ];
+
+  const card = (side, i) => {
+    const x0 = side === 'cache' ? 40 : 632;
+    return { x: x0 + i * 178, y: 100, w: 166, h: 100 };
+  };
+  const LOG_X = 40, LOG_Y = 230, ROW_H = 42, HEAD_H = 40;
+  const rowY = i => LOG_Y + 44 + HEAD_H + i * ROW_H;
+  const sub = n => `<tspan dy="7" font-size="70%">${n}</tspan>`;
+
+  let h = '';
+  CAPS.forEach((c, i) => {
+    const last = i === CAPS.length - 1;
+    h += `<text class="cap ${c.cls}" data-cap="${c.id}" x="600" y="32"${last ? '' : ' opacity="0"'}>${c.text}</text>`;
+  });
+
+  h += `<rect class="panel" x="24" y="48" width="560" height="168" rx="12"/>
+        <text class="panel-title" x="304" y="78">memory (cache)</text>
+        <rect class="panel" x="616" y="48" width="560" height="168" rx="12"/>
+        <text class="panel-title" x="896" y="78">disk</text>`;
+
+  ITEMS.forEach((it, i) => {
+    const cc = card('cache', i), dc = card('disk', i);
+    const cx = cc.x + cc.w / 2, dx = dc.x + dc.w / 2;
+    // Final frame: cache lost; disk has T1's redone values, D3 still original.
+    const diskKeepsInit = it.id === 'D3';
+    h += `<g data-cache="${it.id}">
+            <rect class="card" x="${cc.x}" y="${cc.y}" width="${cc.w}" height="${cc.h}" rx="8"/>
+            <text class="iname" x="${cx}" y="${cc.y + 28}">${it.id}</text>
+            <text class="ival init" x="${cx}" y="${cc.y + 64}" opacity="0">${it.init}</text>
+            <text class="ival written" x="${cx}" y="${cc.y + 64}" opacity="0">${it.written}</text>
+            <text class="lost" x="${cx}" y="${cc.y + 64}">lost</text>
+            <text class="dirty-tag" x="${cx}" y="${cc.y + 86}" opacity="0">dirty</text>
+          </g>
+          <g data-disk="${it.id}">
+            <rect class="card" x="${dc.x}" y="${dc.y}" width="${dc.w}" height="${dc.h}" rx="8"/>
+            <text class="iname" x="${dx}" y="${dc.y + 28}">${it.id}</text>
+            <text class="ival init" x="${dx}" y="${dc.y + 64}"${diskKeepsInit ? '' : ' opacity="0"'}>${it.init}</text>
+            <text class="ival written" x="${dx}" y="${dc.y + 64}"${diskKeepsInit ? ' opacity="0"' : ''}>${it.written}</text>
+            <rect class="flash" data-flash="${it.id}" x="${dc.x}" y="${dc.y}" width="${dc.w}" height="${dc.h}" rx="8" opacity="0"/>
+          </g>`;
+  });
+
+  // Blocked flush: short arrow in the gutter between the two panels, so it
+  // does not cross the disk cards.
+  {
+    const cc = card('cache', 2);
+    const y = cc.y + cc.h / 2;
+    const x1 = cc.x + cc.w + 4, x2 = 610, mid = (x1 + x2) / 2;
+    h += `<g class="nogo" data-nogo="D3" opacity="0">
+            <path class="nogo-line" d="M${x1},${y} H${x2}"/>
+            <path class="nogo-x" d="M${mid - 8},${y - 8} l16,16 M${mid - 8},${y + 8} l16,-16"/>
+          </g>`;
+  }
+
+  h += `<rect class="panel" x="${LOG_X}" y="${LOG_Y}" width="1120" height="368" rx="12"/>
+        <text class="log-title" x="${LOG_X + 18}" y="${LOG_Y + 32}">log (new values only)</text>
+        <g class="clist">
+          <rect class="clist-box" x="820" y="${LOG_Y + 10}" width="318" height="28" rx="8"/>
+          <text class="clist-t" x="834" y="${LOG_Y + 30}">commit list: T${sub(1)}</text>
+        </g>
+        <rect class="log-head" x="${LOG_X + 16}" y="${LOG_Y + 44}" width="1088" height="${HEAD_H}"/>
+        <text class="hcell" x="${LOG_X + 70}" y="${LOG_Y + 70}">LSN</text>
+        <text class="hcell" x="${LOG_X + 380}" y="${LOG_Y + 70}">record contents</text>
+        <text class="hcell" x="${LOG_X + 720}" y="${LOG_Y + 70}">on disk?</text>
+        <text class="hcell" x="${LOG_X + 870}" y="${LOG_Y + 70}">backward</text>
+        <text class="hcell" x="${LOG_X + 1035}" y="${LOG_Y + 70}">forward</text>`;
+
+  LOG.forEach((r, i) => {
+    const y = rowY(i);
+    const commit = r.back.startsWith('T1');
+    const redo = r.fwd.startsWith('redo');
+    h += `<g class="entry" data-row="${i}">
+            <rect class="log-row" x="${LOG_X + 16}" y="${y}" width="1088" height="${ROW_H}"/>
+            <text class="lsn t${r.txn}" x="${LOG_X + 70}" y="${y + 28}">${r.lsn}</text>
+            <text class="rec t${r.txn}" x="${LOG_X + 120}" y="${y + 28}">${r.rec}</text>
+            <text class="on-disk" data-diskrow="${i}" x="${LOG_X + 720}" y="${y + 28}">forced</text>
+            <text class="recov${commit ? ' commit' : ''}" data-back="${i}"
+                  x="${LOG_X + 800}" y="${y + 28}">${r.back}</text>
+            <text class="recov${redo ? ' redo' : ''}" data-fwd="${i}"
+                  x="${LOG_X + 955}" y="${y + 28}">${r.fwd}</text>
+          </g>`;
+  });
+
+  const yLast = rowY(LOG.length - 1) + ROW_H / 2;
+  const yFirst = rowY(0) + ROW_H / 2;
+  h += `<g class="pass-back">
+          <path class="pass back" d="M${LOG_X + 928},${yLast} V${yFirst}"/>
+          <path class="pass-tip back" d="M${LOG_X + 928},${yFirst - 2} l-7,12 h14 z"/>
+        </g>
+        <g class="pass-fwd">
+          <path class="pass fwd" d="M${LOG_X + 1112},${yFirst} V${yLast}"/>
+          <path class="pass-tip fwd" d="M${LOG_X + 1112},${yLast + 2} l-7,-12 h14 z"/>
+        </g>
+        <g class="crash" opacity="0">
+          <rect class="crash-veil" x="24" y="48" width="1152" height="168" rx="12" fill-opacity="0.12"/>
+          <text class="crash-label" x="600" y="140">CRASH</text>
+        </g>`;
+  svg.innerHTML = h;
+
+  const $ = sel => svg.querySelector(sel);
+  const timeline = [];
+  const add = (el, frames, start, dur, opts) => {
+    if (!el) return;
+    timeline.push([el, frames, start, dur, opts]);
+  };
+
+  const fadeIn = (el, tOn, dur = 0.3) =>
+    add(el, [{ opacity: 0 }, { opacity: 1 }], tOn, dur);
+  const hideAt = (el, tOff, dur = 0.25) =>
+    add(el, [{ opacity: 1 }, { opacity: 0 }], tOff, dur);
+  const windowed = (el, tOn, tOff) => {
+    const dur = Math.max(0.35, tOff - tOn);
+    add(el, [
+      { opacity: 0 },
+      { opacity: 1, offset: 0.08 },
+      { opacity: 1, offset: 0.92 },
+      { opacity: 0 },
+    ], tOn, dur);
+  };
+  const pulse = (el, tOn) =>
+    add(el, [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], tOn, 0.85);
+
+  const cache = id => $(`[data-cache="${id}"]`);
+  const disk = id => $(`[data-disk="${id}"]`);
+  const cap = id => $(`.cap[data-cap="${id}"]`);
+
+  // ---- Clock (seconds) ----
+  const T = {
+    begin:     0.45,
+    d1:        1.2,
+    d2:        2.15,
+    wal:       3.4,
+    commitRec: 4.8,
+    t2:        6.2,
+    d3:        6.85,
+    nogo:      7.5,
+    crash:     9.0,
+    recover:  10.7,
+    back:     11.2,
+    fwd:      14.2,
+  };
+  const backAt = k => T.back + k * 0.4;        // k = 0 is log row 5 (bottom)
+  const fwdAt  = k => T.fwd  + k * 0.45;       // k = 0 is log row 0 (top)
+
+  hideAt(cap('c0'), T.d1);
+  windowed(cap('c1'), T.d1, T.wal);
+  windowed(cap('c2'), T.wal, T.commitRec);
+  windowed(cap('c3'), T.commitRec, T.t2);
+  windowed(cap('c4'), T.t2, T.crash);
+  windowed(cap('c5'), T.crash, T.recover);
+  fadeIn(cap('c6'), T.recover);
+
+  // Cache values. Markup is the final frame (all lost).
+  ['D1', 'D2', 'D3'].forEach(id => {
+    hideAt(cache(id).querySelector('.init'), id === 'D3' ? T.d3 : (id === 'D1' ? T.d1 : T.d2));
+    fadeIn(cache(id).querySelector('.lost'), T.crash);
+  });
+  windowed(cache('D1').querySelector('.written'), T.d1, T.crash);
+  windowed(cache('D2').querySelector('.written'), T.d2, T.crash);
+  windowed(cache('D3').querySelector('.written'), T.d3, T.crash);
+  // Dirty until crash — pages were never forced to disk.
+  windowed(cache('D1').querySelector('.dirty-tag'), T.d1, T.crash);
+  windowed(cache('D2').querySelector('.dirty-tag'), T.d2, T.crash);
+  windowed(cache('D3').querySelector('.dirty-tag'), T.d3, T.crash);
+
+  const dirtyStroke = (el, tOn, tOff) => {
+    const dur = tOff - tOn;
+    add(el, [
+      { stroke: '#555' },
+      { stroke: '#c00', offset: 0.06 },
+      { stroke: '#c00', offset: 0.9 },
+      { stroke: '#555' },
+    ], tOn, dur);
+  };
+  dirtyStroke(cache('D1').querySelector('.card'), T.d1, T.crash);
+  dirtyStroke(cache('D2').querySelector('.card'), T.d2, T.crash);
+  dirtyStroke(cache('D3').querySelector('.card'), T.d3, T.crash);
+
+  windowed($('[data-nogo="D3"]'), T.nogo, T.crash);
+
+  // Disk: D1/D2 change only on the forward redo; D3 never changes (init is final).
+  hideAt(disk('D1').querySelector('.init'), fwdAt(1));
+  hideAt(disk('D2').querySelector('.init'), fwdAt(2));
+  fadeIn(disk('D1').querySelector('.written'), fwdAt(1));
+  fadeIn(disk('D2').querySelector('.written'), fwdAt(2));
+  pulse($('[data-flash="D1"]'), fwdAt(1));
+  pulse($('[data-flash="D2"]'), fwdAt(2));
+
+  const rowTime = [T.begin, T.d1, T.d2, T.commitRec, T.t2, T.d3];
+  LOG.forEach((_, i) => fadeIn($(`.entry[data-row="${i}"]`), rowTime[i]));
+  fadeIn($('[data-diskrow="0"]'), T.wal);
+  fadeIn($('[data-diskrow="1"]'), T.wal + 0.15);
+  fadeIn($('[data-diskrow="2"]'), T.wal + 0.3);
+  fadeIn($('[data-diskrow="3"]'), T.commitRec + 0.35);
+  fadeIn($('[data-diskrow="4"]'), T.nogo);
+  fadeIn($('[data-diskrow="5"]'), T.nogo + 0.15);
+
+  windowed($('.crash'), T.crash, T.crash + 1.5);
+  fadeIn($('.pass-back'), T.recover);
+  fadeIn($('.clist'), backAt(2));
+  fadeIn($('.pass-fwd'), T.fwd);
+
+  [5, 4, 3, 2, 1, 0].forEach((row, k) => fadeIn($(`.recov[data-back="${row}"]`), backAt(k)));
+  [0, 1, 2, 3, 4, 5].forEach((row, k) => fadeIn($(`.recov[data-fwd="${row}"]`), fwdAt(k)));
+
+  animPlayer(svg, timeline);
+})();
+</script>
+```
