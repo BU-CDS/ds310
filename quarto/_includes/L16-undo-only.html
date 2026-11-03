@@ -1,0 +1,307 @@
+```{=html}
+<!--
+  Animation for L16 (included by L16-Logging2.qmd, after "Undo-Only Logging"):
+  how undo-only logging actually moves data.
+
+  A simplified cut of the undo-redo example: T1 updates D1 and D2 and commits;
+  T2 updates D3 and is still in progress when the system crashes.
+
+    1. update records store only the old value
+    2. WAL: log records are forced to disk before any changed page
+    3. at commit: force changed pages to disk, then write/force the commit record
+    4. uncommitted pages may still go to disk (steal) — we can undo them
+    5. recovery is a single backward pass; committed data needs no redo
+
+  Playback (Start / Pause button, rewind on leaving the slide, final frame in
+  a PDF export) comes from anim-player.html, which the deck includes first.
+
+  Markup is the final frame. Each element gets at most one animation, so
+  fill: 'both' (applied by the player) does not fight itself during delays.
+-->
+<style>
+#uol-anim .panel { fill: #fff; stroke: #cfcabd; stroke-width: 2; }
+#uol-anim .panel-title { fill: #000; font-size: 24px; font-weight: 700; }
+#uol-anim .panel-sub { fill: #666; font-size: 16px; font-style: italic; }
+
+#uol-anim .card { fill: #fff; stroke: #555; stroke-width: 2.5; }
+#uol-anim .iname { fill: #000; font-size: 22px; font-weight: 700; }
+#uol-anim .ival { fill: #222; font-size: 28px; }
+#uol-anim .dirty-tag { fill: #c00; font-size: 15px; font-style: italic; }
+#uol-anim .lost { fill: #999; font-size: 22px; font-style: italic; }
+
+#uol-anim .cap { fill: #3a5fcd; font-size: 23px; }
+#uol-anim .cap.alert { fill: #7c1717; font-weight: 700; }
+#uol-anim .cap.ok { fill: #1a8a1a; }
+
+#uol-anim .log-head { fill: #ccccff; stroke: #000; stroke-width: 2; }
+#uol-anim .log-row { fill: #fff; stroke: #000; stroke-width: 1.5; }
+#uol-anim .log-title { fill: #000; font-size: 22px; font-weight: 700; text-anchor: start; }
+#uol-anim .hcell { fill: #000; font-size: 18px; font-style: italic; }
+#uol-anim .lsn { fill: #000; font-size: 20px; }
+#uol-anim .rec { fill: #000; font-size: 20px; text-anchor: start; }
+#uol-anim .rec.t1, #uol-anim .lsn.t1 { fill: #3a5fcd; }
+#uol-anim .rec.t2, #uol-anim .lsn.t2 { fill: #cc6600; }
+#uol-anim .on-disk { fill: #1a8a1a; font-size: 16px; font-style: italic; }
+#uol-anim .recov { fill: #000; font-size: 20px; text-anchor: start; }
+#uol-anim .recov.undo { fill: #c00; font-weight: 700; }
+#uol-anim .recov.commit { fill: #3a5fcd; font-weight: 700; }
+
+#uol-anim .arrow { fill: none; stroke: #1a8a1a; stroke-width: 3; }
+#uol-anim .arrow-tip { fill: #1a8a1a; }
+#uol-anim .arrow.steal { stroke: #cc6600; }
+#uol-anim .arrow-tip.steal { fill: #cc6600; }
+
+#uol-anim .flash { fill: #1a8a1a; fill-opacity: 0.22; pointer-events: none; }
+#uol-anim .flash.steal { fill: #cc6600; }
+#uol-anim .flash.undo { fill: #c00; }
+#uol-anim .crash-veil { fill: #7c1717; }
+#uol-anim .crash-label { fill: #7c1717; font-size: 36px; font-weight: 700; }
+
+#uol-anim .clist-box { fill: #eef2fb; stroke: #3a5fcd; stroke-width: 2; }
+#uol-anim .clist-t { fill: #3a5fcd; font-size: 18px; font-weight: 700; text-anchor: start; }
+
+#uol-anim .pass { fill: none; stroke: #c00; stroke-width: 3; }
+#uol-anim .pass-tip { fill: #c00; }
+</style>
+
+<svg id="uol-anim" class="anim-fig" viewBox="0 0 1200 700" role="img"
+     aria-label="Animation of undo-only logging. T1 updates D1 and D2; those log records store only the old values and are forced to disk, then the changed pages are forced to disk, then T1 commits. T2 updates D3 and that uncommitted page reaches disk. After a crash, recovery walks the log backward, undoes T2, and skips T1 because its data is already on disk."></svg>
+
+<script>
+(function () {
+  const svg = document.getElementById('uol-anim');
+
+  const ITEMS = [
+    { id: 'D1', init: 3000, written: 2500 },
+    { id: 'D2', init: 1000, written: 1500 },
+    { id: 'D3', init: 7200, written: 6780, restored: 7200 },
+  ];
+  const LOG = [
+    { lsn: 100, txn: 1, rec: 'txn: 1; BEGIN', recov: 'skip' },
+    { lsn: 150, txn: 1, rec: 'txn: 1; item: D1; old: 3000', recov: 'skip' },
+    { lsn: 225, txn: 1, rec: 'txn: 1; item: D2; old: 1000', recov: 'skip' },
+    { lsn: 300, txn: 1, rec: 'txn: 1; COMMIT', recov: 'T1 committed' },
+    { lsn: 350, txn: 2, rec: 'txn: 2; BEGIN', recov: 'skip' },
+    { lsn: 400, txn: 2, rec: 'txn: 2; item: D3; old: 7200', recov: 'undo: D3 = 7200' },
+  ];
+  const CAPS = [
+    { id: 'c0', cls: '',     text: 'Same running example. Update records store only the old value.' },
+    { id: 'c1', cls: '',     text: 'T1 writes D1 and D2. The log records the old values — not the new ones.' },
+    { id: 'c2', cls: '',     text: 'WAL: force those log records to disk before any changed page.' },
+    { id: 'c3', cls: '',     text: 'At commit: force the changed pages to disk, then write/force COMMIT.' },
+    { id: 'c4', cls: '',     text: 'T2 writes D3. Uncommitted pages may still go to disk — we can undo them.' },
+    { id: 'c5', cls: 'alert', text: 'Crash! Cache is lost. Disk has T1’s committed pages and T2’s dirty write.' },
+    { id: 'c6', cls: 'ok',   text: 'Recovery is one backward pass: undo T2, skip T1. No redo.' },
+  ];
+
+  const card = (side, i) => {
+    const x0 = side === 'cache' ? 40 : 632;
+    return { x: x0 + i * 178, y: 100, w: 166, h: 100 };
+  };
+  const LOG_X = 40, LOG_Y = 230, ROW_H = 42, HEAD_H = 40;
+  const rowY = i => LOG_Y + 44 + HEAD_H + i * ROW_H;
+  const sub = n => `<tspan dy="7" font-size="70%">${n}</tspan>`;
+
+  let h = '';
+  CAPS.forEach((c, i) => {
+    const last = i === CAPS.length - 1;
+    h += `<text class="cap ${c.cls}" data-cap="${c.id}" x="600" y="32"${last ? '' : ' opacity="0"'}>${c.text}</text>`;
+  });
+
+  h += `<rect class="panel" x="24" y="48" width="560" height="168" rx="12"/>
+        <text class="panel-title" x="304" y="78">memory (cache)</text>
+        <rect class="panel" x="616" y="48" width="560" height="168" rx="12"/>
+        <text class="panel-title" x="896" y="78">disk</text>`;
+
+  ITEMS.forEach((it, i) => {
+    const cc = card('cache', i), dc = card('disk', i);
+    const cx = cc.x + cc.w / 2, dx = dc.x + dc.w / 2;
+    const diskFinal = it.restored != null ? 'restored' : 'written';
+    h += `<g data-cache="${it.id}">
+            <rect class="card" x="${cc.x}" y="${cc.y}" width="${cc.w}" height="${cc.h}" rx="8"/>
+            <text class="iname" x="${cx}" y="${cc.y + 28}">${it.id}</text>
+            <text class="ival init" x="${cx}" y="${cc.y + 64}" opacity="0">${it.init}</text>
+            <text class="ival written" x="${cx}" y="${cc.y + 64}" opacity="0">${it.written}</text>
+            <text class="lost" x="${cx}" y="${cc.y + 64}">lost</text>
+            <text class="dirty-tag" x="${cx}" y="${cc.y + 86}" opacity="0">dirty</text>
+          </g>
+          <g data-disk="${it.id}">
+            <rect class="card" x="${dc.x}" y="${dc.y}" width="${dc.w}" height="${dc.h}" rx="8"/>
+            <text class="iname" x="${dx}" y="${dc.y + 28}">${it.id}</text>
+            <text class="ival init" x="${dx}" y="${dc.y + 64}" opacity="0">${it.init}</text>
+            <text class="ival written" x="${dx}" y="${dc.y + 64}"${diskFinal === 'written' ? '' : ' opacity="0"'}>${it.written}</text>
+            ${it.restored != null
+              ? `<text class="ival restored" x="${dx}" y="${dc.y + 64}">${it.restored}</text>`
+              : ''}
+            <rect class="flash" data-flash="${it.id}" x="${dc.x}" y="${dc.y}" width="${dc.w}" height="${dc.h}" rx="8" opacity="0"/>
+            <rect class="flash undo" data-undoflash="${it.id}" x="${dc.x}" y="${dc.y}" width="${dc.w}" height="${dc.h}" rx="8" opacity="0"/>
+          </g>`;
+  });
+
+  ['D1', 'D2', 'D3'].forEach(id => {
+    const i = ITEMS.findIndex(it => it.id === id);
+    const cc = card('cache', i), dc = card('disk', i);
+    const y = cc.y + cc.h / 2;
+    const x1 = cc.x + cc.w + 6, x2 = dc.x - 10;
+    const steal = id === 'D3' ? ' steal' : '';
+    h += `<g class="flush" data-flush="${id}" opacity="0">
+            <path class="arrow${steal}" d="M${x1},${y} H${x2}"/>
+            <path class="arrow-tip${steal}" d="M${x2 - 1},${y} l-14,-7 v14 z"/>
+          </g>`;
+  });
+
+  h += `<rect class="panel" x="${LOG_X}" y="${LOG_Y}" width="1120" height="368" rx="12"/>
+        <text class="log-title" x="${LOG_X + 18}" y="${LOG_Y + 32}">log (old values only)</text>
+        <g class="clist">
+          <rect class="clist-box" x="820" y="${LOG_Y + 10}" width="318" height="28" rx="8"/>
+          <text class="clist-t" x="834" y="${LOG_Y + 30}">commit list: T${sub(1)}</text>
+        </g>
+        <rect class="log-head" x="${LOG_X + 16}" y="${LOG_Y + 44}" width="1088" height="${HEAD_H}"/>
+        <text class="hcell" x="${LOG_X + 70}" y="${LOG_Y + 70}">LSN</text>
+        <text class="hcell" x="${LOG_X + 430}" y="${LOG_Y + 70}">record contents</text>
+        <text class="hcell" x="${LOG_X + 860}" y="${LOG_Y + 70}">on disk?</text>
+        <text class="hcell" x="${LOG_X + 1030}" y="${LOG_Y + 70}">recovery</text>`;
+
+  LOG.forEach((r, i) => {
+    const y = rowY(i);
+    const undo = r.recov.startsWith('undo');
+    const commit = r.recov.startsWith('add');
+    h += `<g class="entry" data-row="${i}">
+            <rect class="log-row" x="${LOG_X + 16}" y="${y}" width="1088" height="${ROW_H}"/>
+            <text class="lsn t${r.txn}" x="${LOG_X + 70}" y="${y + 28}">${r.lsn}</text>
+            <text class="rec t${r.txn}" x="${LOG_X + 130}" y="${y + 28}">${r.rec}</text>
+            <text class="on-disk" data-diskrow="${i}" x="${LOG_X + 860}" y="${y + 28}">forced</text>
+            <text class="recov${undo ? ' undo' : commit ? ' commit' : ''}" data-recov="${i}"
+                  x="${LOG_X + 930}" y="${y + 28}">${r.recov}</text>
+          </g>`;
+  });
+
+  const yLast = rowY(LOG.length - 1) + ROW_H / 2;
+  const yFirst = rowY(0) + ROW_H / 2;
+  h += `<g class="pass-g">
+          <path class="pass" d="M${LOG_X + 1106},${yLast} V${yFirst}"/>
+          <path class="pass-tip" d="M${LOG_X + 1106},${yFirst - 2} l-8,14 h16 z"/>
+        </g>
+        <g class="crash" opacity="0">
+          <rect class="crash-veil" x="24" y="48" width="1152" height="168" rx="12" fill-opacity="0.12"/>
+          <text class="crash-label" x="600" y="140">CRASH</text>
+        </g>`;
+  svg.innerHTML = h;
+
+  const $ = sel => svg.querySelector(sel);
+  const timeline = [];
+  const add = (el, frames, start, dur, opts) => {
+    if (!el) return;
+    timeline.push([el, frames, start, dur, opts]);
+  };
+
+  // Appear at tOn and stay (final-frame elements, hidden until then).
+  const fadeIn = (el, tOn, dur = 0.3) =>
+    add(el, [{ opacity: 0 }, { opacity: 1 }], tOn, dur);
+  // Visible from the start, hidden at tOff (markup is the hidden final state).
+  const hideAt = (el, tOff, dur = 0.25) =>
+    add(el, [{ opacity: 1 }, { opacity: 0 }], tOff, dur);
+  // Appear at tOn, gone again at tOff.
+  const windowed = (el, tOn, tOff) => {
+    const dur = Math.max(0.35, tOff - tOn);
+    add(el, [
+      { opacity: 0 },
+      { opacity: 1, offset: 0.08 },
+      { opacity: 1, offset: 0.92 },
+      { opacity: 0 },
+    ], tOn, dur);
+  };
+  const pulse = (el, tOn) =>
+    add(el, [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], tOn, 0.85);
+
+  const cache = id => $(`[data-cache="${id}"]`);
+  const disk = id => $(`[data-disk="${id}"]`);
+  const cap = id => $(`.cap[data-cap="${id}"]`);
+
+  // ---- Clock (seconds) ----
+  const T = {
+    begin:      0.45,
+    d1:         1.2,
+    d2:         2.15,
+    wal:        3.4,
+    pages:      4.7,
+    commitRec:  6.3,
+    t2:         7.5,
+    d3:         8.15,
+    steal:      9.4,
+    crash:     10.8,
+    recover:   12.5,
+    undo:      13.0,
+  };
+  const recovAt = k => T.undo + k * 0.45;   // k = 0 is log row 5 (bottom)
+
+  // Captions: c6 is the final frame; the rest are windows.
+  hideAt(cap('c0'), T.d1);
+  windowed(cap('c1'), T.d1, T.wal);
+  windowed(cap('c2'), T.wal, T.pages);
+  windowed(cap('c3'), T.pages, T.t2);
+  windowed(cap('c4'), T.t2, T.crash);
+  windowed(cap('c5'), T.crash, T.recover);
+  fadeIn(cap('c6'), T.recover);
+
+  // Cache / disk values. Markup is the final frame (cache lost; disk 2500, 1500, 7200).
+  ['D1', 'D2', 'D3'].forEach(id => {
+    hideAt(cache(id).querySelector('.init'), id === 'D3' ? T.d3 : (id === 'D1' ? T.d1 : T.d2));
+    hideAt(disk(id).querySelector('.init'), id === 'D3' ? T.steal : T.pages + (id === 'D2' ? 0.45 : 0));
+    fadeIn(cache(id).querySelector('.lost'), T.crash);
+  });
+  windowed(cache('D1').querySelector('.written'), T.d1, T.crash);
+  windowed(cache('D2').querySelector('.written'), T.d2, T.crash);
+  windowed(cache('D3').querySelector('.written'), T.d3, T.crash);
+  windowed(cache('D1').querySelector('.dirty-tag'), T.d1, T.pages);
+  windowed(cache('D2').querySelector('.dirty-tag'), T.d2, T.pages + 0.45);
+  windowed(cache('D3').querySelector('.dirty-tag'), T.d3, T.steal);
+  fadeIn(disk('D1').querySelector('.written'), T.pages);
+  fadeIn(disk('D2').querySelector('.written'), T.pages + 0.45);
+  windowed(disk('D3').querySelector('.written'), T.steal, T.undo);
+  fadeIn(disk('D3').querySelector('.restored'), T.undo);
+
+  // Dirty red stroke on the cache card while the page is dirty.
+  const dirtyStroke = (el, tOn, tOff) => {
+    const dur = tOff - tOn;
+    add(el, [
+      { stroke: '#555' },
+      { stroke: '#c00', offset: 0.06 },
+      { stroke: '#c00', offset: 0.9 },
+      { stroke: '#555' },
+    ], tOn, dur);
+  };
+  dirtyStroke(cache('D1').querySelector('.card'), T.d1, T.pages);
+  dirtyStroke(cache('D2').querySelector('.card'), T.d2, T.pages + 0.45);
+  dirtyStroke(cache('D3').querySelector('.card'), T.d3, T.steal);
+
+  windowed($('[data-flush="D1"]'), T.pages, T.pages + 0.9);
+  windowed($('[data-flush="D2"]'), T.pages + 0.45, T.pages + 1.35);
+  windowed($('[data-flush="D3"]'), T.steal, T.steal + 0.9);
+  pulse($('[data-flash="D1"]'), T.pages);
+  pulse($('[data-flash="D2"]'), T.pages + 0.45);
+  pulse($('[data-flash="D3"]'), T.steal);
+  pulse($('[data-undoflash="D3"]'), T.undo);
+
+  // Log rows (final frame: all present). Appear as they are written.
+  const rowTime = [T.begin, T.d1, T.d2, T.commitRec, T.t2, T.d3];
+  LOG.forEach((_, i) => fadeIn($(`.entry[data-row="${i}"]`), rowTime[i]));
+  // "forced" badges: T1's records at WAL, COMMIT at commitRec, T2's at steal-time WAL
+  fadeIn($('[data-diskrow="0"]'), T.wal);
+  fadeIn($('[data-diskrow="1"]'), T.wal + 0.15);
+  fadeIn($('[data-diskrow="2"]'), T.wal + 0.3);
+  fadeIn($('[data-diskrow="3"]'), T.commitRec + 0.35);
+  fadeIn($('[data-diskrow="4"]'), T.steal - 0.55);
+  fadeIn($('[data-diskrow="5"]'), T.steal - 0.4);
+
+  windowed($('.crash'), T.crash, T.crash + 1.5);
+  fadeIn($('.pass-g'), T.recover);
+  fadeIn($('.clist'), recovAt(2));   // when we hit T1 COMMIT, walking upward
+
+  // Recovery column, bottom to top.
+  [5, 4, 3, 2, 1, 0].forEach((row, k) => fadeIn($(`.recov[data-recov="${row}"]`), recovAt(k)));
+
+  animPlayer(svg, timeline);
+})();
+</script>
+```

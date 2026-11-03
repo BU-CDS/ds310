@@ -242,6 +242,11 @@ format:
 - During recovery, the system only performs the backward pass.
 :::
 
+## Undo-Only Logging (cont.)
+
+{{< include _includes/anim-player.html >}}
+{{< include _includes/L16-undo-only.html >}}
+
 ## Redo-Only Logging
 
 - Only store the info. needed to redo txns.
@@ -269,6 +274,10 @@ format:
 - If a transaction aborts, none of its changes can be on disk.
 - During recovery, perform the backward pass to build the commit list (no undos).  Then perform the forward pass as in undo-redo.
 :::
+
+## Redo-Only Logging (cont.)
+
+{{< include _includes/L16-redo-only.html >}}
 
 ## Comparing the Three Logging Schemes
 
