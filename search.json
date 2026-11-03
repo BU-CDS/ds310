@@ -910,11 +910,25 @@
     "text": "Undo-Only Logging\n\nOnly store the info. needed to undo txns.\n\nupdate records include only the old value\n\n\n\n\nLike undo-redo logging, undo-only logging follows WAL.\nIn addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit. Why? so that no redo operations will be needed\n\n\n\n\nAt transaction commit:\n\n\n\n\nforce all dirty log records to disk\n\n\n\n\nforce database pages changed by the txn to disk\n\n\n\n\nwrite the commit log record\n\n\n\n\nforce the commit log record to disk\n\n\n\n\nDuring recovery, the system only performs the backward pass."
   },
   {
+    "objectID": "L16-Logging2.html#undo-only-logging-cont.",
+    "href": "L16-Logging2.html#undo-only-logging-cont.",
+    "title": "Recovery and Logging II",
+    "section": "Undo-Only Logging (cont.)",
+    "text": "Undo-Only Logging (cont.)"
+  },
+  {
     "objectID": "L16-Logging2.html#redo-only-logging",
     "href": "L16-Logging2.html#redo-only-logging",
     "title": "Recovery and Logging II",
     "section": "Redo-Only Logging",
     "text": "Redo-Only Logging\n\nOnly store the info. needed to redo txns.\n\nupdate records include only the new value\n\n\n\n\nLike the other two schemes, redo-only logging follows WAL.\nIn addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.\n\n\n\n\nAt transaction commit:\n\nwrite the commit log record\n\n\n\n\n\nforce all dirty log records to disk\n\n\n\n\n(changed database pages are allowed to go to disk anytime after this)\n\n\n\n\nIf a transaction aborts, none of its changes can be on disk.\nDuring recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo."
+  },
+  {
+    "objectID": "L16-Logging2.html#redo-only-logging-cont.",
+    "href": "L16-Logging2.html#redo-only-logging-cont.",
+    "title": "Recovery and Logging II",
+    "section": "Redo-Only Logging (cont.)",
+    "text": "Redo-Only Logging (cont.)"
   },
   {
     "objectID": "L16-Logging2.html#comparing-the-three-logging-schemes",
