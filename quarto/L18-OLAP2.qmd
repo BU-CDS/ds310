@@ -58,11 +58,11 @@ Outline
 - The lattice is a graph showing relationships between cuboids
 - Moving on the lattice corresponds to aggregation or disaggregation
 
-![](images/L18-OLAP2/cube-cuboids.png){width="90%" fig-align="center"}
+![](images/L18-OLAP2/cube-cuboids.svg){width="90%" fig-align="center"}
 
 ## Cuboids Corresponding to the Cube
 
-![](images/L18-OLAP2/lattice-3d.png){width="80%" fig-align="center"}
+![](images/L18-OLAP2/lattice-3d.svg){width="92%" fig-align="center"}
 
 ## Data Cube Example
 
@@ -567,7 +567,7 @@ A: 6 x 6 x 6 = 216
 
 - In this example, we decide to use a star schema
 
-![](images/L18-OLAP2/star-schema.png){width="62%" fig-align="center"}
+![](images/L18-OLAP2/star-schema.svg){width="82%" fig-align="center"}
 
 - We determine that we only need [quantity]{style="color:#a00;"} and (unit) [price]{style="color:#a00;"} to derive
     - [sum(sales_in_dollars)]{style="color:#a00;"} = quantity\*price

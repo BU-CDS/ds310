@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 268 210" role="img"
+     aria-label="The location dimension table: location key, street, city, province or state, and country.">
+  <style>
+    text {
+      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      fill: #1c1c1c;
+      dominant-baseline: middle;
+    }
+    .name { font-size: 22px; font-weight: 600; }
+    .attr { font-size: 20px; }
+    .key { font-size: 20px; text-decoration: underline; }
+  </style>
+  <rect x="1" y="1" width="266" height="208" fill="#faf4dc" stroke="#b8922e" stroke-width="2"/>
+  <rect x="3" y="3" width="262" height="38" fill="#f0e4b4"/>
+  <line x1="1" y1="41" x2="267" y2="41" stroke="#b8922e" stroke-width="2"/>
+  <text class="name" x="134" y="22" text-anchor="middle">location</text>
+  <text class="key" x="134" y="58" text-anchor="middle">location_key</text>
+  <text class="attr" x="134" y="92" text-anchor="middle">street</text>
+  <text class="attr" x="134" y="126" text-anchor="middle">city</text>
+  <text class="attr" x="134" y="160" text-anchor="middle">province_or_state</text>
+  <text class="attr" x="134" y="194" text-anchor="middle">country</text>
+</svg>

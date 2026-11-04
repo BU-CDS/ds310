@@ -26,6 +26,12 @@ format:
 ::: {.fragment}
 - We'll now look at how the DBMS guarantees atomicity and durability.
     - ensured by the subsystem responsible for *recovery*
+    - recovery is the process of restoring the database to a consistent state after a failure
+        - by "failure", we generally mean a crash -- a catastrophic failure or power outage
+:::
+
+::: {.fragment}
+- The reason that a database may be in an inconsistent state after a failure has to do with *caching.*
 :::
 
 ## A Quick Look at Caching
@@ -34,11 +40,12 @@ format:
 
 ::: {.fragment fragment-index=2}
 - There may be more than one cache:
-    - the DBMS's own cache (called the *memory pool* in BDB)
+    - the DBMS's own cache (also called the *memory pool*)
 :::
 
 ::: {.fragment fragment-index=3 .sub}
 - the operating system's buffer cache
+    - think of this as the OS's own cache for the database files
 :::
 
 ::: {.r-stack}
@@ -125,8 +132,50 @@ format:
 ![](images/L15-Logging1/cachewr-3.png){.fragment fragment-index=2 width="60%"}
 :::
 
-::: {.fragment fragment-index=3}
-- This complicates recovery, because changes may not be on disk.
+
+## The Problem
+
+::: {.fragment}
+- There are two problems that can arise due to the interaction of memory caches and disk storage.
+:::
+
+::: {.fragment}
+- These concern transactions, and whether they have committed.
+:::
+
+::: {.fragment}
+- Problem 1:
+    - A data item is updated in memory, but not yet written to disk.
+    - The transaction commits.
+        - Note that this means that the database *guarantees* that the changes are durable (permanent).
+    - The database crashes.
+    - When the database restarts, the changed data has disappeared from memory.
+    - So the database is **inconsistent:** a committed transaction has been lost.
+:::
+
+::: {.fragment}
+- For Problem 1, we need a way to "redo" the transaction.
+:::
+
+## The Problem (cont.)
+
+::: {.fragment}
+- Problem 2:
+    - A data item is updated in memory, and the update is written to disk.
+    - The transaction has not yet committed.
+        - Note that this means that the database *guarantees* that the changes are not (yet) permanent.
+    - The database crashes.
+    - When the database restarts, the transaction is no longer in progress.
+    - So the database is **inconsistent:** there is permanent data on the disk from a transaction that did not commit and will never commit.
+:::
+
+::: {.fragment}
+- For Problem 2, we need a way to "undo" the transaction.
+:::
+
+::: {.fragment}
+- The solution to both problems is to use *logging.*
+- And use the log to fix these problems during *recovery.*
 :::
 
 ## What Is Recovery?
@@ -271,6 +320,8 @@ must be forced to disk
 ::: {.fragment}
 - This ensures that the recovery system can restore the database to a consistent state.
 :::
+
+
 
 ## Undo-Redo Logging
 
@@ -517,6 +568,32 @@ must be forced to disk
 | E\. &nbsp;[570]{.fragment .highlight-blue fragment-index=10} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [420]{.fragment .highlight-blue fragment-index=18}
 :::
 
+## Improvements to Undo-Redo Logging
+
+Undo-redo logging is a simple and effective way to ensure that the database is in a consistent state after a failure.
+
+However, it has a few drawbacks:
+
+::: {.fragment}
+- Large logs can be a problem:
+    - When logs are large, recovery can take a long time.
+    - Undo-redo logging needs to read the entire log *twice*to recover the database.
+:::
+
+::: {.fragment}
+- We've been assuming that a data item (like "D1") is a single field or record.
+    - However, for efficiency reasons, we often use pages or blocks as data elements.
+    - This means that we need to store the old and new contents of the page or block in the log record.
+    - This can take up a lot of space.
+:::
+
+::: {.fragment}
+- We will address these problems with a number of improvements to undo-redo logging.
+    - To address the data item size problem, we will use *logical logging.*
+    - To address the log size problem, we will use *undo-only logging.*, *redo-only logging.*, and *checkpoints.*
+        - these will be covered in the next lecture
+:::
+
 ## Logical Logging
 
 - We've assumed that update records store the old + new values of the changed data element.
@@ -751,231 +828,3 @@ must be forced to disk
 ![](images/L15-Logging1/redone-07.png){.fragment width="82%"}
 :::
 
-## Undo-Only Logging
-
-- Only store the info. needed to undo txns.
-    - update records include only the old value
-
-::: {.fragment}
-- Like undo-redo logging, undo-only logging follows WAL.
-- In addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit. Why? [so that no redo operations will be needed]{.fragment style="color:#3a5fcd;"}
-:::
-
-::: {.fragment}
-- At transaction commit:
-
-1. force all dirty log records to disk
-:::
-
-::: {.fragment .sub}
-2. force database pages changed by the txn to disk
-:::
-
-::: {.fragment .sub}
-3. write the commit log record
-:::
-
-::: {.fragment .sub}
-4. force the commit log record to disk
-:::
-
-::: {.fragment}
-- During recovery, the system only performs the backward pass.
-:::
-
-## Redo-Only Logging
-
-- Only store the info. needed to redo txns.
-    - update records include only the new value
-
-::: {.fragment}
-- Like the other two schemes, redo-only logging follows WAL.
-- In addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.
-:::
-
-::: {.fragment}
-- At transaction commit:
-
-1. write the commit log record
-:::
-
-::: {.fragment .sub}
-2. force all dirty log records to disk
-
-(changed database pages are allowed to go to disk anytime after this)
-:::
-
-::: {.fragment}
-- If a transaction aborts, none of its changes can be on disk.
-- During recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo.
-:::
-
-## Comparing the Three Logging Schemes
-
-- Factors to consider in the comparison:
-    - complexity/efficiency of recovery
-    - size of the log files
-    - what needs to happen when a txn commits
-    - other restrictions that a logging scheme imposes on the system
-- We'll list advantages and disadvantages of each scheme.
-
-::: {.fragment .plus-minus}
-- Undo-only:
-    - \+ smaller logs than undo-redo
-    - \+ simple and quick recovery procedure (only one pass)
-    - -- forces log and data to disk at commit; have to wait for the I/Os
-:::
-
-## Comparing the Three Logging Schemes (cont.)
-
-::: {.plus-minus}
-- Redo-only:
-    - \+ smaller logs than undo-redo
-    - \+/-- recovery: more complex than undo-only, less than undo-redo
-    - -- must be able to cache all changes until the txn commits
-        - limits the size of transactions
-        - constrains the replacement policy of the cache
-    - \+ forces only log records to disk at commit
-:::
-
-::: {.fragment .plus-minus}
-- Undo-redo:
-    - -- larger logs
-    - -- more complex recovery
-    - \+ forces only log records to disk at commit
-    - \+ don't need to retain all data in the cache until commit
-:::
-
-## Checkpoints
-
-- As a DBMS runs, the log gets longer and longer.
-    - thus, recovery could end up taking a very long time!
-
-::: {.fragment}
-- To avoid long recoveries, periodically perform a *checkpoint*.
-    - force data and log records to disk to create a consistent on-disk database state
-:::
-
-::: {.fragment .sub}
-- during recovery, don't need to consider operations that preceded this consistent state
-:::
-
-## Static Checkpoints
-
-- Stop activity and wait for a consistent state.
-
-1) prohibit new transactions from starting and wait until all current transactions have aborted or committed.
-
-::: {.fragment}
-- Once there is a consistent state:
-
-2) force all dirty log records to disk (dirty = not yet written to disk)
-:::
-
-::: {.fragment .sub}
-3) force all dirty database pages to disk
-:::
-
-::: {.fragment .sub}
-4) write a *checkpoint record* to the log
-:::
-
-::: {.fragment .sub}
-- these steps must be performed in the specified order!
-:::
-
-::: {.fragment}
-- When performing recovery, go back to the most recent checkpoint record.
-- Problem with this approach? [stopping all activity can significantly reduce performance!]{.fragment style="color:#3a5fcd;"}
-:::
-
-## Dynamic Checkpoints
-
-- Don't stop and wait for a consistent state. Steps:
-
-1) prevent all update operations
-
-::: {.fragment .sub}
-2) force all dirty log records to disk
-:::
-
-::: {.fragment .sub}
-3) force all dirty database pages to disk
-:::
-
-::: {.fragment .sub}
-4) write a *checkpoint record* to the log
-    - include a list of all active txns
-:::
-
-::: {.fragment}
-- When performing recovery:
-    - backward pass: go back until you've seen the start records of all uncommitted txns in the most recent checkpoint record
-:::
-
-::: {.fragment .sub}
-- forward pass: begin from the log record that comes after the most recent checkpoint record. why?
-:::
-
-::: {.fragment .sub}
-- [all earlier changes were forced to disk by the checkpoint]{style="color:#3a5fcd;"}
-:::
-
-::: {.fragment .sub}
-- note: if all txns in the checkpoint record are on the commit list, we stop the backward pass at the checkpoint record
-:::
-
-## Example of Recovery with Dynamic Checkpoints
-
-::: {.r-stack}
-![](images/L15-Logging1/dynck-01.png){width="78%"}
-
-![](images/L15-Logging1/dynck-02.png){.fragment fragment-index=1 width="78%"}
-
-![](images/L15-Logging1/dynck-03.png){.fragment fragment-index=2 width="78%"}
-
-![](images/L15-Logging1/dynck-04.png){.fragment fragment-index=3 width="78%"}
-
-![](images/L15-Logging1/dynck-05.png){.fragment fragment-index=4 width="78%"}
-
-![](images/L15-Logging1/dynck-06.png){.fragment fragment-index=5 width="78%"}
-
-![](images/L15-Logging1/dynck-07.png){.fragment fragment-index=6 width="78%"}
-
-![](images/L15-Logging1/dynck-08.png){.fragment fragment-index=7 width="78%"}
-
-![](images/L15-Logging1/dynck-09.png){.fragment fragment-index=8 width="78%"}
-
-![](images/L15-Logging1/dynck-10.png){.fragment fragment-index=9 width="78%"}
-
-![](images/L15-Logging1/dynck-11.png){.fragment fragment-index=10 width="78%"}
-
-![](images/L15-Logging1/dynck-12.png){.fragment fragment-index=11 width="78%"}
-
-![](images/L15-Logging1/dynck-13.png){.fragment fragment-index=12 width="78%"}
-:::
-
-::: {.fragment fragment-index=12}
-- Could D4 have a datum LSN of less than 110? [no. the checkpoint forces T1's change (LSN 110) to disk.]{.fragment fragment-index=13 style="color:#3a5fcd;"}
-:::
-
-## Reviewing the Log Record Types
-
-- Why is each type needed?
-    - assume undo-redo logging
-
-::: {.fragment}
-- [update records]{style="color:#3a5fcd;"}: hold the info. needed to undo/redo changes
-:::
-
-::: {.fragment}
-- [commit records]{style="color:#3a5fcd;"}: allow us to determine which changes should be undone and which should be redone
-:::
-
-::: {.fragment}
-- [begin records]{style="color:#3a5fcd;"}: allow us to determine the extent of the backward pass in the presence of dynamic checkpoints
-:::
-
-::: {.fragment}
-- [checkpoint records]{style="color:#3a5fcd;"}: limit the amount of the log that is processed during recovery
-:::
