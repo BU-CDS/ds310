@@ -156,12 +156,17 @@ Data Science 310
 <li>Recently accessed database pages are <em>cached</em> in memory so that subsequent accesses to them don’t require disk I/O.</li>
 <li>There may be more than one cache:
 <ul>
-<li>the DBMS’s own cache (called the memory pool in BDB)</li>
+<li>the DBMS’s own cache (also called the memory pool)</li>
 <li>the operating system’s buffer cache</li>
 </ul></li>
 </ul>
+<div class="fragment">
+<ul>
+<li>Caches are crucial for good performance, but they present challenges for maintaining the database’s integrity, particularly after a crash.</li>
+</ul>
+</div>
 
-<img data-src="images/L16-Logging2/caching-diagram.png" class="quarto-figure quarto-figure-center r-stretch" style="width:55.0%"></section>
+<img data-src="images/L16-Logging2/caching-diagram.png" class="quarto-figure quarto-figure-center r-stretch" style="width:40.0%"></section>
 <section id="review-what-is-recovery" class="slide level2">
 <h2>Review: What Is Recovery?</h2>
 <ul>
@@ -197,7 +202,8 @@ Data Science 310
 <section id="review-undo-redo-logging" class="slide level2">
 <h2>Review: Undo-Redo Logging</h2>
 <ul>
-<li>Here’s how it would work on our earlier example:</li>
+<li>The undo-redo logging scheme is a simple and effective way to ensure that the database is in a consistent state after a failure.</li>
+<li>Here’s a reminder of how it works:</li>
 </ul>
 <div class="r-stack">
 <p><img data-src="images/L16-Logging2/undo-redo-01.png" style="width:90.0%"></p>
@@ -221,6 +227,41 @@ Data Science 310
 <p><img data-src="images/L16-Logging2/undo-redo-19.png" class="fragment" style="width:90.0%"></p>
 <p><img data-src="images/L16-Logging2/undo-redo-20.png" class="fragment" style="width:90.0%"></p>
 <p><img data-src="images/L16-Logging2/undo-redo-21.png" class="fragment" style="width:90.0%"></p>
+</div>
+</section>
+<section id="improvements-to-undo-redo-logging" class="slide level2">
+<h2>Improvements to Undo-Redo Logging</h2>
+<p>As discused in the previous lecture, undo-redo logging has a few drawbacks:</p>
+<div class="fragment">
+<ul>
+<li>Large logs can be a problem:
+<ul>
+<li>When logs are large, recovery can take a long time.</li>
+<li>Undo-redo logging needs to read the entire log <em>twice</em>to recover the database.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>We’ve been assuming that a data item (like “D1”) is a single field or record.
+<ul>
+<li>However, for efficiency reasons, we often use pages or blocks as data elements.</li>
+<li>This means that we need to store the old and new contents of the page or block in the log record.</li>
+<li>This can take up a lot of space.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>We will address these problems with a number of improvements to undo-redo logging.
+<ul>
+<li>To address the data item size problem, we will use <em>logical logging.</em> (covered in the last lecture)</li>
+<li>To address the log size problem, we will use <em>undo-only logging.</em>, <em>redo-only logging.</em>, and <em>checkpoints.</em>
+<ul>
+<li>covered in this lecture</li>
+</ul></li>
+</ul></li>
+</ul>
 </div>
 </section>
 <section id="review-logical-logging" class="slide level2">
@@ -293,73 +334,27 @@ Data Science 310
 <p><img data-src="images/L16-Logging2/lsn-log-undo.png" style="width:100.0%"></p>
 </div></div>
 </section>
-<section id="the-backward-pass-using-lsns" class="slide level2">
-<h2>The Backward Pass Using LSNs</h2>
-<div class="columns">
-<div class="column" style="width:55%;">
-<ul>
-<li>During the backward pass, we undo an update if:
-<ul>
-<li>the txn did <em>not</em> commit</li>
-<li><strong>datum LSN</strong> == <strong>record LSN</strong></li>
-</ul></li>
-<li>When we undo, we also set: datum LSN = olsn</li>
-</ul>
-</div><div class="column" style="width:45%;">
-<p><img data-src="images/L16-Logging2/lsn-log-undo.png" style="width:100.0%"></p>
-</div></div>
-</section>
-<section id="which-updates-will-be-undone" class="slide level2">
-<h2>Which updates will be undone?</h2>
-<div class="r-stack">
-<p><img data-src="images/L16-Logging2/undone-01.png" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-02.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-03.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-04.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-05.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-06.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-07.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-08.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-09.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-10.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/undone-11.png" class="fragment" style="width:88.0%"></p>
-</div>
-</section>
-<section id="the-forward-pass-using-lsns" class="slide level2">
-<h2>The Forward Pass Using LSNs</h2>
-<div class="columns">
-<div class="column" style="width:55%;">
-<ul>
-<li>During the forward pass, we redo an update if:
-<ul>
-<li>the txn <em>did</em> commit</li>
-<li><strong>datum LSN</strong> == <strong>olsn</strong></li>
-</ul></li>
-<li>When we redo, we also set: datum LSN = record LSN</li>
-</ul>
-</div><div class="column" style="width:45%;">
-<p><img data-src="images/L16-Logging2/lsn-log-redo.png" style="width:100.0%"></p>
-</div></div>
-</section>
-<section id="which-updates-will-be-redone" class="slide level2">
-<h2>Which updates will be redone?</h2>
-<div class="r-stack">
-<p><img data-src="images/L16-Logging2/redone-01.png" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/redone-02.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/redone-03.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/redone-04.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/redone-05.png" class="fragment" style="width:88.0%"></p>
-<p><img data-src="images/L16-Logging2/redone-06.png" class="fragment" style="width:88.0%"></p>
-</div>
-</section>
 <section id="undo-only-logging" class="slide level2 scrollable">
 <h2>Undo-Only Logging</h2>
 <ul>
-<li>Only store the info. needed to undo txns.
+<li>The goal of undo-only logging is to reduce the size of the log and simplify recovery.</li>
+</ul>
+<div class="fragment">
 <ul>
-<li>update records include only the old value</li>
+<li>We will do this by ensuring that no committed transaction ever needs to be redone.
+<ul>
+<li>to do that, we will accept that commits during normal operation will be somewhat slower.</li>
 </ul></li>
 </ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Only store the information needed to undo transactions.
+<ul>
+<li>thus, update records include only the old value of the data item</li>
+</ul></li>
+</ul>
+</div>
 <div class="fragment">
 <ul>
 <li>Like undo-redo logging, undo-only logging follows WAL.</li>
@@ -409,8 +404,10 @@ Data Science 310
   runs the timeline:
     - nothing moves until Start is clicked; the button then pauses and
       resumes the run, and replays it once it has finished
+    - the progress bar steps to the previous or next beat, or to the beat
+      under a click; playback stays paused there until Resume
     - leaving the slide rewinds to the opening frame
-    - a PDF export gets the final frame and no button
+    - a PDF export gets the final frame and no controls
   While running, the svg carries data-state="playing" (otherwise "idle",
   "paused" or "done"), which fragments can use in their own CSS.
 -->
@@ -432,39 +429,122 @@ Data Science 310
 .anim-fig .btn text { fill: #333; font-size: 22px; }
 .anim-fig[data-state="playing"] .icon-play,
 .anim-fig:not([data-state="playing"]) .icon-pause { display: none; }
+
+/* progress bar: step backward, jump to a beat, step forward */
+.anim-fig .step-btn { cursor: pointer; }
+.anim-fig .step-btn rect { fill: #fff; stroke: #888; stroke-width: 2; }
+.anim-fig .step-btn:hover rect { fill: #f1efe9; }
+.anim-fig .step-btn path { fill: none; stroke: #444; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.anim-fig .scrub { cursor: pointer; }
+.anim-fig .scrub-track { fill: #fff; stroke: #888; stroke-width: 2; }
+.anim-fig .scrub-fill { fill: #3a5fcd; }
+.anim-fig .scrub-tick { stroke: #d9d3c7; stroke-width: 2; }
+.anim-fig .scrub-thumb { fill: #fff; stroke: #3a5fcd; stroke-width: 3; }
 </style>
 
 <script>
 // animPlayer(svg, timeline)
 //   timeline: [[element, keyframes, start, duration, extra options], ...], times in seconds
 window.animPlayer = function (svg, timeline) {
-  // A PDF export keeps the final frame and has no use for the button.
+  // A PDF export keeps the final frame and has no use for the controls.
   if (/print-pdf/.test(location.search)) return;
 
-  // The button is an SVG group, not a <button>, so a click never takes
-  // keyboard focus away from reveal.js.
+  const vb = svg.viewBox.baseVal;
+  const y = vb.height - 80;
+  // Beats are the timeline's start times, merged when they land together.
+  const total = timeline.reduce((m, [, , start, dur]) => Math.max(m, start + dur), 0);
+  const steps = [0];
+  [...new Set(timeline.map(([, , start]) => start))].sort((a, b) => a - b).forEach(t => {
+    if (t - steps[steps.length - 1] >= 0.35) steps.push(t);
+  });
+  if (total - steps[steps.length - 1] > 0.05) steps.push(total);
+  const totalMs = total * 1000;
+
+  const stepW = 44, gap = 10;
+  const trackX = 16 + 150 + gap + stepW + gap;
+  const trackW = Math.max(80, vb.width - 16 - stepW - gap - trackX);
+  // Controls are SVG groups, not <button>s, so a click never takes keyboard
+  // focus away from reveal.js.
   svg.insertAdjacentHTML('beforeend',
-    `<g class="btn" role="button" transform="translate(16 ${svg.viewBox.baseVal.height - 80})">
+    `<g class="btn" role="button" transform="translate(16 ${y})">
        <rect width="150" height="48" rx="24"/>
        <path class="icon-play" d="M22,13 l19,11 l-19,11 z"/>
        <path class="icon-pause" d="M21,14 h7 v20 h-7 z M34,14 h7 v20 h-7 z"/>
        <text x="92" y="32"></text>
+     </g>
+     <g class="step-btn step-back" role="button" aria-label="Previous step" transform="translate(${16 + 150 + gap} ${y})">
+       <rect width="${stepW}" height="48" rx="24"/>
+       <path d="M27,15 L16,24 L27,33"/>
+     </g>
+     <g class="scrub" role="slider" aria-label="Animation progress" aria-valuemin="0" aria-valuemax="${steps.length - 1}" transform="translate(${trackX} ${y})">
+       <rect class="scrub-hit" x="0" y="0" width="${trackW}" height="48" fill="transparent"/>
+       <rect class="scrub-track" x="0" y="16" width="${trackW}" height="16" rx="8"/>
+       <rect class="scrub-fill" x="2" y="18" height="12" width="0" rx="6"/>
+       ${steps.map((t, i) => {
+         if (i === 0 || i === steps.length - 1) return '';
+         const x = total ? (t / total) * trackW : 0;
+         return `<line class="scrub-tick" x1="${x}" y1="18" x2="${x}" y2="30"/>`;
+       }).join('')}
+       <circle class="scrub-thumb" cx="9" cy="24" r="9"/>
+     </g>
+     <g class="step-btn step-fwd" role="button" aria-label="Next step" transform="translate(${trackX + trackW + gap} ${y})">
+       <rect width="${stepW}" height="48" rx="24"/>
+       <path d="M17,15 L28,24 L17,33"/>
      </g>`);
+
   const btn = svg.querySelector('.btn');
+  const scrub = svg.querySelector('.scrub');
+  const fill = scrub.querySelector('.scrub-fill');
+  const thumb = scrub.querySelector('.scrub-thumb');
   const LABEL = { idle: 'Start', playing: 'Pause', paused: 'Resume', done: 'Replay' };
   const last = timeline.reduce((best, [, , start, dur], i, all) =>
     start + dur > all[best][2] + all[best][3] ? i : best, 0);
-  let anims = [], state;
+  let anims = [], state, raf = 0;
 
+  function endOf(a) {
+    return a.effect.getComputedTiming().endTime;
+  }
+  function clock() {
+    return anims.length ? (anims[last].currentTime || 0) : 0;
+  }
+  function paint(ms) {
+    const r = totalMs ? Math.max(0, Math.min(1, ms / totalMs)) : 0;
+    fill.setAttribute('width', r * (trackW - 4));
+    thumb.setAttribute('cx', Math.max(9, Math.min(trackW - 9, r * trackW)));
+    const at = stepIndex(ms / 1000);
+    scrub.setAttribute('aria-valuenow', at);
+    svg.querySelector('.step-back').style.opacity = at === 0 ? '0.35' : '1';
+    svg.querySelector('.step-fwd').style.opacity = at === steps.length - 1 ? '0.35' : '1';
+  }
+  // Last beat whose time is at or just before t.
+  function stepIndex(t) {
+    let i = 0;
+    steps.forEach((s, k) => { if (s <= t + 0.02) i = k; });
+    return i;
+  }
   function setState(s) {
     state = s;
     svg.dataset.state = s;                 // the CSS picks the icon from this
     btn.querySelector('text').textContent = LABEL[s];
     btn.setAttribute('aria-label', LABEL[s] + ' animation');
+    if (s === 'playing') watch();
+    else {
+      cancelAnimationFrame(raf);
+      paint(s === 'done' ? totalMs : s === 'idle' ? 0 : clock());
+    }
+  }
+  function watch() {
+    cancelAnimationFrame(raf);
+    const loop = () => {
+      if (state !== 'playing') return;
+      paint(clock());
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
   }
   // (Re)build every animation, held on its first frame.
   function load() {
-    anims.forEach(a => a.cancel());
+    anims.forEach(a => { a.onfinish = null; a.cancel(); });
     anims = timeline.map(([el, frames, start, dur, opts]) => {
       const a = el.animate(frames, { delay: start * 1000, duration: dur * 1000, fill: 'both', ...opts });
       a.pause();
@@ -474,21 +554,65 @@ window.animPlayer = function (svg, timeline) {
     anims[last].onfinish = () => setState('done');
     setState('idle');
   }
+  // Hold every animation at the same instant. Finished ones stay put:
+  // play() on a finished animation would rewind it.
+  function seek(seconds) {
+    // Land just after the beat so a fade-in has finished, without reaching
+    // the next beat. The opening and final frames stay exact.
+    const nudged = seconds > 0.05 && seconds < total - 0.05
+      ? Math.min(seconds + 0.28, total) : seconds;
+    const ms = Math.max(0, Math.min(nudged * 1000, totalMs));
+    anims.forEach(a => {
+      a.pause();
+      a.currentTime = Math.min(ms, endOf(a));
+    });
+    if (ms < 20) setState('idle');
+    else if (ms >= totalMs - 20) setState('done');
+    else setState('paused');
+  }
+  function stepBy(dir) {
+    const i = Math.max(0, Math.min(steps.length - 1, stepIndex(clock() / 1000) + dir));
+    seek(steps[i]);
+  }
   // Only touch animations still in flight: play() on a finished one would rewind it.
   function pause() {
     anims.forEach(a => { if (a.playState === 'running') a.pause(); });
     setState('paused');
   }
   function resume() {
-    anims.forEach(a => { if (a.playState === 'paused') a.play(); });
+    anims.forEach(a => {
+      if (a.playState === 'paused' && a.currentTime < endOf(a) - 1) a.play();
+    });
     setState('playing');
+  }
+  function swallow(el, fn) {
+    el.addEventListener('click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      fn(ev);
+    });
   }
 
   load();
-  btn.addEventListener('click', () => {
+  swallow(btn, () => {
     if (state === 'playing') return pause();
     if (state === 'done') load();
     resume();
+  });
+  swallow(svg.querySelector('.step-back'), () => stepBy(-1));
+  swallow(svg.querySelector('.step-fwd'), () => stepBy(1));
+  swallow(scrub, ev => {
+    const pt = svg.createSVGPoint();
+    pt.x = ev.clientX;
+    pt.y = ev.clientY;
+    const local = pt.matrixTransform(svg.getScreenCTM().inverse()).x - trackX;
+    const ratio = Math.max(0, Math.min(1, local / trackW));
+    let nearest = 0, best = Infinity;
+    steps.forEach((s, k) => {
+      const d = Math.abs(s / total - ratio);
+      if (d < best) { best = d; nearest = k; }
+    });
+    seek(steps[nearest]);
   });
   // Rewind when reveal.js moves off this slide (it marks the current one "present").
   const slide = svg.closest('section');
@@ -512,8 +636,9 @@ window.animPlayer = function (svg, timeline) {
     4. uncommitted pages may still go to disk (steal) — we can undo them
     5. recovery is a single backward pass; committed data needs no redo
 
-  Playback (Start / Pause button, rewind on leaving the slide, final frame in
-  a PDF export) comes from anim-player.html, which the deck includes first.
+  Playback (Start / Pause, a progress bar that steps between beats, rewind on
+  leaving the slide, final frame in a PDF export) comes from anim-player.html,
+  which the deck includes first.
 
   Markup is the final frame. Each element gets at most one animation, so
   fill: 'both' (applied by the player) does not fight itself during delays.
@@ -807,18 +932,31 @@ window.animPlayer = function (svg, timeline) {
 <section id="redo-only-logging" class="slide level2">
 <h2>Redo-Only Logging</h2>
 <ul>
-<li>Only store the info. needed to redo txns.
-<ul>
-<li>update records include only the new value</li>
-</ul></li>
+<li>The goal of redo-only logging is also to reduce the size of the log and simplify recovery.</li>
 </ul>
 <div class="fragment" data-fragment-index="1">
+<ul>
+<li>We will do this by ensuring that no <em>un</em>committed transaction ever needs to be undone.
+<ul>
+<li>to do that, we will enforce that no uncommitted data is ever written to disk.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="2">
+<ul>
+<li>Only store the information needed to redo transactions.
+<ul>
+<li>thus, update records include only the new value of the data item</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment" data-fragment-index="3">
 <ul>
 <li>Like the other two schemes, redo-only logging follows WAL.</li>
 <li>In addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.</li>
 </ul>
 </div>
-<div class="fragment" data-fragment-index="2">
+<div class="fragment" data-fragment-index="4">
 <ul>
 <li>At transaction commit:
 <ul>
@@ -826,17 +964,17 @@ window.animPlayer = function (svg, timeline) {
 </ul></li>
 </ul>
 </div>
-<div class="fragment sub" data-fragment-index="3">
+<div class="fragment sub" data-fragment-index="5">
 <ul>
 <li>force all dirty log records to disk</li>
 </ul>
 </div>
-<div class="fragment" data-fragment-index="3">
+<div class="fragment" data-fragment-index="6">
 <ul>
 <li>(changed database pages are allowed to go to disk anytime after this)</li>
 </ul>
 </div>
-<div class="fragment" data-fragment-index="4">
+<div class="fragment" data-fragment-index="7">
 <ul>
 <li>If a transaction aborts, none of its changes can be on disk.</li>
 <li>During recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo.</li>

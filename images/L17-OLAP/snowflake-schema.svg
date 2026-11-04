@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 490" role="img"
+     aria-label="Snowflake schema. The sales star, with item normalized into a supplier table and location normalized into a city table.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,1 L10,5 L0,9 Z" fill="context-stroke"/>
+    </marker>
+    <style>
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        fill: #1c1c1c;
+        dominant-baseline: middle;
+      }
+      .name { font-size: 20px; font-weight: 600; }
+      .attr { font-size: 18px; }
+      .key { font-size: 18px; text-decoration: underline; }
+      .title { font-size: 22px; font-weight: 600; fill: #7c1717; }
+    </style>
+  </defs>
+
+  <!-- time -->
+  <g>
+    <rect x="8" y="10" width="230" height="228" fill="#e5f4ec" stroke="#3e8f68" stroke-width="2"/>
+    <rect x="10" y="12" width="226" height="34" fill="#cfe8db"/>
+    <line x1="8" y1="46" x2="238" y2="46" stroke="#3e8f68" stroke-width="2"/>
+    <text class="name" x="123" y="29" text-anchor="middle">time</text>
+    <text class="key" x="123" y="62" text-anchor="middle">time_key</text>
+    <text class="attr" x="123" y="94" text-anchor="middle">day</text>
+    <text class="attr" x="123" y="126" text-anchor="middle">day_of_the_week</text>
+    <text class="attr" x="123" y="158" text-anchor="middle">month</text>
+    <text class="attr" x="123" y="190" text-anchor="middle">quarter</text>
+    <text class="attr" x="123" y="222" text-anchor="middle">year</text>
+  </g>
+
+  <!-- branch -->
+  <g>
+    <rect x="8" y="262" width="230" height="132" fill="#e7f1f8" stroke="#4d82b0" stroke-width="2"/>
+    <rect x="10" y="264" width="226" height="34" fill="#d2e4f2"/>
+    <line x1="8" y1="298" x2="238" y2="298" stroke="#4d82b0" stroke-width="2"/>
+    <text class="name" x="123" y="281" text-anchor="middle">branch</text>
+    <text class="key" x="123" y="314" text-anchor="middle">branch_key</text>
+    <text class="attr" x="123" y="346" text-anchor="middle">branch_name</text>
+    <text class="attr" x="123" y="378" text-anchor="middle">branch_type</text>
+  </g>
+
+  <!-- item; supplier_type has moved out to supplier -->
+  <g>
+    <rect x="634" y="10" width="220" height="196" fill="#fbf0e4" stroke="#c4843a" stroke-width="2"/>
+    <rect x="636" y="12" width="216" height="34" fill="#f3e0c8"/>
+    <line x1="634" y1="46" x2="854" y2="46" stroke="#c4843a" stroke-width="2"/>
+    <text class="name" x="744" y="29" text-anchor="middle">item</text>
+    <text class="key" x="744" y="62" text-anchor="middle">item_key</text>
+    <text class="attr" x="744" y="94" text-anchor="middle">item_name</text>
+    <text class="attr" x="744" y="126" text-anchor="middle">brand</text>
+    <text class="attr" x="744" y="158" text-anchor="middle">type</text>
+    <text class="attr" x="744" y="190" text-anchor="middle">supplier_key</text>
+  </g>
+
+  <!-- supplier, same family as item -->
+  <g>
+    <rect x="890" y="138" width="210" height="100" fill="#f6e6d0" stroke="#a86e2c" stroke-width="2"/>
+    <rect x="892" y="140" width="206" height="34" fill="#edd4b4"/>
+    <line x1="890" y1="174" x2="1100" y2="174" stroke="#a86e2c" stroke-width="2"/>
+    <text class="name" x="995" y="157" text-anchor="middle">supplier</text>
+    <text class="key" x="995" y="190" text-anchor="middle">supplier_key</text>
+    <text class="attr" x="995" y="222" text-anchor="middle">supplier_type</text>
+  </g>
+
+  <!-- location; city attributes have moved out to city -->
+  <g>
+    <rect x="634" y="250" width="220" height="132" fill="#faf4dc" stroke="#b8922e" stroke-width="2"/>
+    <rect x="636" y="252" width="216" height="34" fill="#f0e4b4"/>
+    <line x1="634" y1="286" x2="854" y2="286" stroke="#b8922e" stroke-width="2"/>
+    <text class="name" x="744" y="269" text-anchor="middle">location</text>
+    <text class="key" x="744" y="302" text-anchor="middle">location_key</text>
+    <text class="attr" x="744" y="334" text-anchor="middle">street</text>
+    <text class="attr" x="744" y="366" text-anchor="middle">city_key</text>
+  </g>
+
+  <!-- city, same family as location -->
+  <g>
+    <rect x="890" y="314" width="220" height="164" fill="#f3e7c0" stroke="#9a7a22" stroke-width="2"/>
+    <rect x="892" y="316" width="216" height="34" fill="#e8d59a"/>
+    <line x1="890" y1="350" x2="1110" y2="350" stroke="#9a7a22" stroke-width="2"/>
+    <text class="name" x="1000" y="333" text-anchor="middle">city</text>
+    <text class="key" x="1000" y="366" text-anchor="middle">city_key</text>
+    <text class="attr" x="1000" y="398" text-anchor="middle">city</text>
+    <text class="attr" x="1000" y="430" text-anchor="middle">province_or_state</text>
+    <text class="attr" x="1000" y="462" text-anchor="middle">country</text>
+  </g>
+
+  <text class="title" x="436" y="68" text-anchor="middle">Sales Fact Table</text>
+  <g>
+    <rect x="318" y="88" width="236" height="238" fill="#fff" stroke="#333" stroke-width="2"/>
+    <rect x="320" y="90" width="232" height="34" fill="#e5f4ec"/>
+    <rect x="320" y="124" width="232" height="34" fill="#fbf0e4"/>
+    <rect x="320" y="158" width="232" height="34" fill="#e7f1f8"/>
+    <rect x="320" y="192" width="232" height="34" fill="#faf4dc"/>
+    <rect x="320" y="226" width="232" height="98" fill="#f7f6f4"/>
+    <line x1="318" y1="124" x2="554" y2="124" stroke="#ddd9d2"/>
+    <line x1="318" y1="158" x2="554" y2="158" stroke="#ddd9d2"/>
+    <line x1="318" y1="192" x2="554" y2="192" stroke="#ddd9d2"/>
+    <line x1="318" y1="226" x2="554" y2="226" stroke="#333" stroke-width="1.5"/>
+    <line x1="318" y1="260" x2="554" y2="260" stroke="#e6e3de"/>
+    <line x1="318" y1="292" x2="554" y2="292" stroke="#e6e3de"/>
+    <text class="attr" x="436" y="107" text-anchor="middle">time_key</text>
+    <text class="attr" x="436" y="141" text-anchor="middle">item_key</text>
+    <text class="attr" x="436" y="175" text-anchor="middle">branch_key</text>
+    <text class="attr" x="436" y="209" text-anchor="middle">location_key</text>
+    <text class="attr" x="436" y="243" text-anchor="middle">units_sold</text>
+    <text class="attr" x="436" y="277" text-anchor="middle">dollars_sold</text>
+    <text class="attr" x="436" y="311" text-anchor="middle">avg_sales</text>
+  </g>
+
+  <g fill="none" stroke-width="2.25" marker-end="url(#arrow)">
+    <path d="M318,107 L238,62" stroke="#3e8f68"/>
+    <path d="M554,141 L634,62" stroke="#c4843a"/>
+    <path d="M318,175 L238,314" stroke="#4d82b0"/>
+    <path d="M554,209 L634,302" stroke="#b8922e"/>
+    <path d="M854,190 L890,190" stroke="#a86e2c"/>
+    <path d="M854,366 L890,366" stroke="#9a7a22"/>
+  </g>
+</svg>

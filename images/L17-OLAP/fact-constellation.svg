@@ -1,0 +1,143 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -16 1040 498" role="img"
+     aria-label="Fact constellation. Sales and shipping share the time, item, and location dimensions. Shipping also has a shipper dimension, and shipper refers to location.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7.5" markerHeight="7.5" orient="auto">
+      <path d="M0,1 L10,5 L0,9 Z" fill="context-stroke"/>
+    </marker>
+    <style>
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        fill: #1c1c1c;
+        dominant-baseline: middle;
+      }
+      .name { font-size: 18px; font-weight: 600; }
+      .attr { font-size: 16px; }
+      .key { font-size: 16px; text-decoration: underline; }
+      .title { font-size: 18px; font-weight: 600; fill: #7c1717; }
+    </style>
+  </defs>
+
+  <!-- time -->
+  <g>
+    <rect x="6" y="8" width="214" height="214" fill="#e5f4ec" stroke="#3e8f68" stroke-width="2"/>
+    <rect x="8" y="10" width="210" height="32" fill="#cfe8db"/>
+    <line x1="6" y1="42" x2="220" y2="42" stroke="#3e8f68" stroke-width="2"/>
+    <text class="name" x="113" y="26" text-anchor="middle">time</text>
+    <text class="key" x="113" y="57" text-anchor="middle">time_key</text>
+    <text class="attr" x="113" y="87" text-anchor="middle">day</text>
+    <text class="attr" x="113" y="117" text-anchor="middle">day_of_the_week</text>
+    <text class="attr" x="113" y="147" text-anchor="middle">month</text>
+    <text class="attr" x="113" y="177" text-anchor="middle">quarter</text>
+    <text class="attr" x="113" y="207" text-anchor="middle">year</text>
+  </g>
+
+  <!-- branch, used only by sales -->
+  <g>
+    <rect x="6" y="240" width="214" height="124" fill="#e7f1f8" stroke="#4d82b0" stroke-width="2"/>
+    <rect x="8" y="242" width="210" height="32" fill="#d2e4f2"/>
+    <line x1="6" y1="274" x2="220" y2="274" stroke="#4d82b0" stroke-width="2"/>
+    <text class="name" x="113" y="258" text-anchor="middle">branch</text>
+    <text class="key" x="113" y="289" text-anchor="middle">branch_key</text>
+    <text class="attr" x="113" y="319" text-anchor="middle">branch_name</text>
+    <text class="attr" x="113" y="349" text-anchor="middle">branch_type</text>
+  </g>
+
+  <!-- item, shared; still holds supplier_type -->
+  <g>
+    <rect x="516" y="8" width="210" height="184" fill="#fbf0e4" stroke="#c4843a" stroke-width="2"/>
+    <rect x="518" y="10" width="206" height="32" fill="#f3e0c8"/>
+    <line x1="516" y1="42" x2="726" y2="42" stroke="#c4843a" stroke-width="2"/>
+    <text class="name" x="621" y="26" text-anchor="middle">item</text>
+    <text class="key" x="621" y="57" text-anchor="middle">item_key</text>
+    <text class="attr" x="621" y="87" text-anchor="middle">item_name</text>
+    <text class="attr" x="621" y="117" text-anchor="middle">brand</text>
+    <text class="attr" x="621" y="147" text-anchor="middle">type</text>
+    <text class="attr" x="621" y="177" text-anchor="middle">supplier_type</text>
+  </g>
+
+  <!-- location, shared by sales, both shipping endpoints, and shipper -->
+  <g>
+    <rect x="516" y="208" width="230" height="184" fill="#faf4dc" stroke="#b8922e" stroke-width="2"/>
+    <rect x="518" y="210" width="226" height="32" fill="#f0e4b4"/>
+    <line x1="516" y1="242" x2="746" y2="242" stroke="#b8922e" stroke-width="2"/>
+    <text class="name" x="631" y="226" text-anchor="middle">location</text>
+    <text class="key" x="631" y="257" text-anchor="middle">location_key</text>
+    <text class="attr" x="631" y="287" text-anchor="middle">street</text>
+    <text class="attr" x="631" y="317" text-anchor="middle">city</text>
+    <text class="attr" x="631" y="347" text-anchor="middle">province_or_state</text>
+    <text class="attr" x="631" y="377" text-anchor="middle">country</text>
+  </g>
+
+  <!-- shipper, new dimension -->
+  <g>
+    <rect x="794" y="312" width="220" height="154" fill="#f4eef8" stroke="#8a6aa3" stroke-width="2"/>
+    <rect x="796" y="314" width="216" height="32" fill="#e6d8f0"/>
+    <line x1="794" y1="346" x2="1014" y2="346" stroke="#8a6aa3" stroke-width="2"/>
+    <text class="name" x="904" y="330" text-anchor="middle">shipper</text>
+    <text class="key" x="904" y="361" text-anchor="middle">shipper_key</text>
+    <text class="attr" x="904" y="391" text-anchor="middle">shipper_name</text>
+    <text class="attr" x="904" y="421" text-anchor="middle">location_key</text>
+    <text class="attr" x="904" y="451" text-anchor="middle">shipper_type</text>
+  </g>
+
+  <text class="title" x="368" y="36" text-anchor="middle">Sales Fact Table</text>
+  <g>
+    <rect x="268" y="70" width="200" height="224" fill="#fff" stroke="#333" stroke-width="2"/>
+    <rect x="270" y="72" width="196" height="32" fill="#e5f4ec"/>
+    <rect x="270" y="104" width="196" height="32" fill="#fbf0e4"/>
+    <rect x="270" y="136" width="196" height="32" fill="#e7f1f8"/>
+    <rect x="270" y="168" width="196" height="32" fill="#faf4dc"/>
+    <rect x="270" y="200" width="196" height="92" fill="#f7f6f4"/>
+    <line x1="268" y1="104" x2="468" y2="104" stroke="#ddd9d2"/>
+    <line x1="268" y1="136" x2="468" y2="136" stroke="#ddd9d2"/>
+    <line x1="268" y1="168" x2="468" y2="168" stroke="#ddd9d2"/>
+    <line x1="268" y1="200" x2="468" y2="200" stroke="#333" stroke-width="1.5"/>
+    <line x1="268" y1="232" x2="468" y2="232" stroke="#e6e3de"/>
+    <line x1="268" y1="264" x2="468" y2="264" stroke="#e6e3de"/>
+    <text class="attr" x="368" y="88" text-anchor="middle">time_key</text>
+    <text class="attr" x="368" y="120" text-anchor="middle">item_key</text>
+    <text class="attr" x="368" y="152" text-anchor="middle">branch_key</text>
+    <text class="attr" x="368" y="184" text-anchor="middle">location_key</text>
+    <text class="attr" x="368" y="216" text-anchor="middle">units_sold</text>
+    <text class="attr" x="368" y="248" text-anchor="middle">dollars_sold</text>
+    <text class="attr" x="368" y="280" text-anchor="middle">avg_sales</text>
+  </g>
+
+  <text class="title" x="904" y="36" text-anchor="middle">Shipping Fact Table</text>
+  <g>
+    <rect x="794" y="70" width="220" height="224" fill="#fff" stroke="#333" stroke-width="2"/>
+    <rect x="796" y="72" width="216" height="32" fill="#e5f4ec"/>
+    <rect x="796" y="104" width="216" height="32" fill="#fbf0e4"/>
+    <rect x="796" y="136" width="216" height="32" fill="#f4eef8"/>
+    <rect x="796" y="168" width="216" height="32" fill="#faf4dc"/>
+    <rect x="796" y="200" width="216" height="32" fill="#faf4dc"/>
+    <rect x="796" y="232" width="216" height="60" fill="#f7f6f4"/>
+    <line x1="794" y1="104" x2="1014" y2="104" stroke="#ddd9d2"/>
+    <line x1="794" y1="136" x2="1014" y2="136" stroke="#ddd9d2"/>
+    <line x1="794" y1="168" x2="1014" y2="168" stroke="#ddd9d2"/>
+    <line x1="794" y1="200" x2="1014" y2="200" stroke="#ddd9d2"/>
+    <line x1="794" y1="232" x2="1014" y2="232" stroke="#333" stroke-width="1.5"/>
+    <line x1="794" y1="262" x2="1014" y2="262" stroke="#e6e3de"/>
+    <text class="attr" x="904" y="88" text-anchor="middle">time_key</text>
+    <text class="attr" x="904" y="120" text-anchor="middle">item_key</text>
+    <text class="attr" x="904" y="152" text-anchor="middle">shipper_key</text>
+    <text class="attr" x="904" y="184" text-anchor="middle">from_location</text>
+    <text class="attr" x="904" y="216" text-anchor="middle">to_location</text>
+    <text class="attr" x="904" y="247" text-anchor="middle">dollars_cost</text>
+    <text class="attr" x="904" y="277" text-anchor="middle">units_shipped</text>
+  </g>
+
+  <g fill="none" stroke-width="2.25" marker-end="url(#arrow)">
+    <path d="M268,88 L220,66" stroke="#3e8f68"/>
+    <path d="M794,88 V-10 H236 V48 H220" stroke="#3e8f68"/>
+    <path d="M468,120 L516,57" stroke="#c4843a"/>
+    <path d="M794,120 L726,57" stroke="#c4843a"/>
+    <path d="M268,152 L220,289" stroke="#4d82b0"/>
+    <path d="M468,184 L516,257" stroke="#b8922e"/>
+    <path d="M794,184 L746,248" stroke="#b8922e"/>
+    <path d="M794,216 L746,274" stroke="#b8922e"/>
+    <path d="M1014,152 H1026 V361 H1014" stroke="#8a6aa3"/>
+    <path d="M794,421 H660 V392" stroke="#8a6aa3"/>
+  </g>
+</svg>

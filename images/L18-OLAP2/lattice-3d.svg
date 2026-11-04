@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1980 940" role="img"
+     aria-label="Lattice of cuboids for a cube with dimensions product, date, and country. Ranks run from the 0-D apex down to the 3-D base cuboid.">
+  <style>
+    text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #1c1c1c; dominant-baseline: middle; }
+    .name { font-size: 51px; paint-order: stroke fill; stroke: #ffffff; stroke-width: 10px; }
+    .rank { font-size: 51px; }
+    .apex { font-weight: 600; }
+  </style>
+  <line x1="700" y1="120" x2="380" y2="330" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="700" y1="120" x2="820" y2="330" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="700" y1="120" x2="1120" y2="330" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="380" y1="330" x2="380" y2="560" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="380" y1="330" x2="560" y2="560" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="820" y1="330" x2="380" y2="560" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="820" y1="330" x2="1120" y2="560" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1120" y1="330" x2="560" y2="560" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1120" y1="330" x2="1120" y2="560" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="380" y1="560" x2="700" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="560" y1="560" x2="700" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1120" y1="560" x2="700" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <circle cx="700" cy="120" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="380" cy="330" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="820" cy="330" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1120" cy="330" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="380" cy="560" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="560" cy="560" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1120" cy="560" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="700" cy="790" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <text class="name apex" x="700" y="58" text-anchor="middle">all (apex)</text>
+  <text class="name" x="350" y="330" text-anchor="end">product</text>
+  <text class="name" x="850" y="292" text-anchor="start">date</text>
+  <text class="name" x="1150" y="330" text-anchor="start">country</text>
+  <text class="name" x="350" y="560" text-anchor="end">product, date</text>
+  <text class="name" x="610" y="586" text-anchor="start">product, country</text>
+  <text class="name" x="1150" y="560" text-anchor="start">date, country</text>
+  <text class="name" x="700" y="868" text-anchor="middle">product, date, country (base)</text>
+  <text class="rank" x="1520" y="120">0-D (apex) cuboid</text>
+  <text class="rank" x="1520" y="330">1-D cuboids</text>
+  <text class="rank" x="1520" y="560">2-D cuboids</text>
+  <text class="rank" x="1520" y="790">3-D (base) cuboid</text>
+</svg>

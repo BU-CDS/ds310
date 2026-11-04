@@ -564,7 +564,7 @@ Data Science 310
 <section id="a-3d-data-cube" class="slide level2">
 <h2>A 3D Data Cube</h2>
 
-<img data-src="images/L17-OLAP/cube-3d.png" class="quarto-figure quarto-figure-center r-stretch" style="width:82.0%"></section>
+<img data-src="images/L17-OLAP/cube-3d.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:90.0%"></section>
 <section id="data-cube-is-the-model-not-the-implementation" class="slide level2">
 <h2>Data Cube is the Model, not the Implementation!</h2>
 <ul>
@@ -604,7 +604,7 @@ Data Science 310
 <section id="example-of-a-star-schema" class="slide level2">
 <h2>Example of a Star Schema</h2>
 
-<img data-src="images/L17-OLAP/star-schema.png" class="quarto-figure quarto-figure-center r-stretch" style="width:64.0%"><ul>
+<img data-src="images/L17-OLAP/star-schema.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:88.0%"><ul>
 <li>In this <span style="color:#990000;">data cube</span>, there is one <span style="color:#990000;">fact</span> table and four <span style="color:#990000;">dimension</span> tables
 <ul>
 <li>This is a four-dimensional data cube</li>
@@ -627,7 +627,7 @@ Data Science 310
 </ul></li>
 </ul>
 </div><div class="column" style="width:40%;">
-<p><img data-src="images/L17-OLAP/location-dim.png" style="float: right; margin: 0 0 12px 24px;" width="255"></p>
+<p><img data-src="images/L17-OLAP/location-dim.svg" style="float: right; margin: 0 0 12px 24px;" width="280"></p>
 </div></div>
 <div class="fragment">
 <ul>
@@ -638,7 +638,7 @@ Data Science 310
 <section id="example-of-a-snowflake-schema" class="slide level2">
 <h2>Example of a Snowflake Schema</h2>
 
-<img data-src="images/L17-OLAP/snowflake-schema.png" class="quarto-figure quarto-figure-center r-stretch" style="width:76.0%"><ul>
+<img data-src="images/L17-OLAP/snowflake-schema.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:94.0%"><ul>
 <li>Normalizing the Star creates a Snowflake
 <ul>
 <li>Here: ‘item’ and ‘location’ have been normalized</li>
@@ -675,7 +675,7 @@ Data Science 310
 <section id="example-of-a-fact-constellation" class="slide level2">
 <h2>Example of a Fact Constellation</h2>
 
-<img data-src="images/L17-OLAP/fact-constellation.png" class="quarto-figure quarto-figure-center r-stretch" style="width:72.0%"><ul>
+<img data-src="images/L17-OLAP/fact-constellation.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:96.0%"><ul>
 <li>New fact table with measures <span style="color:#990000;">dollars_cost, units_shipped</span></li>
 <li>Sharing some dimensions with Sales, but also has a new dimension (<span style="color:#990000;">shipper</span>)</li>
 </ul>
@@ -739,18 +739,18 @@ Data Science 310
 </ul></li>
 </ul>
 </div>
+<!--
+## A 3D Data Cube and its Cuboids
+
+- The set of cuboids forms a *lattice*
+- The lattice is a graph showing relationships between cuboids
+- Moving on the lattice corresponds to aggregation or disaggregation
+
+![](images/L17-OLAP/cuboids-lattice.png){width="92%" fig-align="center"}
+-->
+
+
 </section>
-<section id="a-3d-data-cube-and-its-cuboids" class="slide level2">
-<h2>A 3D Data Cube and its Cuboids</h2>
-<ul>
-<li>The set of cuboids forms a <em>lattice</em></li>
-<li>The lattice is a graph showing relationships between cuboids</li>
-<li>Moving on the lattice corresponds to aggregation or disaggregation</li>
-</ul>
-
-
-
-<img data-src="images/L17-OLAP/cuboids-lattice.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"></section>
     </div>
   <div class="quarto-auto-generated-content" style="display: none;">
 <div class="footer footer-default">

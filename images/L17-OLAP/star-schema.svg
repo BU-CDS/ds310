@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 516" role="img"
+     aria-label="Star schema for a sales data cube. The Sales fact table in the center holds foreign keys to four dimension tables ? time, item, branch, and location ? plus the measures units sold, dollars sold, and average sales.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,1 L10,5 L0,9 Z" fill="context-stroke"/>
+    </marker>
+    <style>
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        fill: #1c1c1c;
+        dominant-baseline: middle;
+      }
+      .name { font-size: 22px; font-weight: 600; }
+      .attr { font-size: 20px; }
+      .key { font-size: 20px; text-decoration: underline; }
+      .title { font-size: 24px; font-weight: 600; fill: #7c1717; }
+    </style>
+  </defs>
+
+  <!-- time -->
+  <g>
+    <rect x="8" y="14" width="268" height="244" fill="#e5f4ec" stroke="#3e8f68" stroke-width="2"/>
+    <rect x="10" y="16" width="264" height="38" fill="#cfe8db"/>
+    <line x1="8" y1="54" x2="276" y2="54" stroke="#3e8f68" stroke-width="2"/>
+    <text class="name" x="142" y="35" text-anchor="middle">time</text>
+    <text class="key" x="142" y="71" text-anchor="middle">time_key</text>
+    <text class="attr" x="142" y="105" text-anchor="middle">day</text>
+    <text class="attr" x="142" y="139" text-anchor="middle">day_of_the_week</text>
+    <text class="attr" x="142" y="173" text-anchor="middle">month</text>
+    <text class="attr" x="142" y="207" text-anchor="middle">quarter</text>
+    <text class="attr" x="142" y="241" text-anchor="middle">year</text>
+  </g>
+
+  <!-- branch -->
+  <g>
+    <rect x="8" y="290" width="268" height="142" fill="#e7f1f8" stroke="#4d82b0" stroke-width="2"/>
+    <rect x="10" y="292" width="264" height="38" fill="#d2e4f2"/>
+    <line x1="8" y1="330" x2="276" y2="330" stroke="#4d82b0" stroke-width="2"/>
+    <text class="name" x="142" y="311" text-anchor="middle">branch</text>
+    <text class="key" x="142" y="347" text-anchor="middle">branch_key</text>
+    <text class="attr" x="142" y="381" text-anchor="middle">branch_name</text>
+    <text class="attr" x="142" y="415" text-anchor="middle">branch_type</text>
+  </g>
+
+  <!-- item -->
+  <g>
+    <rect x="804" y="14" width="268" height="210" fill="#fbf0e4" stroke="#c4843a" stroke-width="2"/>
+    <rect x="806" y="16" width="264" height="38" fill="#f3e0c8"/>
+    <line x1="804" y1="54" x2="1072" y2="54" stroke="#c4843a" stroke-width="2"/>
+    <text class="name" x="938" y="35" text-anchor="middle">item</text>
+    <text class="key" x="938" y="71" text-anchor="middle">item_key</text>
+    <text class="attr" x="938" y="105" text-anchor="middle">item_name</text>
+    <text class="attr" x="938" y="139" text-anchor="middle">brand</text>
+    <text class="attr" x="938" y="173" text-anchor="middle">type</text>
+    <text class="attr" x="938" y="207" text-anchor="middle">supplier_type</text>
+  </g>
+
+  <!-- location -->
+  <g>
+    <rect x="804" y="290" width="268" height="210" fill="#faf4dc" stroke="#b8922e" stroke-width="2"/>
+    <rect x="806" y="292" width="264" height="38" fill="#f0e4b4"/>
+    <line x1="804" y1="330" x2="1072" y2="330" stroke="#b8922e" stroke-width="2"/>
+    <text class="name" x="938" y="311" text-anchor="middle">location</text>
+    <text class="key" x="938" y="347" text-anchor="middle">location_key</text>
+    <text class="attr" x="938" y="381" text-anchor="middle">street</text>
+    <text class="attr" x="938" y="415" text-anchor="middle">city</text>
+    <text class="attr" x="938" y="449" text-anchor="middle">province_or_state</text>
+    <text class="attr" x="938" y="483" text-anchor="middle">country</text>
+  </g>
+
+  <!-- Sales fact table. Key rows reuse the dimension color; measures stay neutral. -->
+  <text class="title" x="540" y="96" text-anchor="middle">Sales Fact Table</text>
+  <g>
+    <rect x="414" y="118" width="252" height="252" fill="#fff" stroke="#333" stroke-width="2"/>
+    <rect x="416" y="120" width="248" height="34" fill="#e5f4ec"/>
+    <rect x="416" y="154" width="248" height="34" fill="#fbf0e4"/>
+    <rect x="416" y="188" width="248" height="34" fill="#e7f1f8"/>
+    <rect x="416" y="222" width="248" height="34" fill="#faf4dc"/>
+    <rect x="416" y="256" width="248" height="112" fill="#f7f6f4"/>
+    <line x1="414" y1="154" x2="666" y2="154" stroke="#ddd9d2"/>
+    <line x1="414" y1="188" x2="666" y2="188" stroke="#ddd9d2"/>
+    <line x1="414" y1="222" x2="666" y2="222" stroke="#ddd9d2"/>
+    <line x1="414" y1="256" x2="666" y2="256" stroke="#333" stroke-width="1.5"/>
+    <line x1="414" y1="292" x2="666" y2="292" stroke="#e6e3de"/>
+    <line x1="414" y1="328" x2="666" y2="328" stroke="#e6e3de"/>
+    <text class="attr" x="540" y="136" text-anchor="middle">time_key</text>
+    <text class="attr" x="540" y="172" text-anchor="middle">item_key</text>
+    <text class="attr" x="540" y="208" text-anchor="middle">branch_key</text>
+    <text class="attr" x="540" y="244" text-anchor="middle">location_key</text>
+    <text class="attr" x="540" y="280" text-anchor="middle">units_sold</text>
+    <text class="attr" x="540" y="316" text-anchor="middle">dollars_sold</text>
+    <text class="attr" x="540" y="352" text-anchor="middle">avg_sales</text>
+  </g>
+
+  <!-- Connectors run from each foreign key to that dimension's primary key. -->
+  <g fill="none" stroke-width="2.25" marker-end="url(#arrow)">
+    <path d="M414,136 L278,71" stroke="#3e8f68"/>
+    <path d="M666,172 L802,71" stroke="#c4843a"/>
+    <path d="M414,208 L278,347" stroke="#4d82b0"/>
+    <path d="M666,244 L802,347" stroke="#b8922e"/>
+  </g>
+</svg>

@@ -232,7 +232,16 @@ Data Science 310
 <li>We’ll now look at how the DBMS guarantees atomicity and durability.
 <ul>
 <li>ensured by the subsystem responsible for <em>recovery</em></li>
+<li>recovery is the process of restoring the database to a consistent state after a failure
+<ul>
+<li>by “failure”, we generally mean a crash – a catastrophic failure or power outage</li>
 </ul></li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>The reason that a database may be in an inconsistent state after a failure has to do with <em>caching.</em></li>
 </ul>
 </div>
 </section>
@@ -245,13 +254,16 @@ Data Science 310
 <ul>
 <li>There may be more than one cache:
 <ul>
-<li>the DBMS’s own cache (called the <em>memory pool</em> in BDB)</li>
+<li>the DBMS’s own cache (also called the <em>memory pool</em>)</li>
 </ul></li>
 </ul>
 </div>
 <div class="fragment sub" data-fragment-index="3">
 <ul>
-<li>the operating system’s buffer cache</li>
+<li>the operating system’s buffer cache
+<ul>
+<li>think of this as the OS’s own cache for the database files</li>
+</ul></li>
 </ul>
 </div>
 <div class="r-stack">
@@ -341,9 +353,66 @@ Data Science 310
 <p><img data-src="images/L15-Logging1/cachewr-2.png" class="fragment" style="width:60.0%" data-fragment-index="1"></p>
 <p><img data-src="images/L15-Logging1/cachewr-3.png" class="fragment" style="width:60.0%" data-fragment-index="2"></p>
 </div>
-<div class="fragment" data-fragment-index="3">
+</section>
+<section id="the-problem" class="slide level2">
+<h2>The Problem</h2>
+<div class="fragment">
 <ul>
-<li>This complicates recovery, because changes may not be on disk.</li>
+<li>There are two problems that can arise due to the interaction of memory caches and disk storage.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>These concern transactions, and whether they have committed.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Problem 1:
+<ul>
+<li>A data item is updated in memory, but not yet written to disk.</li>
+<li>The transaction commits.
+<ul>
+<li>Note that this means that the database <em>guarantees</em> that the changes are durable (permanent).</li>
+</ul></li>
+<li>The database crashes.</li>
+<li>When the database restarts, the changed data has disappeared from memory.</li>
+<li>So the database is <strong>inconsistent:</strong> a committed transaction has been lost.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>For Problem 1, we need a way to “redo” the transaction.</li>
+</ul>
+</div>
+</section>
+<section id="the-problem-cont." class="slide level2">
+<h2>The Problem (cont.)</h2>
+<div class="fragment">
+<ul>
+<li>Problem 2:
+<ul>
+<li>A data item is updated in memory, and the update is written to disk.</li>
+<li>The transaction has not yet committed.
+<ul>
+<li>Note that this means that the database <em>guarantees</em> that the changes are not (yet) permanent.</li>
+</ul></li>
+<li>The database crashes.</li>
+<li>When the database restarts, the transaction is no longer in progress.</li>
+<li>So the database is <strong>inconsistent:</strong> there is permanent data on the disk from a transaction that did not commit and will never commit.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>For Problem 2, we need a way to “undo” the transaction.</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>The solution to both problems is to use <em>logging.</em></li>
+<li>And use the log to fix these problems during <em>recovery.</em></li>
 </ul>
 </div>
 </section>
@@ -760,6 +829,42 @@ D. &nbsp;<span class="fragment highlight-blue" data-fragment-index="10">570</spa
 E. &nbsp;<span class="fragment highlight-blue" data-fragment-index="10">570</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="fragment highlight-blue" data-fragment-index="18">420</span></div>
 </div>
 </section>
+<section id="improvements-to-undo-redo-logging" class="slide level2">
+<h2>Improvements to Undo-Redo Logging</h2>
+<p>Undo-redo logging is a simple and effective way to ensure that the database is in a consistent state after a failure.</p>
+<p>However, it has a few drawbacks:</p>
+<div class="fragment">
+<ul>
+<li>Large logs can be a problem:
+<ul>
+<li>When logs are large, recovery can take a long time.</li>
+<li>Undo-redo logging needs to read the entire log <em>twice</em>to recover the database.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>We’ve been assuming that a data item (like “D1”) is a single field or record.
+<ul>
+<li>However, for efficiency reasons, we often use pages or blocks as data elements.</li>
+<li>This means that we need to store the old and new contents of the page or block in the log record.</li>
+<li>This can take up a lot of space.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>We will address these problems with a number of improvements to undo-redo logging.
+<ul>
+<li>To address the data item size problem, we will use <em>logical logging.</em></li>
+<li>To address the log size problem, we will use <em>undo-only logging.</em>, <em>redo-only logging.</em>, and <em>checkpoints.</em>
+<ul>
+<li>these will be covered in the next lecture</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</section>
 <section id="logical-logging" class="slide level2">
 <h2>Logical Logging</h2>
 <ul>
@@ -990,298 +1095,6 @@ E. &nbsp;<span class="fragment highlight-blue" data-fragment-index="10">570</spa
 <p><img data-src="images/L15-Logging1/redone-05.png" class="fragment" style="width:82.0%"></p>
 <p><img data-src="images/L15-Logging1/redone-06.png" class="fragment" style="width:82.0%"></p>
 <p><img data-src="images/L15-Logging1/redone-07.png" class="fragment" style="width:82.0%"></p>
-</div>
-</section>
-<section id="undo-only-logging" class="slide level2 scrollable">
-<h2>Undo-Only Logging</h2>
-<ul>
-<li>Only store the info. needed to undo txns.
-<ul>
-<li>update records include only the old value</li>
-</ul></li>
-</ul>
-<div class="fragment">
-<ul>
-<li>Like undo-redo logging, undo-only logging follows WAL.</li>
-<li>In addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit. Why? <span class="fragment" style="color:#3a5fcd;">so that no redo operations will be needed</span></li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
-<li>At transaction commit:</li>
-</ul>
-<ol type="1">
-<li>force all dirty log records to disk</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="2" type="1">
-<li>force database pages changed by the txn to disk</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="3" type="1">
-<li>write the commit log record</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="4" type="1">
-<li>force the commit log record to disk</li>
-</ol>
-</div>
-<div class="fragment">
-<ul>
-<li>During recovery, the system only performs the backward pass.</li>
-</ul>
-</div>
-</section>
-<section id="redo-only-logging" class="slide level2 scrollable">
-<h2>Redo-Only Logging</h2>
-<ul>
-<li>Only store the info. needed to redo txns.
-<ul>
-<li>update records include only the new value</li>
-</ul></li>
-</ul>
-<div class="fragment">
-<ul>
-<li>Like the other two schemes, redo-only logging follows WAL.</li>
-<li>In addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.</li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
-<li>At transaction commit:</li>
-</ul>
-<ol type="1">
-<li>write the commit log record</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="2" type="1">
-<li>force all dirty log records to disk</li>
-</ol>
-<p>(changed database pages are allowed to go to disk anytime after this)</p>
-</div>
-<div class="fragment">
-<ul>
-<li>If a transaction aborts, none of its changes can be on disk.</li>
-<li>During recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo.</li>
-</ul>
-</div>
-</section>
-<section id="comparing-the-three-logging-schemes" class="slide level2">
-<h2>Comparing the Three Logging Schemes</h2>
-<ul>
-<li>Factors to consider in the comparison:
-<ul>
-<li>complexity/efficiency of recovery</li>
-<li>size of the log files</li>
-<li>what needs to happen when a txn commits</li>
-<li>other restrictions that a logging scheme imposes on the system</li>
-</ul></li>
-<li>We’ll list advantages and disadvantages of each scheme.</li>
-</ul>
-<div class="fragment plus-minus">
-<ul>
-<li>Undo-only:
-<ul>
-<li>+ smaller logs than undo-redo</li>
-<li>+ simple and quick recovery procedure (only one pass)</li>
-<li>– forces log and data to disk at commit; have to wait for the I/Os</li>
-</ul></li>
-</ul>
-</div>
-</section>
-<section id="comparing-the-three-logging-schemes-cont." class="slide level2">
-<h2>Comparing the Three Logging Schemes (cont.)</h2>
-<div class="plus-minus">
-<ul>
-<li>Redo-only:
-<ul>
-<li>+ smaller logs than undo-redo</li>
-<li>+/– recovery: more complex than undo-only, less than undo-redo</li>
-<li>– must be able to cache all changes until the txn commits
-<ul>
-<li>limits the size of transactions</li>
-<li>constrains the replacement policy of the cache</li>
-</ul></li>
-<li>+ forces only log records to disk at commit</li>
-</ul></li>
-</ul>
-</div>
-<div class="fragment plus-minus">
-<ul>
-<li>Undo-redo:
-<ul>
-<li>– larger logs</li>
-<li>– more complex recovery</li>
-<li>+ forces only log records to disk at commit</li>
-<li>+ don’t need to retain all data in the cache until commit</li>
-</ul></li>
-</ul>
-</div>
-</section>
-<section id="checkpoints" class="slide level2">
-<h2>Checkpoints</h2>
-<ul>
-<li>As a DBMS runs, the log gets longer and longer.
-<ul>
-<li>thus, recovery could end up taking a very long time!</li>
-</ul></li>
-</ul>
-<div class="fragment">
-<ul>
-<li>To avoid long recoveries, periodically perform a <em>checkpoint</em>.
-<ul>
-<li>force data and log records to disk to create a consistent on-disk database state</li>
-</ul></li>
-</ul>
-</div>
-<div class="fragment sub">
-<ul>
-<li>during recovery, don’t need to consider operations that preceded this consistent state</li>
-</ul>
-</div>
-</section>
-<section id="static-checkpoints" class="slide level2 scrollable">
-<h2>Static Checkpoints</h2>
-<ul>
-<li>Stop activity and wait for a consistent state.</li>
-</ul>
-<ol type="1">
-<li>prohibit new transactions from starting and wait until all current transactions have aborted or committed.</li>
-</ol>
-<div class="fragment">
-<ul>
-<li>Once there is a consistent state:</li>
-</ul>
-<ol start="2" type="1">
-<li>force all dirty log records to disk (dirty = not yet written to disk)</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="3" type="1">
-<li>force all dirty database pages to disk</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="4" type="1">
-<li>write a <em>checkpoint record</em> to the log</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ul>
-<li>these steps must be performed in the specified order!</li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
-<li>When performing recovery, go back to the most recent checkpoint record.</li>
-<li>Problem with this approach? <span class="fragment" style="color:#3a5fcd;">stopping all activity can significantly reduce performance!</span></li>
-</ul>
-</div>
-</section>
-<section id="dynamic-checkpoints" class="slide level2 scrollable">
-<h2>Dynamic Checkpoints</h2>
-<ul>
-<li>Don’t stop and wait for a consistent state. Steps:</li>
-</ul>
-<ol type="1">
-<li>prevent all update operations</li>
-</ol>
-<div class="fragment sub">
-<ol start="2" type="1">
-<li>force all dirty log records to disk</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="3" type="1">
-<li>force all dirty database pages to disk</li>
-</ol>
-</div>
-<div class="fragment sub">
-<ol start="4" type="1">
-<li>write a <em>checkpoint record</em> to the log
-<ul>
-<li>include a list of all active txns</li>
-</ul></li>
-</ol>
-</div>
-<div class="fragment">
-<ul>
-<li>When performing recovery:
-<ul>
-<li>backward pass: go back until you’ve seen the start records of all uncommitted txns in the most recent checkpoint record</li>
-</ul></li>
-</ul>
-</div>
-<div class="fragment sub">
-<ul>
-<li>forward pass: begin from the log record that comes after the most recent checkpoint record. why?</li>
-</ul>
-</div>
-<div class="fragment sub">
-<ul>
-<li><span style="color:#3a5fcd;">all earlier changes were forced to disk by the checkpoint</span></li>
-</ul>
-</div>
-<div class="fragment sub">
-<ul>
-<li>note: if all txns in the checkpoint record are on the commit list, we stop the backward pass at the checkpoint record</li>
-</ul>
-</div>
-</section>
-<section id="example-of-recovery-with-dynamic-checkpoints" class="slide level2">
-<h2>Example of Recovery with Dynamic Checkpoints</h2>
-<div class="r-stack">
-<p><img data-src="images/L15-Logging1/dynck-01.png" style="width:78.0%"></p>
-<p><img data-src="images/L15-Logging1/dynck-02.png" class="fragment" style="width:78.0%" data-fragment-index="1"></p>
-<p><img data-src="images/L15-Logging1/dynck-03.png" class="fragment" style="width:78.0%" data-fragment-index="2"></p>
-<p><img data-src="images/L15-Logging1/dynck-04.png" class="fragment" style="width:78.0%" data-fragment-index="3"></p>
-<p><img data-src="images/L15-Logging1/dynck-05.png" class="fragment" style="width:78.0%" data-fragment-index="4"></p>
-<p><img data-src="images/L15-Logging1/dynck-06.png" class="fragment" style="width:78.0%" data-fragment-index="5"></p>
-<p><img data-src="images/L15-Logging1/dynck-07.png" class="fragment" style="width:78.0%" data-fragment-index="6"></p>
-<p><img data-src="images/L15-Logging1/dynck-08.png" class="fragment" style="width:78.0%" data-fragment-index="7"></p>
-<p><img data-src="images/L15-Logging1/dynck-09.png" class="fragment" style="width:78.0%" data-fragment-index="8"></p>
-<p><img data-src="images/L15-Logging1/dynck-10.png" class="fragment" style="width:78.0%" data-fragment-index="9"></p>
-<p><img data-src="images/L15-Logging1/dynck-11.png" class="fragment" style="width:78.0%" data-fragment-index="10"></p>
-<p><img data-src="images/L15-Logging1/dynck-12.png" class="fragment" style="width:78.0%" data-fragment-index="11"></p>
-<p><img data-src="images/L15-Logging1/dynck-13.png" class="fragment" style="width:78.0%" data-fragment-index="12"></p>
-</div>
-<div class="fragment" data-fragment-index="12">
-<ul>
-<li>Could D4 have a datum LSN of less than 110? <span class="fragment" data-fragment-index="13" style="color:#3a5fcd;">no. the checkpoint forces T1’s change (LSN 110) to disk.</span></li>
-</ul>
-</div>
-</section>
-<section id="reviewing-the-log-record-types" class="slide level2">
-<h2>Reviewing the Log Record Types</h2>
-<ul>
-<li>Why is each type needed?
-<ul>
-<li>assume undo-redo logging</li>
-</ul></li>
-</ul>
-<div class="fragment">
-<ul>
-<li><span style="color:#3a5fcd;">update records</span>: hold the info. needed to undo/redo changes</li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
-<li><span style="color:#3a5fcd;">commit records</span>: allow us to determine which changes should be undone and which should be redone</li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
-<li><span style="color:#3a5fcd;">begin records</span>: allow us to determine the extent of the backward pass in the presence of dynamic checkpoints</li>
-</ul>
-</div>
-<div class="fragment">
-<ul>
-<li><span style="color:#3a5fcd;">checkpoint records</span>: limit the amount of the log that is processed during recovery</li>
-</ul>
 </div>
 
 

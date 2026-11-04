@@ -823,7 +823,7 @@
     "href": "L16-Logging2.html#review-caching",
     "title": "Recovery and Logging II",
     "section": "Review: Caching",
-    "text": "Review: Caching\n\nRecently accessed database pages are cached in memory so that subsequent accesses to them don’t require disk I/O.\nThere may be more than one cache:\n\nthe DBMS’s own cache (called the memory pool in BDB)\nthe operating system’s buffer cache"
+    "text": "Review: Caching\n\nRecently accessed database pages are cached in memory so that subsequent accesses to them don’t require disk I/O.\nThere may be more than one cache:\n\nthe DBMS’s own cache (also called the memory pool)\nthe operating system’s buffer cache\n\n\n\n\nCaches are crucial for good performance, but they present challenges for maintaining the database’s integrity, particularly after a crash."
   },
   {
     "objectID": "L16-Logging2.html#review-what-is-recovery",
@@ -844,7 +844,14 @@
     "href": "L16-Logging2.html#review-undo-redo-logging",
     "title": "Recovery and Logging II",
     "section": "Review: Undo-Redo Logging",
-    "text": "Review: Undo-Redo Logging\n\nHere’s how it would work on our earlier example:"
+    "text": "Review: Undo-Redo Logging\n\nThe undo-redo logging scheme is a simple and effective way to ensure that the database is in a consistent state after a failure.\nHere’s a reminder of how it works:"
+  },
+  {
+    "objectID": "L16-Logging2.html#improvements-to-undo-redo-logging",
+    "href": "L16-Logging2.html#improvements-to-undo-redo-logging",
+    "title": "Recovery and Logging II",
+    "section": "Improvements to Undo-Redo Logging",
+    "text": "Improvements to Undo-Redo Logging\nAs discused in the previous lecture, undo-redo logging has a few drawbacks:\n\n\nLarge logs can be a problem:\n\nWhen logs are large, recovery can take a long time.\nUndo-redo logging needs to read the entire log twiceto recover the database.\n\n\n\n\n\nWe’ve been assuming that a data item (like “D1”) is a single field or record.\n\nHowever, for efficiency reasons, we often use pages or blocks as data elements.\nThis means that we need to store the old and new contents of the page or block in the log record.\nThis can take up a lot of space.\n\n\n\n\n\nWe will address these problems with a number of improvements to undo-redo logging.\n\nTo address the data item size problem, we will use logical logging. (covered in the last lecture)\nTo address the log size problem, we will use undo-only logging., redo-only logging., and checkpoints.\n\ncovered in this lecture"
   },
   {
     "objectID": "L16-Logging2.html#review-logical-logging",
@@ -875,39 +882,11 @@
     "text": "Review: Recovery Using LSNs\n\n\n\nDuring recovery, there are three LSNs to consider for each update record:\n\nthe record LSN: the one for the update record itself\nthe on-disk datum LSN for the data item\n\nthe one associated with it in the database file\n\nthe olsn: the old datum LSN for the data item\n\nthe one associated with it when the update was originally requested"
   },
   {
-    "objectID": "L16-Logging2.html#the-backward-pass-using-lsns",
-    "href": "L16-Logging2.html#the-backward-pass-using-lsns",
-    "title": "Recovery and Logging II",
-    "section": "The Backward Pass Using LSNs",
-    "text": "The Backward Pass Using LSNs\n\n\n\nDuring the backward pass, we undo an update if:\n\nthe txn did not commit\ndatum LSN == record LSN\n\nWhen we undo, we also set: datum LSN = olsn"
-  },
-  {
-    "objectID": "L16-Logging2.html#which-updates-will-be-undone",
-    "href": "L16-Logging2.html#which-updates-will-be-undone",
-    "title": "Recovery and Logging II",
-    "section": "Which updates will be undone?",
-    "text": "Which updates will be undone?"
-  },
-  {
-    "objectID": "L16-Logging2.html#the-forward-pass-using-lsns",
-    "href": "L16-Logging2.html#the-forward-pass-using-lsns",
-    "title": "Recovery and Logging II",
-    "section": "The Forward Pass Using LSNs",
-    "text": "The Forward Pass Using LSNs\n\n\n\nDuring the forward pass, we redo an update if:\n\nthe txn did commit\ndatum LSN == olsn\n\nWhen we redo, we also set: datum LSN = record LSN"
-  },
-  {
-    "objectID": "L16-Logging2.html#which-updates-will-be-redone",
-    "href": "L16-Logging2.html#which-updates-will-be-redone",
-    "title": "Recovery and Logging II",
-    "section": "Which updates will be redone?",
-    "text": "Which updates will be redone?"
-  },
-  {
     "objectID": "L16-Logging2.html#undo-only-logging",
     "href": "L16-Logging2.html#undo-only-logging",
     "title": "Recovery and Logging II",
     "section": "Undo-Only Logging",
-    "text": "Undo-Only Logging\n\nOnly store the info. needed to undo txns.\n\nupdate records include only the old value\n\n\n\n\nLike undo-redo logging, undo-only logging follows WAL.\nIn addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit. Why? so that no redo operations will be needed\n\n\n\n\nAt transaction commit:\n\n\n\n\nforce all dirty log records to disk\n\n\n\n\nforce database pages changed by the txn to disk\n\n\n\n\nwrite the commit log record\n\n\n\n\nforce the commit log record to disk\n\n\n\n\nDuring recovery, the system only performs the backward pass."
+    "text": "Undo-Only Logging\n\nThe goal of undo-only logging is to reduce the size of the log and simplify recovery.\n\n\n\nWe will do this by ensuring that no committed transaction ever needs to be redone.\n\nto do that, we will accept that commits during normal operation will be somewhat slower.\n\n\n\n\n\nOnly store the information needed to undo transactions.\n\nthus, update records include only the old value of the data item\n\n\n\n\n\nLike undo-redo logging, undo-only logging follows WAL.\nIn addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit. Why? so that no redo operations will be needed\n\n\n\n\nAt transaction commit:\n\n\n\n\nforce all dirty log records to disk\n\n\n\n\nforce database pages changed by the txn to disk\n\n\n\n\nwrite the commit log record\n\n\n\n\nforce the commit log record to disk\n\n\n\n\nDuring recovery, the system only performs the backward pass."
   },
   {
     "objectID": "L16-Logging2.html#undo-only-logging-cont.",
@@ -921,7 +900,7 @@
     "href": "L16-Logging2.html#redo-only-logging",
     "title": "Recovery and Logging II",
     "section": "Redo-Only Logging",
-    "text": "Redo-Only Logging\n\nOnly store the info. needed to redo txns.\n\nupdate records include only the new value\n\n\n\n\nLike the other two schemes, redo-only logging follows WAL.\nIn addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.\n\n\n\n\nAt transaction commit:\n\nwrite the commit log record\n\n\n\n\n\nforce all dirty log records to disk\n\n\n\n\n(changed database pages are allowed to go to disk anytime after this)\n\n\n\n\nIf a transaction aborts, none of its changes can be on disk.\nDuring recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo."
+    "text": "Redo-Only Logging\n\nThe goal of redo-only logging is also to reduce the size of the log and simplify recovery.\n\n\n\nWe will do this by ensuring that no uncommitted transaction ever needs to be undone.\n\nto do that, we will enforce that no uncommitted data is ever written to disk.\n\n\n\n\n\nOnly store the information needed to redo transactions.\n\nthus, update records include only the new value of the data item\n\n\n\n\n\nLike the other two schemes, redo-only logging follows WAL.\nIn addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.\n\n\n\n\nAt transaction commit:\n\nwrite the commit log record\n\n\n\n\n\nforce all dirty log records to disk\n\n\n\n\n(changed database pages are allowed to go to disk anytime after this)\n\n\n\n\nIf a transaction aborts, none of its changes can be on disk.\nDuring recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo."
   },
   {
     "objectID": "L16-Logging2.html#redo-only-logging-cont.",
@@ -3952,14 +3931,14 @@
     "href": "L15-Logging1.html#review-acid-properties",
     "title": "Recovery and Logging",
     "section": "Review: ACID Properties",
-    "text": "Review: ACID Properties\n\nA transaction has the following “ACID” properties:\n\nAtomicity: either all of its changes take effect or none do\nConsistency preservation: its operations take the database from one consistent state to another\nIsolation: it is not affected by and does not affect other concurrent transactions\nDurability: once it completes, its changes survive failures\n\n\n\n\nWe’ll now look at how the DBMS guarantees atomicity and durability.\n\nensured by the subsystem responsible for recovery"
+    "text": "Review: ACID Properties\n\nA transaction has the following “ACID” properties:\n\nAtomicity: either all of its changes take effect or none do\nConsistency preservation: its operations take the database from one consistent state to another\nIsolation: it is not affected by and does not affect other concurrent transactions\nDurability: once it completes, its changes survive failures\n\n\n\n\nWe’ll now look at how the DBMS guarantees atomicity and durability.\n\nensured by the subsystem responsible for recovery\nrecovery is the process of restoring the database to a consistent state after a failure\n\nby “failure”, we generally mean a crash – a catastrophic failure or power outage\n\n\n\n\n\n\nThe reason that a database may be in an inconsistent state after a failure has to do with caching."
   },
   {
     "objectID": "L15-Logging1.html#a-quick-look-at-caching",
     "href": "L15-Logging1.html#a-quick-look-at-caching",
     "title": "Recovery and Logging",
     "section": "A Quick Look at Caching",
-    "text": "A Quick Look at Caching\n\nRecently accessed database pages are cached in memory so that subsequent accesses to them don’t require disk I/O.\n\n\n\nThere may be more than one cache:\n\nthe DBMS’s own cache (called the memory pool in BDB)\n\n\n\n\n\nthe operating system’s buffer cache"
+    "text": "A Quick Look at Caching\n\nRecently accessed database pages are cached in memory so that subsequent accesses to them don’t require disk I/O.\n\n\n\nThere may be more than one cache:\n\nthe DBMS’s own cache (also called the memory pool)\n\n\n\n\n\nthe operating system’s buffer cache\n\nthink of this as the OS’s own cache for the database files"
   },
   {
     "objectID": "L15-Logging1.html#caching-example-1",
@@ -3987,7 +3966,21 @@
     "href": "L15-Logging1.html#caching-and-disk-writes",
     "title": "Recovery and Logging",
     "section": "Caching and Disk Writes",
-    "text": "Caching and Disk Writes\n\nUpdates to a page may not make it to disk until the page is evicted from all of the caches.\n\n\n\ninitially, only the page in the DBMS’s cache is updated\n\n\n\n\nwhen evicted from the DBMS’s cache, it is written to the backing file, but it may not go to disk right away\n\n\n\n\n\n\n\n\n\nThis complicates recovery, because changes may not be on disk."
+    "text": "Caching and Disk Writes\n\nUpdates to a page may not make it to disk until the page is evicted from all of the caches.\n\n\n\ninitially, only the page in the DBMS’s cache is updated\n\n\n\n\nwhen evicted from the DBMS’s cache, it is written to the backing file, but it may not go to disk right away"
+  },
+  {
+    "objectID": "L15-Logging1.html#the-problem",
+    "href": "L15-Logging1.html#the-problem",
+    "title": "Recovery and Logging",
+    "section": "The Problem",
+    "text": "The Problem\n\n\nThere are two problems that can arise due to the interaction of memory caches and disk storage.\n\n\n\n\nThese concern transactions, and whether they have committed.\n\n\n\n\nProblem 1:\n\nA data item is updated in memory, but not yet written to disk.\nThe transaction commits.\n\nNote that this means that the database guarantees that the changes are durable (permanent).\n\nThe database crashes.\nWhen the database restarts, the changed data has disappeared from memory.\nSo the database is inconsistent: a committed transaction has been lost.\n\n\n\n\n\nFor Problem 1, we need a way to “redo” the transaction."
+  },
+  {
+    "objectID": "L15-Logging1.html#the-problem-cont.",
+    "href": "L15-Logging1.html#the-problem-cont.",
+    "title": "Recovery and Logging",
+    "section": "The Problem (cont.)",
+    "text": "The Problem (cont.)\n\n\nProblem 2:\n\nA data item is updated in memory, and the update is written to disk.\nThe transaction has not yet committed.\n\nNote that this means that the database guarantees that the changes are not (yet) permanent.\n\nThe database crashes.\nWhen the database restarts, the transaction is no longer in progress.\nSo the database is inconsistent: there is permanent data on the disk from a transaction that did not commit and will never commit.\n\n\n\n\n\nFor Problem 2, we need a way to “undo” the transaction.\n\n\n\n\nThe solution to both problems is to use logging.\nAnd use the log to fix these problems during recovery."
   },
   {
     "objectID": "L15-Logging1.html#what-is-recovery",
@@ -4074,6 +4067,13 @@
     "text": "What are the LSNs of: (1) the first update undone, and (2) the first update redone?\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n       undone      redone\nA.  210           500\nB.  210           420\nC.  570           500\nD.  570           210\nE.  570           420"
   },
   {
+    "objectID": "L15-Logging1.html#improvements-to-undo-redo-logging",
+    "href": "L15-Logging1.html#improvements-to-undo-redo-logging",
+    "title": "Recovery and Logging",
+    "section": "Improvements to Undo-Redo Logging",
+    "text": "Improvements to Undo-Redo Logging\nUndo-redo logging is a simple and effective way to ensure that the database is in a consistent state after a failure.\nHowever, it has a few drawbacks:\n\n\nLarge logs can be a problem:\n\nWhen logs are large, recovery can take a long time.\nUndo-redo logging needs to read the entire log twiceto recover the database.\n\n\n\n\n\nWe’ve been assuming that a data item (like “D1”) is a single field or record.\n\nHowever, for efficiency reasons, we often use pages or blocks as data elements.\nThis means that we need to store the old and new contents of the page or block in the log record.\nThis can take up a lot of space.\n\n\n\n\n\nWe will address these problems with a number of improvements to undo-redo logging.\n\nTo address the data item size problem, we will use logical logging.\nTo address the log size problem, we will use undo-only logging., redo-only logging., and checkpoints.\n\nthese will be covered in the next lecture"
+  },
+  {
     "objectID": "L15-Logging1.html#logical-logging",
     "href": "L15-Logging1.html#logical-logging",
     "title": "Recovery and Logging",
@@ -4135,69 +4135,6 @@
     "title": "Recovery and Logging",
     "section": "Which updates will be redone?",
     "text": "Which updates will be redone?"
-  },
-  {
-    "objectID": "L15-Logging1.html#undo-only-logging",
-    "href": "L15-Logging1.html#undo-only-logging",
-    "title": "Recovery and Logging",
-    "section": "Undo-Only Logging",
-    "text": "Undo-Only Logging\n\nOnly store the info. needed to undo txns.\n\nupdate records include only the old value\n\n\n\n\nLike undo-redo logging, undo-only logging follows WAL.\nIn addition, all database pages changed by a transaction must be forced to disk before allowing the transaction to commit. Why? so that no redo operations will be needed\n\n\n\n\nAt transaction commit:\n\n\nforce all dirty log records to disk\n\n\n\n\nforce database pages changed by the txn to disk\n\n\n\n\nwrite the commit log record\n\n\n\n\nforce the commit log record to disk\n\n\n\n\nDuring recovery, the system only performs the backward pass."
-  },
-  {
-    "objectID": "L15-Logging1.html#redo-only-logging",
-    "href": "L15-Logging1.html#redo-only-logging",
-    "title": "Recovery and Logging",
-    "section": "Redo-Only Logging",
-    "text": "Redo-Only Logging\n\nOnly store the info. needed to redo txns.\n\nupdate records include only the new value\n\n\n\n\nLike the other two schemes, redo-only logging follows WAL.\nIn addition, all database pages changed by a txn are held in memory until it commits and its commit record is forced to disk.\n\n\n\n\nAt transaction commit:\n\n\nwrite the commit log record\n\n\n\n\nforce all dirty log records to disk\n\n(changed database pages are allowed to go to disk anytime after this)\n\n\n\nIf a transaction aborts, none of its changes can be on disk.\nDuring recovery, perform the backward pass to build the commit list (no undos). Then perform the forward pass as in undo-redo."
-  },
-  {
-    "objectID": "L15-Logging1.html#comparing-the-three-logging-schemes",
-    "href": "L15-Logging1.html#comparing-the-three-logging-schemes",
-    "title": "Recovery and Logging",
-    "section": "Comparing the Three Logging Schemes",
-    "text": "Comparing the Three Logging Schemes\n\nFactors to consider in the comparison:\n\ncomplexity/efficiency of recovery\nsize of the log files\nwhat needs to happen when a txn commits\nother restrictions that a logging scheme imposes on the system\n\nWe’ll list advantages and disadvantages of each scheme.\n\n\n\nUndo-only:\n\n+ smaller logs than undo-redo\n+ simple and quick recovery procedure (only one pass)\n– forces log and data to disk at commit; have to wait for the I/Os"
-  },
-  {
-    "objectID": "L15-Logging1.html#comparing-the-three-logging-schemes-cont.",
-    "href": "L15-Logging1.html#comparing-the-three-logging-schemes-cont.",
-    "title": "Recovery and Logging",
-    "section": "Comparing the Three Logging Schemes (cont.)",
-    "text": "Comparing the Three Logging Schemes (cont.)\n\n\nRedo-only:\n\n+ smaller logs than undo-redo\n+/– recovery: more complex than undo-only, less than undo-redo\n– must be able to cache all changes until the txn commits\n\nlimits the size of transactions\nconstrains the replacement policy of the cache\n\n+ forces only log records to disk at commit\n\n\n\n\n\nUndo-redo:\n\n– larger logs\n– more complex recovery\n+ forces only log records to disk at commit\n+ don’t need to retain all data in the cache until commit"
-  },
-  {
-    "objectID": "L15-Logging1.html#checkpoints",
-    "href": "L15-Logging1.html#checkpoints",
-    "title": "Recovery and Logging",
-    "section": "Checkpoints",
-    "text": "Checkpoints\n\nAs a DBMS runs, the log gets longer and longer.\n\nthus, recovery could end up taking a very long time!\n\n\n\n\nTo avoid long recoveries, periodically perform a checkpoint.\n\nforce data and log records to disk to create a consistent on-disk database state\n\n\n\n\n\nduring recovery, don’t need to consider operations that preceded this consistent state"
-  },
-  {
-    "objectID": "L15-Logging1.html#static-checkpoints",
-    "href": "L15-Logging1.html#static-checkpoints",
-    "title": "Recovery and Logging",
-    "section": "Static Checkpoints",
-    "text": "Static Checkpoints\n\nStop activity and wait for a consistent state.\n\n\nprohibit new transactions from starting and wait until all current transactions have aborted or committed.\n\n\n\nOnce there is a consistent state:\n\n\nforce all dirty log records to disk (dirty = not yet written to disk)\n\n\n\n\nforce all dirty database pages to disk\n\n\n\n\nwrite a checkpoint record to the log\n\n\n\n\nthese steps must be performed in the specified order!\n\n\n\n\nWhen performing recovery, go back to the most recent checkpoint record.\nProblem with this approach? stopping all activity can significantly reduce performance!"
-  },
-  {
-    "objectID": "L15-Logging1.html#dynamic-checkpoints",
-    "href": "L15-Logging1.html#dynamic-checkpoints",
-    "title": "Recovery and Logging",
-    "section": "Dynamic Checkpoints",
-    "text": "Dynamic Checkpoints\n\nDon’t stop and wait for a consistent state. Steps:\n\n\nprevent all update operations\n\n\n\nforce all dirty log records to disk\n\n\n\n\nforce all dirty database pages to disk\n\n\n\n\nwrite a checkpoint record to the log\n\ninclude a list of all active txns\n\n\n\n\n\nWhen performing recovery:\n\nbackward pass: go back until you’ve seen the start records of all uncommitted txns in the most recent checkpoint record\n\n\n\n\n\nforward pass: begin from the log record that comes after the most recent checkpoint record. why?\n\n\n\n\nall earlier changes were forced to disk by the checkpoint\n\n\n\n\nnote: if all txns in the checkpoint record are on the commit list, we stop the backward pass at the checkpoint record"
-  },
-  {
-    "objectID": "L15-Logging1.html#example-of-recovery-with-dynamic-checkpoints",
-    "href": "L15-Logging1.html#example-of-recovery-with-dynamic-checkpoints",
-    "title": "Recovery and Logging",
-    "section": "Example of Recovery with Dynamic Checkpoints",
-    "text": "Example of Recovery with Dynamic Checkpoints\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nCould D4 have a datum LSN of less than 110? no. the checkpoint forces T1’s change (LSN 110) to disk."
-  },
-  {
-    "objectID": "L15-Logging1.html#reviewing-the-log-record-types",
-    "href": "L15-Logging1.html#reviewing-the-log-record-types",
-    "title": "Recovery and Logging",
-    "section": "Reviewing the Log Record Types",
-    "text": "Reviewing the Log Record Types\n\nWhy is each type needed?\n\nassume undo-redo logging\n\n\n\n\nupdate records: hold the info. needed to undo/redo changes\n\n\n\n\ncommit records: allow us to determine which changes should be undone and which should be redone\n\n\n\n\nbegin records: allow us to determine the extent of the backward pass in the presence of dynamic checkpoints\n\n\n\n\ncheckpoint records: limit the amount of the log that is processed during recovery"
   },
   {
     "objectID": "L17-OLAP.html#data-warehousing-and-olap-technology",
@@ -4401,13 +4338,6 @@
     "title": "Data Warehousing and OLAP",
     "section": "Aggregate Functions on Measures: Three Categories",
     "text": "Aggregate Functions on Measures: Three Categories\n\nGiven a table: Sales(itemid, timeid, quantity)\nTarget: compute an aggregate on quantity\n\n\n\ndistributive:\n\nTo compute sum(quantity) we can first compute sum(quantity) for each item and then add these numbers.\n\n\n\n\n\nalgebraic:\n\nTo compute avg(quantity) we can first compute sum(quantity) and count(quantity) and then divide these numbers.\n\n\n\n\n\nholistic:\n\nTo compute median(quantity) we can use neither median(quantity) for each item nor any combination of distributive functions.\nHas to be computed separately for each aggregation"
-  },
-  {
-    "objectID": "L17-OLAP.html#a-3d-data-cube-and-its-cuboids",
-    "href": "L17-OLAP.html#a-3d-data-cube-and-its-cuboids",
-    "title": "Data Warehousing and OLAP",
-    "section": "A 3D Data Cube and its Cuboids",
-    "text": "A 3D Data Cube and its Cuboids\n\nThe set of cuboids forms a lattice\nThe lattice is a graph showing relationships between cuboids\nMoving on the lattice corresponds to aggregation or disaggregation"
   },
   {
     "objectID": "L19-Distributed.html#what-is-a-distributed-database",
