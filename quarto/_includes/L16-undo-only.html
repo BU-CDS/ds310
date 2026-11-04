@@ -12,8 +12,9 @@
     4. uncommitted pages may still go to disk (steal) — we can undo them
     5. recovery is a single backward pass; committed data needs no redo
 
-  Playback (Start / Pause button, rewind on leaving the slide, final frame in
-  a PDF export) comes from anim-player.html, which the deck includes first.
+  Playback (Start / Pause, a progress bar that steps between beats, rewind on
+  leaving the slide, final frame in a PDF export) comes from anim-player.html,
+  which the deck includes first.
 
   Markup is the final frame. Each element gets at most one animation, so
   fill: 'both' (applied by the player) does not fight itself during delays.

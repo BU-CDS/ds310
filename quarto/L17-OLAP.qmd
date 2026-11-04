@@ -264,7 +264,7 @@ Outline
 
 ## A 3D Data Cube
 
-![](images/L17-OLAP/cube-3d.png){width="82%" fig-align="center"}
+![](images/L17-OLAP/cube-3d.svg){width="90%" fig-align="center"}
 
 ## Data Cube is the Model, not the Implementation!
 
@@ -293,7 +293,7 @@ Outline
 
 ## Example of a Star Schema
 
-![](images/L17-OLAP/star-schema.png){width="64%" fig-align="center"}
+![](images/L17-OLAP/star-schema.svg){width="88%" fig-align="center"}
 
 - In this [data cube]{style="color:#990000;"}, there is one [fact]{style="color:#990000;"} table and four [dimension]{style="color:#990000;"} tables
     - This is a four-dimensional data cube
@@ -312,7 +312,7 @@ Outline
 :::
 
 ::: {.column width=40%}
-![](images/L17-OLAP/location-dim.png){style="float: right; margin: 0 0 12px 24px;" width="255"}
+![](images/L17-OLAP/location-dim.svg){style="float: right; margin: 0 0 12px 24px;" width="280"}
 :::
 :::
 
@@ -322,7 +322,7 @@ Outline
 
 ## Example of a Snowflake Schema
 
-![](images/L17-OLAP/snowflake-schema.png){width="76%" fig-align="center"}
+![](images/L17-OLAP/snowflake-schema.svg){width="94%" fig-align="center"}
 
 - Normalizing the Star creates a Snowflake
     - Here: 'item' and 'location' have been normalized
@@ -347,7 +347,7 @@ Outline
 
 ## Example of a Fact Constellation
 
-![](images/L17-OLAP/fact-constellation.png){width="72%" fig-align="center"}
+![](images/L17-OLAP/fact-constellation.svg){width="96%" fig-align="center"}
 
 - New fact table with measures [dollars_cost, units_shipped]{style="color:#990000;"}
 - Sharing some dimensions with Sales, but also has a new dimension ([shipper]{style="color:#990000;"})
@@ -391,6 +391,7 @@ Outline
     - Has to be computed separately for each aggregation
 :::
 
+<!--
 ## A 3D Data Cube and its Cuboids
 
 - The set of cuboids forms a *lattice*
@@ -398,3 +399,4 @@ Outline
 - Moving on the lattice corresponds to aggregation or disaggregation
 
 ![](images/L17-OLAP/cuboids-lattice.png){width="92%" fig-align="center"}
+-->

@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1020 540" role="img"
+     aria-label="Star schema for the sales warehouse. A fact table of quantity and price, with dimensions time, part, and customer.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M0,1 L10,5 L0,9 Z" fill="context-stroke"/>
+    </marker>
+    <style>
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        fill: #1c1c1c;
+        dominant-baseline: middle;
+      }
+      .name { font-size: 22px; font-weight: 600; }
+      .attr { font-size: 20px; }
+      .key { font-size: 20px; text-decoration: underline; }
+      .title { font-size: 24px; font-weight: 600; fill: #7c1717; }
+    </style>
+  </defs>
+
+  <!-- time -->
+  <g>
+    <rect x="16" y="16" width="250" height="244" fill="#e5f4ec" stroke="#3e8f68" stroke-width="2"/>
+    <rect x="18" y="18" width="246" height="38" fill="#cfe8db"/>
+    <line x1="16" y1="56" x2="266" y2="56" stroke="#3e8f68" stroke-width="2"/>
+    <text class="name" x="141" y="37" text-anchor="middle">time</text>
+    <text class="key" x="141" y="73" text-anchor="middle">time_id</text>
+    <text class="attr" x="141" y="107" text-anchor="middle">day</text>
+    <text class="attr" x="141" y="141" text-anchor="middle">week</text>
+    <text class="attr" x="141" y="175" text-anchor="middle">month</text>
+    <text class="attr" x="141" y="209" text-anchor="middle">quarter</text>
+    <text class="attr" x="141" y="243" text-anchor="middle">year</text>
+  </g>
+
+  <!-- part -->
+  <g>
+    <rect x="16" y="280" width="250" height="244" fill="#fbf0e4" stroke="#c4843a" stroke-width="2"/>
+    <rect x="18" y="282" width="246" height="38" fill="#f3e0c8"/>
+    <line x1="16" y1="320" x2="266" y2="320" stroke="#c4843a" stroke-width="2"/>
+    <text class="name" x="141" y="301" text-anchor="middle">part</text>
+    <text class="key" x="141" y="337" text-anchor="middle">part_id</text>
+    <text class="attr" x="141" y="371" text-anchor="middle">name</text>
+    <text class="attr" x="141" y="405" text-anchor="middle">type</text>
+    <text class="attr" x="141" y="439" text-anchor="middle">color</text>
+    <text class="attr" x="141" y="473" text-anchor="middle">brand</text>
+    <text class="attr" x="141" y="507" text-anchor="middle">manufacturer</text>
+  </g>
+
+  <!-- customer -->
+  <g>
+    <rect x="740" y="148" width="264" height="244" fill="#e7f1f8" stroke="#4d82b0" stroke-width="2"/>
+    <rect x="742" y="150" width="260" height="38" fill="#d2e4f2"/>
+    <line x1="740" y1="188" x2="1004" y2="188" stroke="#4d82b0" stroke-width="2"/>
+    <text class="name" x="872" y="169" text-anchor="middle">customer</text>
+    <text class="key" x="872" y="205" text-anchor="middle">cust_id</text>
+    <text class="attr" x="872" y="239" text-anchor="middle">name</text>
+    <text class="attr" x="872" y="273" text-anchor="middle">type</text>
+    <text class="attr" x="872" y="307" text-anchor="middle">city</text>
+    <text class="attr" x="872" y="341" text-anchor="middle">state</text>
+    <text class="attr" x="872" y="375" text-anchor="middle">country</text>
+  </g>
+
+  <text class="title" x="515" y="128" text-anchor="middle">Fact table</text>
+  <g>
+    <rect x="390" y="148" width="250" height="200" fill="#fff" stroke="#333" stroke-width="2"/>
+    <rect x="392" y="150" width="246" height="40" fill="#e5f4ec"/>
+    <rect x="392" y="190" width="246" height="40" fill="#fbf0e4"/>
+    <rect x="392" y="230" width="246" height="40" fill="#e7f1f8"/>
+    <rect x="392" y="270" width="246" height="76" fill="#f7f6f4"/>
+    <line x1="390" y1="190" x2="640" y2="190" stroke="#ddd9d2"/>
+    <line x1="390" y1="230" x2="640" y2="230" stroke="#ddd9d2"/>
+    <line x1="390" y1="270" x2="640" y2="270" stroke="#333" stroke-width="1.5"/>
+    <line x1="390" y1="308" x2="640" y2="308" stroke="#e6e3de"/>
+    <text class="attr" x="515" y="170" text-anchor="middle">time_id</text>
+    <text class="attr" x="515" y="210" text-anchor="middle">part_id</text>
+    <text class="attr" x="515" y="250" text-anchor="middle">cust_id</text>
+    <text class="attr" x="515" y="289" text-anchor="middle">quantity</text>
+    <text class="attr" x="515" y="327" text-anchor="middle">price</text>
+  </g>
+
+  <g fill="none" stroke-width="2.25" marker-end="url(#arrow)">
+    <path d="M390,170 L266,73" stroke="#3e8f68"/>
+    <path d="M390,210 L266,337" stroke="#c4843a"/>
+    <path d="M640,250 L740,205" stroke="#4d82b0"/>
+  </g>
+</svg>

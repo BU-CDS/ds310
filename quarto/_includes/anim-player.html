@@ -9,8 +9,10 @@
   runs the timeline:
     - nothing moves until Start is clicked; the button then pauses and
       resumes the run, and replays it once it has finished
+    - the progress bar steps to the previous or next beat, or to the beat
+      under a click; playback stays paused there until Resume
     - leaving the slide rewinds to the opening frame
-    - a PDF export gets the final frame and no button
+    - a PDF export gets the final frame and no controls
   While running, the svg carries data-state="playing" (otherwise "idle",
   "paused" or "done"), which fragments can use in their own CSS.
 -->
@@ -32,39 +34,122 @@
 .anim-fig .btn text { fill: #333; font-size: 22px; }
 .anim-fig[data-state="playing"] .icon-play,
 .anim-fig:not([data-state="playing"]) .icon-pause { display: none; }
+
+/* progress bar: step backward, jump to a beat, step forward */
+.anim-fig .step-btn { cursor: pointer; }
+.anim-fig .step-btn rect { fill: #fff; stroke: #888; stroke-width: 2; }
+.anim-fig .step-btn:hover rect { fill: #f1efe9; }
+.anim-fig .step-btn path { fill: none; stroke: #444; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.anim-fig .scrub { cursor: pointer; }
+.anim-fig .scrub-track { fill: #fff; stroke: #888; stroke-width: 2; }
+.anim-fig .scrub-fill { fill: #3a5fcd; }
+.anim-fig .scrub-tick { stroke: #d9d3c7; stroke-width: 2; }
+.anim-fig .scrub-thumb { fill: #fff; stroke: #3a5fcd; stroke-width: 3; }
 </style>
 
 <script>
 // animPlayer(svg, timeline)
 //   timeline: [[element, keyframes, start, duration, extra options], ...], times in seconds
 window.animPlayer = function (svg, timeline) {
-  // A PDF export keeps the final frame and has no use for the button.
+  // A PDF export keeps the final frame and has no use for the controls.
   if (/print-pdf/.test(location.search)) return;
 
-  // The button is an SVG group, not a <button>, so a click never takes
-  // keyboard focus away from reveal.js.
+  const vb = svg.viewBox.baseVal;
+  const y = vb.height - 80;
+  // Beats are the timeline's start times, merged when they land together.
+  const total = timeline.reduce((m, [, , start, dur]) => Math.max(m, start + dur), 0);
+  const steps = [0];
+  [...new Set(timeline.map(([, , start]) => start))].sort((a, b) => a - b).forEach(t => {
+    if (t - steps[steps.length - 1] >= 0.35) steps.push(t);
+  });
+  if (total - steps[steps.length - 1] > 0.05) steps.push(total);
+  const totalMs = total * 1000;
+
+  const stepW = 44, gap = 10;
+  const trackX = 16 + 150 + gap + stepW + gap;
+  const trackW = Math.max(80, vb.width - 16 - stepW - gap - trackX);
+  // Controls are SVG groups, not <button>s, so a click never takes keyboard
+  // focus away from reveal.js.
   svg.insertAdjacentHTML('beforeend',
-    `<g class="btn" role="button" transform="translate(16 ${svg.viewBox.baseVal.height - 80})">
+    `<g class="btn" role="button" transform="translate(16 ${y})">
        <rect width="150" height="48" rx="24"/>
        <path class="icon-play" d="M22,13 l19,11 l-19,11 z"/>
        <path class="icon-pause" d="M21,14 h7 v20 h-7 z M34,14 h7 v20 h-7 z"/>
        <text x="92" y="32"></text>
+     </g>
+     <g class="step-btn step-back" role="button" aria-label="Previous step" transform="translate(${16 + 150 + gap} ${y})">
+       <rect width="${stepW}" height="48" rx="24"/>
+       <path d="M27,15 L16,24 L27,33"/>
+     </g>
+     <g class="scrub" role="slider" aria-label="Animation progress" aria-valuemin="0" aria-valuemax="${steps.length - 1}" transform="translate(${trackX} ${y})">
+       <rect class="scrub-hit" x="0" y="0" width="${trackW}" height="48" fill="transparent"/>
+       <rect class="scrub-track" x="0" y="16" width="${trackW}" height="16" rx="8"/>
+       <rect class="scrub-fill" x="2" y="18" height="12" width="0" rx="6"/>
+       ${steps.map((t, i) => {
+         if (i === 0 || i === steps.length - 1) return '';
+         const x = total ? (t / total) * trackW : 0;
+         return `<line class="scrub-tick" x1="${x}" y1="18" x2="${x}" y2="30"/>`;
+       }).join('')}
+       <circle class="scrub-thumb" cx="9" cy="24" r="9"/>
+     </g>
+     <g class="step-btn step-fwd" role="button" aria-label="Next step" transform="translate(${trackX + trackW + gap} ${y})">
+       <rect width="${stepW}" height="48" rx="24"/>
+       <path d="M17,15 L28,24 L17,33"/>
      </g>`);
+
   const btn = svg.querySelector('.btn');
+  const scrub = svg.querySelector('.scrub');
+  const fill = scrub.querySelector('.scrub-fill');
+  const thumb = scrub.querySelector('.scrub-thumb');
   const LABEL = { idle: 'Start', playing: 'Pause', paused: 'Resume', done: 'Replay' };
   const last = timeline.reduce((best, [, , start, dur], i, all) =>
     start + dur > all[best][2] + all[best][3] ? i : best, 0);
-  let anims = [], state;
+  let anims = [], state, raf = 0;
 
+  function endOf(a) {
+    return a.effect.getComputedTiming().endTime;
+  }
+  function clock() {
+    return anims.length ? (anims[last].currentTime || 0) : 0;
+  }
+  function paint(ms) {
+    const r = totalMs ? Math.max(0, Math.min(1, ms / totalMs)) : 0;
+    fill.setAttribute('width', r * (trackW - 4));
+    thumb.setAttribute('cx', Math.max(9, Math.min(trackW - 9, r * trackW)));
+    const at = stepIndex(ms / 1000);
+    scrub.setAttribute('aria-valuenow', at);
+    svg.querySelector('.step-back').style.opacity = at === 0 ? '0.35' : '1';
+    svg.querySelector('.step-fwd').style.opacity = at === steps.length - 1 ? '0.35' : '1';
+  }
+  // Last beat whose time is at or just before t.
+  function stepIndex(t) {
+    let i = 0;
+    steps.forEach((s, k) => { if (s <= t + 0.02) i = k; });
+    return i;
+  }
   function setState(s) {
     state = s;
     svg.dataset.state = s;                 // the CSS picks the icon from this
     btn.querySelector('text').textContent = LABEL[s];
     btn.setAttribute('aria-label', LABEL[s] + ' animation');
+    if (s === 'playing') watch();
+    else {
+      cancelAnimationFrame(raf);
+      paint(s === 'done' ? totalMs : s === 'idle' ? 0 : clock());
+    }
+  }
+  function watch() {
+    cancelAnimationFrame(raf);
+    const loop = () => {
+      if (state !== 'playing') return;
+      paint(clock());
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
   }
   // (Re)build every animation, held on its first frame.
   function load() {
-    anims.forEach(a => a.cancel());
+    anims.forEach(a => { a.onfinish = null; a.cancel(); });
     anims = timeline.map(([el, frames, start, dur, opts]) => {
       const a = el.animate(frames, { delay: start * 1000, duration: dur * 1000, fill: 'both', ...opts });
       a.pause();
@@ -74,21 +159,65 @@ window.animPlayer = function (svg, timeline) {
     anims[last].onfinish = () => setState('done');
     setState('idle');
   }
+  // Hold every animation at the same instant. Finished ones stay put:
+  // play() on a finished animation would rewind it.
+  function seek(seconds) {
+    // Land just after the beat so a fade-in has finished, without reaching
+    // the next beat. The opening and final frames stay exact.
+    const nudged = seconds > 0.05 && seconds < total - 0.05
+      ? Math.min(seconds + 0.28, total) : seconds;
+    const ms = Math.max(0, Math.min(nudged * 1000, totalMs));
+    anims.forEach(a => {
+      a.pause();
+      a.currentTime = Math.min(ms, endOf(a));
+    });
+    if (ms < 20) setState('idle');
+    else if (ms >= totalMs - 20) setState('done');
+    else setState('paused');
+  }
+  function stepBy(dir) {
+    const i = Math.max(0, Math.min(steps.length - 1, stepIndex(clock() / 1000) + dir));
+    seek(steps[i]);
+  }
   // Only touch animations still in flight: play() on a finished one would rewind it.
   function pause() {
     anims.forEach(a => { if (a.playState === 'running') a.pause(); });
     setState('paused');
   }
   function resume() {
-    anims.forEach(a => { if (a.playState === 'paused') a.play(); });
+    anims.forEach(a => {
+      if (a.playState === 'paused' && a.currentTime < endOf(a) - 1) a.play();
+    });
     setState('playing');
+  }
+  function swallow(el, fn) {
+    el.addEventListener('click', ev => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      fn(ev);
+    });
   }
 
   load();
-  btn.addEventListener('click', () => {
+  swallow(btn, () => {
     if (state === 'playing') return pause();
     if (state === 'done') load();
     resume();
+  });
+  swallow(svg.querySelector('.step-back'), () => stepBy(-1));
+  swallow(svg.querySelector('.step-fwd'), () => stepBy(1));
+  swallow(scrub, ev => {
+    const pt = svg.createSVGPoint();
+    pt.x = ev.clientX;
+    pt.y = ev.clientY;
+    const local = pt.matrixTransform(svg.getScreenCTM().inverse()).x - trackX;
+    const ratio = Math.max(0, Math.min(1, local / trackW));
+    let nearest = 0, best = Infinity;
+    steps.forEach((s, k) => {
+      const d = Math.abs(s / total - ratio);
+      if (d < best) { best = d; nearest = k; }
+    });
+    seek(steps[nearest]);
   });
   // Rewind when reveal.js moves off this slide (it marks the current one "present").
   const slide = svg.closest('section');
