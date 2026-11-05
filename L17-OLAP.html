@@ -150,9 +150,65 @@ Data Science 310
 </div>
 
 </section>
-<section id="data-warehousing-and-olap-technology" class="slide level2">
-<h2>Data Warehousing and OLAP Technology</h2>
-<p>Outline</p>
+<section id="the-role-of-a-database" class="slide level2">
+<h2>The Role of a Database</h2>
+<p>Our study of the ACID properties of a database has emphasized a certain role for a DBMS:</p>
+<ul>
+<li>Handling transactions: operations that must be executed atomically and durably</li>
+<li>Consistency: the database contents must always be exactly correct and reflect present status</li>
+</ul>
+<p>The focus has been on operations that involve individual records.</p>
+<div class="fragment">
+<p>We’ll now expand our view of what role a DBMS may serve:</p>
+<ul>
+<li>Supporting <em>analytics</em>: processing large amounts of data for decision-making</li>
+<li>Supporting <em>historical data</em>: data that may not be current, but is still relevant for decision-making</li>
+</ul>
+</div>
+</section>
+<section id="analytics-and-historical-data" class="slide level2">
+<h2>Analytics and Historical Data</h2>
+<p>We’ll now focus on databases that support analytics and historical data.</p>
+<div class="fragment">
+<ul>
+<li>Examples of analytic queries:
+<ul>
+<li>What is the total sales revenue for the past year?</li>
+<li>What is the average sales revenue for the past year?</li>
+<li>What is the total sales revenue for the past year by product category?</li>
+<li>What is the maximum monthly sales revenue for the past year across product categories?<br>
+</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<p>Note that these queries do not involve making record-level modifications to the database.</p>
+<p>They are <em>not</em> primarily concerned with transactions or consistency.</p>
+</div>
+<div class="fragment">
+<p>Much more important is being able to handle many <span style="color:#990000;"><strong>dimensions</strong></span> of the data</p>
+<ul>
+<li>e.g., product category, region, time</li>
+</ul>
+<p>And being able to efficiently compute <span style="color:#990000;"><strong>aggregate</strong></span> operations on the data</p>
+<ul>
+<li>e.g., sum, average, max, min, count</li>
+</ul>
+</div>
+</section>
+<section id="olap-on-line-analytical-processing" class="slide level2">
+<h2>OLAP: On-Line Analytical Processing</h2>
+<p>OLAP is a term used to describe the process of querying and analyzing data from a database for decision-making.</p>
+<p>OLAP is typically used to answer questions about the data, rather than to make changes to the data.</p>
+<div class="fragment">
+<p>The key technology that enables OLAP is the <span style="color:#990000;"><strong>data cube</strong></span></p>
+</div>
+<div class="fragment">
+<p>And a database intended to support OLAP is typically called a <span style="color:#990000;"><strong>data warehouse</strong></span>.</p>
+</div>
+</section>
+<section id="outline" class="slide level2">
+<h2>Outline</h2>
 <ul>
 <li><span style="color:#990000;">What is a data warehouse? What is OLAP?</span></li>
 <li>The Multidimensional Data Model</li>
@@ -163,8 +219,9 @@ Data Science 310
 <section id="what-is-a-data-warehouse" class="slide level2">
 <h2>What is a Data Warehouse?</h2>
 <ul>
-<li>A <em>data warehouse</em> is a decision support database that is maintained <span style="color:#990000;"><em>separately</em></span> from the organization’s operational database
+<li>A <em>data warehouse</em> is a decision support database
 <ul>
+<li>it is maintained <span style="color:#990000;"><em>separately</em></span> from the organization’s operational database</li>
 <li>Operational database: personnel / payroll, accounts payable, accounts receivable, orders, inventory, …</li>
 <li>Data warehouse: none of the above</li>
 </ul></li>
@@ -175,15 +232,24 @@ Data Science 310
 </ul>
 </div>
 <div class="fragment">
-<ul>
-<li>“A data warehouse is a <span style="color:#990000;"><u>subject-oriented</u></span>, <span style="color:#990000;"><u>integrated</u></span>, <span style="color:#990000;"><u>time-variant</u></span>, and <span style="color:#990000;"><u>nonvolatile</u></span> collection of data in support of management’s decision-making process.” – W.H. Inmon</li>
-</ul>
+<p>“A data warehouse is a <span style="color:#990000;"><u>subject-oriented</u></span>, <span style="color:#990000;"><u>integrated</u></span>, <span style="color:#990000;"><u>time-variant</u></span>, and <span style="color:#990000;"><u>nonvolatile</u></span> collection of data in support of management’s decision-making process.”</p>
+<p>– W.H. Inmon</p>
 </div>
 </section>
 <section id="example-of-a-data-warehouse" class="slide level2">
 <h2>Example of a Data Warehouse</h2>
-
-<img data-src="images/L17-OLAP/example-dw.png" class="quarto-figure quarto-figure-center r-stretch" style="width:90.0%"></section>
+<div class="columns">
+<div class="column" style="width:72%;">
+<p><img data-src="images/L17-OLAP/example-dw.svg" style="width:100.0%"></p>
+</div><div class="column" style="width:28%;">
+<p>Note:</p>
+<ul>
+<li>Not everything from the operational DB belongs in the DW</li>
+<li>Data is structured differently in DW than in operational DB</li>
+<li>FACT Table and Dimension Tables</li>
+</ul>
+</div></div>
+</section>
 <section id="a-data-warehouse-is-subject-oriented" class="slide level2">
 <h2>A Data Warehouse is Subject-Oriented</h2>
 <ul>
@@ -262,7 +328,7 @@ Data Science 310
 <section id="how-is-data-loaded-into-a-data-warehouse" class="slide level2">
 <h2>How is Data Loaded into a Data Warehouse?</h2>
 
-<img data-src="images/L17-OLAP/loading-dw.png" class="quarto-figure quarto-figure-center r-stretch" style="width:92.0%"></section>
+<img data-src="images/L17-OLAP/example-dw.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:80.0%"></section>
 <section id="populating-a-data-warehouse" class="slide level2">
 <h2>Populating a Data Warehouse</h2>
 <ul>
@@ -490,7 +556,7 @@ Data Science 310
 </ul>
 </div>
 </section>
-<section id="data-warehousing-and-olap-technology-1" class="slide level2">
+<section id="data-warehousing-and-olap-technology" class="slide level2">
 <h2>Data Warehousing and OLAP Technology</h2>
 <p>Outline</p>
 <ul>

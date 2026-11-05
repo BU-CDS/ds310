@@ -4137,25 +4137,46 @@
     "text": "Which updates will be redone?"
   },
   {
-    "objectID": "L17-OLAP.html#data-warehousing-and-olap-technology",
-    "href": "L17-OLAP.html#data-warehousing-and-olap-technology",
+    "objectID": "L17-OLAP.html#the-role-of-a-database",
+    "href": "L17-OLAP.html#the-role-of-a-database",
     "title": "Data Warehousing and OLAP",
-    "section": "Data Warehousing and OLAP Technology",
-    "text": "Data Warehousing and OLAP Technology\nOutline\n\nWhat is a data warehouse? What is OLAP?\nThe Multidimensional Data Model\nImplementation of Data Cubes\nDesigning a Data Warehouse"
+    "section": "The Role of a Database",
+    "text": "The Role of a Database\nOur study of the ACID properties of a database has emphasized a certain role for a DBMS:\n\nHandling transactions: operations that must be executed atomically and durably\nConsistency: the database contents must always be exactly correct and reflect present status\n\nThe focus has been on operations that involve individual records.\n\nWe’ll now expand our view of what role a DBMS may serve:\n\nSupporting analytics: processing large amounts of data for decision-making\nSupporting historical data: data that may not be current, but is still relevant for decision-making"
+  },
+  {
+    "objectID": "L17-OLAP.html#analytics-and-historical-data",
+    "href": "L17-OLAP.html#analytics-and-historical-data",
+    "title": "Data Warehousing and OLAP",
+    "section": "Analytics and Historical Data",
+    "text": "Analytics and Historical Data\nWe’ll now focus on databases that support analytics and historical data.\n\n\nExamples of analytic queries:\n\nWhat is the total sales revenue for the past year?\nWhat is the average sales revenue for the past year?\nWhat is the total sales revenue for the past year by product category?\nWhat is the maximum monthly sales revenue for the past year across product categories?\n\n\n\n\n\nNote that these queries do not involve making record-level modifications to the database.\nThey are not primarily concerned with transactions or consistency.\n\n\nMuch more important is being able to handle many dimensions of the data\n\ne.g., product category, region, time\n\nAnd being able to efficiently compute aggregate operations on the data\n\ne.g., sum, average, max, min, count"
+  },
+  {
+    "objectID": "L17-OLAP.html#olap-on-line-analytical-processing",
+    "href": "L17-OLAP.html#olap-on-line-analytical-processing",
+    "title": "Data Warehousing and OLAP",
+    "section": "OLAP: On-Line Analytical Processing",
+    "text": "OLAP: On-Line Analytical Processing\nOLAP is a term used to describe the process of querying and analyzing data from a database for decision-making.\nOLAP is typically used to answer questions about the data, rather than to make changes to the data.\n\nThe key technology that enables OLAP is the data cube\n\n\nAnd a database intended to support OLAP is typically called a data warehouse."
+  },
+  {
+    "objectID": "L17-OLAP.html#outline",
+    "href": "L17-OLAP.html#outline",
+    "title": "Data Warehousing and OLAP",
+    "section": "Outline",
+    "text": "Outline\n\nWhat is a data warehouse? What is OLAP?\nThe Multidimensional Data Model\nImplementation of Data Cubes\nDesigning a Data Warehouse"
   },
   {
     "objectID": "L17-OLAP.html#what-is-a-data-warehouse",
     "href": "L17-OLAP.html#what-is-a-data-warehouse",
     "title": "Data Warehousing and OLAP",
     "section": "What is a Data Warehouse?",
-    "text": "What is a Data Warehouse?\n\nA data warehouse is a decision support database that is maintained separately from the organization’s operational database\n\nOperational database: personnel / payroll, accounts payable, accounts receivable, orders, inventory, …\nData warehouse: none of the above\n\n\n\n\nSupports information processing by providing a solid platform of consolidated, historical data for analysis\n\n\n\n\n“A data warehouse is a subject-oriented, integrated, time-variant, and nonvolatile collection of data in support of management’s decision-making process.” – W.H. Inmon"
+    "text": "What is a Data Warehouse?\n\nA data warehouse is a decision support database\n\nit is maintained separately from the organization’s operational database\nOperational database: personnel / payroll, accounts payable, accounts receivable, orders, inventory, …\nData warehouse: none of the above\n\n\n\n\nSupports information processing by providing a solid platform of consolidated, historical data for analysis\n\n\n\n“A data warehouse is a subject-oriented, integrated, time-variant, and nonvolatile collection of data in support of management’s decision-making process.”\n– W.H. Inmon"
   },
   {
     "objectID": "L17-OLAP.html#example-of-a-data-warehouse",
     "href": "L17-OLAP.html#example-of-a-data-warehouse",
     "title": "Data Warehousing and OLAP",
     "section": "Example of a Data Warehouse",
-    "text": "Example of a Data Warehouse"
+    "text": "Example of a Data Warehouse\n\n\n\n\nNote:\n\nNot everything from the operational DB belongs in the DW\nData is structured differently in DW than in operational DB\nFACT Table and Dimension Tables"
   },
   {
     "objectID": "L17-OLAP.html#a-data-warehouse-is-subject-oriented",
@@ -4242,8 +4263,8 @@
     "text": "Why Create a Separate Data Warehouse?\n\nHigh performance for both systems\n\nDBMS— tuned for OLTP: access methods, indexing, concurrency control, recovery\nWarehouse—tuned for OLAP: complex OLAP queries, multidimensional view, consolidation.\n\n\n\n\nDifferent functions and different data:\n\nmissing data: Decision support requires historical data which operational DBs do not typically maintain\ndata consolidation: Decision support requires consolidation (aggregation, summarization) of data from heterogeneous sources\ndata quality: different sources typically use inconsistent data representations, codes and formats which have to be reconciled"
   },
   {
-    "objectID": "L17-OLAP.html#data-warehousing-and-olap-technology-1",
-    "href": "L17-OLAP.html#data-warehousing-and-olap-technology-1",
+    "objectID": "L17-OLAP.html#data-warehousing-and-olap-technology",
+    "href": "L17-OLAP.html#data-warehousing-and-olap-technology",
     "title": "Data Warehousing and OLAP",
     "section": "Data Warehousing and OLAP Technology",
     "text": "Data Warehousing and OLAP Technology\nOutline\n\nWhat is a data warehouse? What is OLAP?\nThe Multidimensional Data Model\nImplementation of Data Cubes\nDesigning a Data Warehouse"
