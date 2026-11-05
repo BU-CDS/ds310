@@ -15,9 +15,65 @@ format:
     chalkboard: true
 ---
 
-## Data Warehousing and OLAP Technology
+## The Role of a Database
 
-Outline
+Our study of the ACID properties of a database has emphasized a certain role for a DBMS:
+
+- Handling transactions: operations that must be executed atomically and durably
+- Consistency: the database contents must always be exactly correct and reflect present status
+
+The focus has been on operations that involve individual records.
+
+::: {.fragment}
+We'll now expand our view of what role a DBMS may serve:
+
+- Supporting *analytics*: processing large amounts of data for decision-making
+- Supporting *historical data*: data that may not be current, but is still relevant for decision-making
+:::
+
+## Analytics and Historical Data
+
+We'll now focus on databases that support analytics and historical data.
+
+::: {.fragment}
+- Examples of analytic queries:
+    - What is the total sales revenue for the past year?
+    - What is the average sales revenue for the past year?
+    - What is the total sales revenue for the past year by product category?
+    - What is the maximum monthly sales revenue for the past year across product categories?  
+:::
+
+::: {.fragment}
+Note that these queries do not involve making record-level modifications to the database.
+
+They are *not* primarily concerned with transactions or consistency.
+:::
+
+::: {.fragment}
+Much more important is being able to handle many [**dimensions**]{style="color:#990000;"} of the data
+
+- e.g., product category, region, time
+
+And being able to efficiently compute [**aggregate**]{style="color:#990000;"} operations on the data
+
+- e.g., sum, average, max, min, count
+:::
+
+## OLAP: On-Line Analytical Processing
+
+OLAP is a term used to describe the process of querying and analyzing data from a database for decision-making.
+
+OLAP is typically used to answer questions about the data, rather than to make changes to the data.
+
+::: {.fragment}
+The key technology that enables OLAP is the [**data cube**]{style="color:#990000;"}
+:::
+
+::: {.fragment}
+And a database intended to support OLAP is typically called a [**data warehouse**]{style="color:#990000;"}.
+:::
+
+## Outline
 
 - [What is a data warehouse? What is OLAP?]{style="color:#990000;"}
 - The Multidimensional Data Model
@@ -26,7 +82,8 @@ Outline
 
 ## What is a Data Warehouse?
 
-- A *data warehouse* is a decision support database that is maintained [*separately*]{style="color:#990000;"} from the organization's operational database
+- A *data warehouse* is a decision support database
+    - it is maintained [*separately*]{style="color:#990000;"} from the organization's operational database
     - Operational database: personnel / payroll, accounts payable, accounts receivable, orders, inventory, &hellip;
     - Data warehouse: none of the above
 
@@ -35,12 +92,26 @@ Outline
 :::
 
 ::: {.fragment}
-- "A data warehouse is a [subject-oriented]{.underline style="color:#990000;"}, [integrated]{.underline style="color:#990000;"}, [time-variant]{.underline style="color:#990000;"}, and [nonvolatile]{.underline style="color:#990000;"} collection of data in support of management's decision-making process." -- W.H. Inmon
+"A data warehouse is a [subject-oriented]{.underline style="color:#990000;"}, [integrated]{.underline style="color:#990000;"}, [time-variant]{.underline style="color:#990000;"}, and [nonvolatile]{.underline style="color:#990000;"} collection of data in support of management's decision-making process." 
+
+-- W.H. Inmon
 :::
 
 ## Example of a Data Warehouse
 
-![](images/L17-OLAP/example-dw.png){width="90%" fig-align="center"}
+:::: {.columns}
+::: {.column width=72%}
+![](images/L17-OLAP/example-dw.svg){width="100%"}
+:::
+
+::: {.column width=28%}
+Note:
+
+- Not everything from the operational DB belongs in the DW
+- Data is structured differently in DW than in operational DB
+- FACT Table and Dimension Tables
+:::
+::::
 
 ## A Data Warehouse is Subject-Oriented
 
@@ -93,7 +164,7 @@ Outline
 
 ## How is Data Loaded into a Data Warehouse?
 
-![](images/L17-OLAP/loading-dw.png){width="92%" fig-align="center"}
+![](images/L17-OLAP/example-dw.svg){width="80%" fig-align="center"}
 
 ## Populating a Data Warehouse
 
