@@ -1,0 +1,269 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 672" role="img"
+     aria-label="Example of a data warehouse. Two operational databases (US and HK) feed a data warehouse that holds a FACT table and two dimension tables, time and product.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5"
+            markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0,1 L10,5 L0,9 Z" fill="context-stroke"/>
+    </marker>
+    <style>
+      text {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        fill: #1c1c1c;
+        dominant-baseline: middle;
+      }
+      .ptitle { font-size: 22px; font-weight: 600; fill: #7c1717; }
+      .tname  { font-size: 18px; font-weight: 600; }
+      .hdr    { font-size: 15px; font-weight: 600; }
+      .cell   { font-size: 15px; }
+      .note   { font-size: 17px; }
+      .notehd { font-size: 17px; font-weight: 600; }
+    </style>
+  </defs>
+  <!-- US operational database -->
+  <text class="ptitle" x="20" y="30" text-anchor="start">US-Operational-Database</text>
+  <rect x="20" y="50" width="480" height="262" rx="6" fill="#e5f4ec" stroke="#3e8f68" stroke-width="2"/>
+  <text class="tname" x="30" y="74" text-anchor="start">Employee</text>
+  <g>
+    <rect x="30" y="86" width="240" height="50" fill="#ffffff" stroke="#3e8f68" stroke-width="1.5"/>
+    <rect x="30" y="86" width="240" height="26" fill="#cfe8db"/>
+    <line x1="30" y1="112" x2="270" y2="112" stroke="#3e8f68" stroke-width="1.5"/>
+    <line x1="80" y1="86" x2="80" y2="136" stroke="#ddd9d2"/>
+    <line x1="170" y1="86" x2="170" y2="136" stroke="#ddd9d2"/>
+    <text class="hdr" x="37" y="100.0">eid</text>
+    <text class="hdr" x="87" y="100.0">name</text>
+    <text class="hdr" x="177" y="100.0">birthdate</text>
+    <text class="cell" x="37" y="125.0">...</text>
+    <text class="cell" x="87" y="125.0">...</text>
+    <text class="cell" x="177" y="125.0">...</text>
+  </g>
+  <text class="tname" x="300" y="74" text-anchor="start">Department</text>
+  <g>
+    <rect x="300" y="86" width="170" height="50" fill="#ffffff" stroke="#3e8f68" stroke-width="1.5"/>
+    <rect x="300" y="86" width="170" height="26" fill="#cfe8db"/>
+    <line x1="300" y1="112" x2="470" y2="112" stroke="#3e8f68" stroke-width="1.5"/>
+    <line x1="360" y1="86" x2="360" y2="136" stroke="#ddd9d2"/>
+    <text class="hdr" x="307" y="100.0">did</text>
+    <text class="hdr" x="367" y="100.0">dname</text>
+    <text class="cell" x="307" y="125.0">...</text>
+    <text class="cell" x="367" y="125.0">...</text>
+  </g>
+  <text class="tname" x="30" y="162" text-anchor="start">Transaction</text>
+  <g>
+    <rect x="30" y="174" width="230" height="122" fill="#ffffff" stroke="#3e8f68" stroke-width="1.5"/>
+    <rect x="30" y="174" width="230" height="26" fill="#cfe8db"/>
+    <line x1="30" y1="200" x2="260" y2="200" stroke="#3e8f68" stroke-width="1.5"/>
+    <line x1="30" y1="224" x2="260" y2="224" stroke="#ddd9d2"/>
+    <line x1="30" y1="248" x2="260" y2="248" stroke="#ddd9d2"/>
+    <line x1="30" y1="272" x2="260" y2="272" stroke="#ddd9d2"/>
+    <line x1="80" y1="174" x2="80" y2="296" stroke="#ddd9d2"/>
+    <line x1="150" y1="174" x2="150" y2="296" stroke="#ddd9d2"/>
+    <text class="hdr" x="37" y="188.0">tid</text>
+    <text class="hdr" x="87" y="188.0">type</text>
+    <text class="hdr" x="157" y="188.0">date</text>
+    <text class="cell" x="37" y="213.0">1</text>
+    <text class="cell" x="87" y="213.0">sale</text>
+    <text class="cell" x="157" y="213.0">4/11/1999</text>
+    <text class="cell" x="37" y="237.0">2</text>
+    <text class="cell" x="87" y="237.0">sale</text>
+    <text class="cell" x="157" y="237.0">5/2/1999</text>
+    <text class="cell" x="37" y="261.0">3</text>
+    <text class="cell" x="87" y="261.0">buy</text>
+    <text class="cell" x="157" y="261.0">5/17/1999</text>
+    <text class="cell" x="37" y="285.0">...</text>
+    <text class="cell" x="87" y="285.0">...</text>
+    <text class="cell" x="157" y="285.0">...</text>
+  </g>
+  <text class="tname" x="300" y="162" text-anchor="start">Details</text>
+  <g>
+    <rect x="300" y="174" width="170" height="122" fill="#ffffff" stroke="#3e8f68" stroke-width="1.5"/>
+    <rect x="300" y="174" width="170" height="26" fill="#cfe8db"/>
+    <line x1="300" y1="200" x2="470" y2="200" stroke="#3e8f68" stroke-width="1.5"/>
+    <line x1="300" y1="224" x2="470" y2="224" stroke="#ddd9d2"/>
+    <line x1="300" y1="248" x2="470" y2="248" stroke="#ddd9d2"/>
+    <line x1="300" y1="272" x2="470" y2="272" stroke="#ddd9d2"/>
+    <line x1="350" y1="174" x2="350" y2="296" stroke="#ddd9d2"/>
+    <line x1="410" y1="174" x2="410" y2="296" stroke="#ddd9d2"/>
+    <text class="hdr" x="307" y="188.0">tid</text>
+    <text class="hdr" x="357" y="188.0">pid</text>
+    <text class="hdr" x="417" y="188.0">qty</text>
+    <text class="cell" x="307" y="213.0">1</text>
+    <text class="cell" x="357" y="213.0">21</text>
+    <text class="cell" x="417" y="213.0">2</text>
+    <text class="cell" x="307" y="237.0">2</text>
+    <text class="cell" x="357" y="237.0">13</text>
+    <text class="cell" x="417" y="237.0">1</text>
+    <text class="cell" x="307" y="261.0">3</text>
+    <text class="cell" x="357" y="261.0">41</text>
+    <text class="cell" x="417" y="261.0">3</text>
+    <text class="cell" x="307" y="285.0">...</text>
+    <text class="cell" x="357" y="285.0">...</text>
+    <text class="cell" x="417" y="285.0">...</text>
+  </g>
+  <!-- HK operational database -->
+  <text class="ptitle" x="20" y="364" text-anchor="start">HK-Operational-Database</text>
+  <rect x="20" y="384" width="480" height="272" rx="6" fill="#fbf0e4" stroke="#c4843a" stroke-width="2"/>
+  <text class="tname" x="30" y="408" text-anchor="start">Supplier</text>
+  <g>
+    <rect x="30" y="420" width="240" height="50" fill="#ffffff" stroke="#c4843a" stroke-width="1.5"/>
+    <rect x="30" y="420" width="240" height="26" fill="#f3e0c8"/>
+    <line x1="30" y1="446" x2="270" y2="446" stroke="#c4843a" stroke-width="1.5"/>
+    <line x1="80" y1="420" x2="80" y2="470" stroke="#ddd9d2"/>
+    <line x1="170" y1="420" x2="170" y2="470" stroke="#ddd9d2"/>
+    <text class="hdr" x="37" y="434.0">sid</text>
+    <text class="hdr" x="87" y="434.0">name</text>
+    <text class="hdr" x="177" y="434.0">birthdate</text>
+    <text class="cell" x="37" y="459.0">...</text>
+    <text class="cell" x="87" y="459.0">...</text>
+    <text class="cell" x="177" y="459.0">...</text>
+  </g>
+  <text class="tname" x="300" y="408" text-anchor="start">Country</text>
+  <g>
+    <rect x="300" y="420" width="160" height="50" fill="#ffffff" stroke="#c4843a" stroke-width="1.5"/>
+    <rect x="300" y="420" width="160" height="26" fill="#f3e0c8"/>
+    <line x1="300" y1="446" x2="460" y2="446" stroke="#c4843a" stroke-width="1.5"/>
+    <line x1="350" y1="420" x2="350" y2="470" stroke="#ddd9d2"/>
+    <text class="hdr" x="307" y="434.0">cid</text>
+    <text class="hdr" x="357" y="434.0">cname</text>
+    <text class="cell" x="307" y="459.0">...</text>
+    <text class="cell" x="357" y="459.0">...</text>
+  </g>
+  <text class="tname" x="30" y="565" text-anchor="start">Sales</text>
+  <g>
+    <rect x="130" y="492" width="330" height="146" fill="#ffffff" stroke="#c4843a" stroke-width="1.5"/>
+    <rect x="130" y="492" width="330" height="26" fill="#f3e0c8"/>
+    <line x1="130" y1="518" x2="460" y2="518" stroke="#c4843a" stroke-width="1.5"/>
+    <line x1="130" y1="542" x2="460" y2="542" stroke="#ddd9d2"/>
+    <line x1="130" y1="566" x2="460" y2="566" stroke="#ddd9d2"/>
+    <line x1="130" y1="590" x2="460" y2="590" stroke="#ddd9d2"/>
+    <line x1="130" y1="614" x2="460" y2="614" stroke="#ddd9d2"/>
+    <line x1="180" y1="492" x2="180" y2="638" stroke="#ddd9d2"/>
+    <line x1="290" y1="492" x2="290" y2="638" stroke="#ddd9d2"/>
+    <line x1="360" y1="492" x2="360" y2="638" stroke="#ddd9d2"/>
+    <line x1="410" y1="492" x2="410" y2="638" stroke="#ddd9d2"/>
+    <text class="hdr" x="137" y="506.0">sid</text>
+    <text class="hdr" x="187" y="506.0">date</text>
+    <text class="hdr" x="297" y="506.0">time</text>
+    <text class="hdr" x="367" y="506.0">qty</text>
+    <text class="hdr" x="417" y="506.0">pid</text>
+    <text class="cell" x="137" y="531.0">1</text>
+    <text class="cell" x="187" y="531.0">15:4:1999</text>
+    <text class="cell" x="297" y="531.0">8:30</text>
+    <text class="cell" x="367" y="531.0">2</text>
+    <text class="cell" x="417" y="531.0">11</text>
+    <text class="cell" x="137" y="555.0">2</text>
+    <text class="cell" x="187" y="555.0">15:4:1999</text>
+    <text class="cell" x="297" y="555.0">9:30</text>
+    <text class="cell" x="367" y="555.0">2</text>
+    <text class="cell" x="417" y="555.0">11</text>
+    <text class="cell" x="137" y="579.0">3</text>
+    <text class="cell" x="187" y="579.0">???</text>
+    <text class="cell" x="367" y="579.0">3</text>
+    <text class="cell" x="417" y="579.0">56</text>
+    <text class="cell" x="137" y="603.0">4</text>
+    <text class="cell" x="187" y="603.0">19:5:1999</text>
+    <text class="cell" x="367" y="603.0">4</text>
+    <text class="cell" x="417" y="603.0">22</text>
+    <text class="cell" x="137" y="627.0">...</text>
+    <text class="cell" x="187" y="627.0">...</text>
+  </g>
+  <!-- Data warehouse -->
+  <text class="ptitle" x="820.0" y="30" text-anchor="middle">Data Warehouse</text>
+  <rect x="580" y="50" width="480" height="606" rx="6" fill="#e7f1f8" stroke="#4d82b0" stroke-width="2"/>
+  <text class="tname" x="820.0" y="78" text-anchor="middle">FACT table</text>
+  <g>
+    <rect x="730" y="96" width="180" height="146" fill="#ffffff" stroke="#4d82b0" stroke-width="1.5"/>
+    <rect x="730" y="96" width="180" height="26" fill="#d2e4f2"/>
+    <line x1="730" y1="122" x2="910" y2="122" stroke="#4d82b0" stroke-width="1.5"/>
+    <line x1="730" y1="146" x2="910" y2="146" stroke="#ddd9d2"/>
+    <line x1="730" y1="170" x2="910" y2="170" stroke="#ddd9d2"/>
+    <line x1="730" y1="194" x2="910" y2="194" stroke="#ddd9d2"/>
+    <line x1="730" y1="218" x2="910" y2="218" stroke="#ddd9d2"/>
+    <line x1="800" y1="96" x2="800" y2="242" stroke="#ddd9d2"/>
+    <line x1="850" y1="96" x2="850" y2="242" stroke="#ddd9d2"/>
+    <text class="hdr" x="737" y="110.0">timeid</text>
+    <text class="hdr" x="807" y="110.0">pid</text>
+    <text class="hdr" x="857" y="110.0">sales</text>
+    <text class="cell" x="737" y="135.0">1</text>
+    <text class="cell" x="807" y="135.0">1</text>
+    <text class="cell" x="857" y="135.0">2</text>
+    <text class="cell" x="737" y="159.0">2</text>
+    <text class="cell" x="807" y="159.0">1</text>
+    <text class="cell" x="857" y="159.0">4</text>
+    <text class="cell" x="737" y="183.0">2</text>
+    <text class="cell" x="807" y="183.0">2</text>
+    <text class="cell" x="857" y="183.0">1</text>
+    <text class="cell" x="737" y="207.0">3</text>
+    <text class="cell" x="807" y="207.0">3</text>
+    <text class="cell" x="857" y="207.0">2</text>
+    <text class="cell" x="737" y="231.0">...</text>
+    <text class="cell" x="807" y="231.0">...</text>
+    <text class="cell" x="857" y="231.0">...</text>
+  </g>
+  <text class="tname" x="820.0" y="294" text-anchor="middle">dimension 1: time</text>
+  <g>
+    <rect x="695" y="312" width="250" height="122" fill="#ffffff" stroke="#4d82b0" stroke-width="1.5"/>
+    <rect x="695" y="312" width="250" height="26" fill="#d2e4f2"/>
+    <line x1="695" y1="338" x2="945" y2="338" stroke="#4d82b0" stroke-width="1.5"/>
+    <line x1="695" y1="362" x2="945" y2="362" stroke="#ddd9d2"/>
+    <line x1="695" y1="386" x2="945" y2="386" stroke="#ddd9d2"/>
+    <line x1="695" y1="410" x2="945" y2="410" stroke="#ddd9d2"/>
+    <line x1="765" y1="312" x2="765" y2="434" stroke="#ddd9d2"/>
+    <line x1="815" y1="312" x2="815" y2="434" stroke="#ddd9d2"/>
+    <line x1="885" y1="312" x2="885" y2="434" stroke="#ddd9d2"/>
+    <text class="hdr" x="702" y="326.0">timeid</text>
+    <text class="hdr" x="772" y="326.0">day</text>
+    <text class="hdr" x="822" y="326.0">month</text>
+    <text class="hdr" x="892" y="326.0">year</text>
+    <text class="cell" x="702" y="351.0">1</text>
+    <text class="cell" x="772" y="351.0">11</text>
+    <text class="cell" x="822" y="351.0">4</text>
+    <text class="cell" x="892" y="351.0">1999</text>
+    <text class="cell" x="702" y="375.0">2</text>
+    <text class="cell" x="772" y="375.0">15</text>
+    <text class="cell" x="822" y="375.0">4</text>
+    <text class="cell" x="892" y="375.0">1999</text>
+    <text class="cell" x="702" y="399.0">3</text>
+    <text class="cell" x="772" y="399.0">2</text>
+    <text class="cell" x="822" y="399.0">5</text>
+    <text class="cell" x="892" y="399.0">1999</text>
+    <text class="cell" x="702" y="423.0">...</text>
+    <text class="cell" x="772" y="423.0">...</text>
+    <text class="cell" x="822" y="423.0">...</text>
+    <text class="cell" x="892" y="423.0">...</text>
+  </g>
+  <text class="tname" x="820.0" y="486" text-anchor="middle">dimension 2: product</text>
+  <g>
+    <rect x="715" y="504" width="210" height="122" fill="#ffffff" stroke="#4d82b0" stroke-width="1.5"/>
+    <rect x="715" y="504" width="210" height="26" fill="#d2e4f2"/>
+    <line x1="715" y1="530" x2="925" y2="530" stroke="#4d82b0" stroke-width="1.5"/>
+    <line x1="715" y1="554" x2="925" y2="554" stroke="#ddd9d2"/>
+    <line x1="715" y1="578" x2="925" y2="578" stroke="#ddd9d2"/>
+    <line x1="715" y1="602" x2="925" y2="602" stroke="#ddd9d2"/>
+    <line x1="765" y1="504" x2="765" y2="626" stroke="#ddd9d2"/>
+    <line x1="845" y1="504" x2="845" y2="626" stroke="#ddd9d2"/>
+    <text class="hdr" x="722" y="518.0">pid</text>
+    <text class="hdr" x="772" y="518.0">name</text>
+    <text class="hdr" x="852" y="518.0">type</text>
+    <text class="cell" x="722" y="543.0">1</text>
+    <text class="cell" x="772" y="543.0">chair</text>
+    <text class="cell" x="852" y="543.0">office</text>
+    <text class="cell" x="722" y="567.0">2</text>
+    <text class="cell" x="772" y="567.0">table</text>
+    <text class="cell" x="852" y="567.0">office</text>
+    <text class="cell" x="722" y="591.0">3</text>
+    <text class="cell" x="772" y="591.0">desk</text>
+    <text class="cell" x="852" y="591.0">office</text>
+    <text class="cell" x="722" y="615.0">...</text>
+    <text class="cell" x="772" y="615.0">...</text>
+  </g>
+  <!-- links from FACT table keys to the dimension tables -->
+  <g fill="none" stroke="#4d82b0" stroke-width="1.75">
+    <path d="M730,105.0 H598 V517.0 H715"/>
+    <path d="M730,114.0 H614 V325.0 H695"/>
+  </g>
+  <!-- operational databases feed the warehouse -->
+  <g fill="none" stroke="#555" stroke-width="2.5" marker-end="url(#arrow)">
+    <path d="M504,300 L574,338"/>
+    <path d="M504,396 L574,358"/>
+  </g>
+</svg>
