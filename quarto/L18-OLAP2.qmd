@@ -105,7 +105,7 @@ Outline
 
 ## The Lattice of Cuboids of a 4D Cube
 
-![](images/L18-OLAP2/lattice-4d.png){width="82%" fig-align="center"}
+![](images/L18-OLAP2/lattice-4d.svg){width="82%" fig-align="center"}
 
 ## Concept Hierarchies
 
@@ -179,34 +179,50 @@ Outline
 
 - As discussed, a data cube may be thought of as a lattice of cuboids
     - Queries will often consist of drill-down or roll-up, ie, moving between cuboids
-- By "materialize" a cuboid we mean to compute it in advance of a query, and maintain it if data changes
+
+::: {.fragment}
+- By [**materialize**]{style="color:#a00;"} a cuboid we mean to compute it in **advance of a query,** and maintain it if data changes
     - Materializing a cuboid will speed up queries
+:::
+
+::: {.fragment}
 - How many cuboids are in an *n*-dimensional data cube?
     - If there are no concept hierarchies, there are $T = 2^{n}$ cuboids
         - Every *n*-digit binary number represents a cuboid
-    - If each dimension has $L_{i}$ levels, there are $T = \prod_{i=1}^{n}(L_{i}+1)$ cuboids
+    - If each dimension has $L_{i}$ levels, there are $T = \prod_{i=1}^{n}(L_{i}+1)$ cuboids   
+::: 
+
+::: {.fragment}
 - It may not be feasible or desirable to actually materialize every cuboid
+:::
 
 ## Counting Cuboids
 
-- In any cuboid, a dimension may be present or absent, and if present, may be aggregated at any level
-- If the dimension is absent, we have summed over all values in that dimension
-- Example:
-    - Three dimensions: Product, Location, Time
-    - Three levels to Product, four levels to Location, five levels to Time
-    - \# Cuboids = (4 x 5 x 6) = 120
+- In any cuboid, a dimension may be *present* or *absent*
+    - and if present, may be aggregated at any level
+- The absence of a dimension corresponds to summing over all values in that dimension
+
+::: {.fragment}
+- Example: a 3D cube with dimensions *Product*, *Location*, and *Time*:
+    - If there are no levels (concept hierarchies), then there are 2 x 2 x 2 = $2^3$ = 8 cuboids
+    - If there are three levels to Product, four levels to Location, five levels to Time, then there are
+    (3 + 1) x (4 + 1) x (5 + 1) = 4 x 5 x 6 = 120 cuboids
+:::
 
 ![](images/L18-OLAP2/counting-cuboids.png){width="72%" fig-align="center"}
 
 ## Materialization Strategies
 
+What options are there for materializing cuboids?
+
 - Materialize every cuboid (full materialization)
 - Don't materialize any cuboids (other than the base)
 - Partial materialization of some cuboids
     - Selection based on size, sharing, access frequency, etc
-- Cuboids are equivalent to the results of GROUP BY operations
 
-![](images/L18-OLAP2/materialize-lattice.png){width="88%" fig-align="center"}
+Cuboids are equivalent to the results of [**GROUP BY**]{style="color:#a00;"} operations
+
+![](images/L18-OLAP2/lattice-4d.svg){width="88%" fig-align="center"}
 
 ## Materializing Cuboids
 
@@ -220,18 +236,24 @@ FROM SALES
 CUBE BY item, city, year
 ```
 
-- Need compute the following GROUP-Bys:
+::: {.fragment}
+- This needs to compute the following GROUP-BYs:
     - [*(city, item, year),*]{style="color:#a00;"}
     - [*(city, item), (city, year), (item, year),*]{style="color:#a00;"}
     - [*(city), (item), (year)*]{style="color:#a00;"}
     - [*( )*]{style="color:#a00;"}
-- Example:
+:::
+
+::: {.fragment}
+- For example, to materialize the (city, item) cuboid:
 
 ```sql
 SELECT city, item, SUM(amount)
 FROM SALES
 GROUP BY city, item
 ```
+:::  
+
 :::
 
 ::: {.column width="45%"}
