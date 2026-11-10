@@ -634,28 +634,28 @@
     "href": "L18-OLAP2.html#efficient-data-cube-computation",
     "title": "Data Warehousing and OLAP",
     "section": "Efficient Data Cube Computation",
-    "text": "Efficient Data Cube Computation\n\nAs discussed, a data cube may be thought of as a lattice of cuboids\n\nQueries will often consist of drill-down or roll-up, ie, moving between cuboids\n\nBy “materialize” a cuboid we mean to compute it in advance of a query, and maintain it if data changes\n\nMaterializing a cuboid will speed up queries\n\nHow many cuboids are in an n-dimensional data cube?\n\nIf there are no concept hierarchies, there are \\(T = 2^{n}\\) cuboids\n\nEvery n-digit binary number represents a cuboid\n\nIf each dimension has \\(L_{i}\\) levels, there are \\(T = \\prod_{i=1}^{n}(L_{i}+1)\\) cuboids\n\nIt may not be feasible or desirable to actually materialize every cuboid"
+    "text": "Efficient Data Cube Computation\n\nAs discussed, a data cube may be thought of as a lattice of cuboids\n\nQueries will often consist of drill-down or roll-up, ie, moving between cuboids\n\n\n\n\nBy materialize a cuboid we mean to compute it in advance of a query, and maintain it if data changes\n\nMaterializing a cuboid will speed up queries\n\n\n\n\n\nHow many cuboids are in an n-dimensional data cube?\n\nIf there are no concept hierarchies, there are \\(T = 2^{n}\\) cuboids\n\nEvery n-digit binary number represents a cuboid\n\nIf each dimension has \\(L_{i}\\) levels, there are \\(T = \\prod_{i=1}^{n}(L_{i}+1)\\) cuboids\n\n\n\n\n\n\nIt may not be feasible or desirable to actually materialize every cuboid"
   },
   {
     "objectID": "L18-OLAP2.html#counting-cuboids",
     "href": "L18-OLAP2.html#counting-cuboids",
     "title": "Data Warehousing and OLAP",
     "section": "Counting Cuboids",
-    "text": "Counting Cuboids\n\nIn any cuboid, a dimension may be present or absent, and if present, may be aggregated at any level\nIf the dimension is absent, we have summed over all values in that dimension\nExample:\n\nThree dimensions: Product, Location, Time\nThree levels to Product, four levels to Location, five levels to Time\n# Cuboids = (4 x 5 x 6) = 120"
+    "text": "Counting Cuboids\n\nIn any cuboid, a dimension may be present or absent\n\nand if present, may be aggregated at any level\n\nThe absence of a dimension corresponds to summing over all values in that dimension\n\n\n\nExample: a 3D cube with dimensions Product, Location, and Time:\n\nIf there are no levels (concept hierarchies), then there are 2 x 2 x 2 = \\(2^3\\) = 8 cuboids\nIf there are three levels to Product, four levels to Location, five levels to Time, then there are (3 + 1) x (4 + 1) x (5 + 1) = 4 x 5 x 6 = 120 cuboids"
   },
   {
     "objectID": "L18-OLAP2.html#materialization-strategies",
     "href": "L18-OLAP2.html#materialization-strategies",
     "title": "Data Warehousing and OLAP",
     "section": "Materialization Strategies",
-    "text": "Materialization Strategies\n\nMaterialize every cuboid (full materialization)\nDon’t materialize any cuboids (other than the base)\nPartial materialization of some cuboids\n\nSelection based on size, sharing, access frequency, etc\n\nCuboids are equivalent to the results of GROUP BY operations"
+    "text": "Materialization Strategies\nWhat options are there for materializing cuboids?\n\nMaterialize every cuboid (full materialization)\nDon’t materialize any cuboids (other than the base)\nPartial materialization of some cuboids\n\nSelection based on size, sharing, access frequency, etc\n\n\nCuboids are equivalent to the results of GROUP BY operations"
   },
   {
     "objectID": "L18-OLAP2.html#materializing-cuboids",
     "href": "L18-OLAP2.html#materializing-cuboids",
     "title": "Data Warehousing and OLAP",
     "section": "Materializing Cuboids",
-    "text": "Materializing Cuboids\n\n\n\nSome SQL implementations allow full materialization using CUBE BY\n\nSELECT item, city, year, SUM (amount)\nFROM SALES\nCUBE BY item, city, year\n\nNeed compute the following GROUP-Bys:\n\n(city, item, year),\n(city, item), (city, year), (item, year),\n(city), (item), (year)\n( )\n\nExample:\n\nSELECT city, item, SUM(amount)\nFROM SALES\nGROUP BY city, item"
+    "text": "Materializing Cuboids\n\n\n\nSome SQL implementations allow full materialization using CUBE BY\n\nSELECT item, city, year, SUM (amount)\nFROM SALES\nCUBE BY item, city, year\n\n\nThis needs to compute the following GROUP-BYs:\n\n(city, item, year),\n(city, item), (city, year), (item, year),\n(city), (item), (year)\n( )\n\n\n\n\n\nFor example, to materialize the (city, item) cuboid:\n\nSELECT city, item, SUM(amount)\nFROM SALES\nGROUP BY city, item"
   },
   {
     "objectID": "L18-OLAP2.html#storing-materialized-cuboids",

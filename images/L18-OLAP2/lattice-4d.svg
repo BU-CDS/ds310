@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2560 1180" role="img"
+     aria-label="Lattice of cuboids for a cube with dimensions time, item, location, and supplier. Ranks run from the 0-D apex down to the 4-D base cuboid.">
+  <style>
+    text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; fill: #1c1c1c; font-weight: 700; dominant-baseline: middle; }
+    .name { font-size: 44px; paint-order: stroke fill; stroke: #ffffff; stroke-width: 9px; }
+    .rank { font-size: 46px; }
+    .apex { font-weight: 700; }
+    .d1 { fill: #fc0000; }
+    .d2 { fill: #00b050; }
+    .d3 { fill: #0070c0; }
+  </style>
+  <!-- 0-D to 1-D -->
+  <line x1="920" y1="90" x2="280" y2="300" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="920" y1="90" x2="700" y2="300" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="920" y1="90" x2="1140" y2="300" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="920" y1="90" x2="1560" y2="300" stroke="#8d8880" stroke-width="2.6"/>
+  <!-- 1-D to 2-D -->
+  <line x1="280" y1="300" x2="160" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="280" y1="300" x2="460" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="280" y1="300" x2="760" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="700" y1="300" x2="160" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="700" y1="300" x2="1060" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="700" y1="300" x2="1360" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1140" y1="300" x2="460" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1140" y1="300" x2="1060" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1140" y1="300" x2="1660" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1560" y1="300" x2="760" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1560" y1="300" x2="1360" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1560" y1="300" x2="1660" y2="530" stroke="#8d8880" stroke-width="2.6"/>
+  <!-- 2-D to 3-D -->
+  <line x1="160" y1="530" x2="280" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="160" y1="530" x2="680" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="460" y1="530" x2="280" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="460" y1="530" x2="1160" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="760" y1="530" x2="680" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="760" y1="530" x2="1160" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1060" y1="530" x2="280" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1060" y1="530" x2="1560" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1360" y1="530" x2="680" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1360" y1="530" x2="1560" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1660" y1="530" x2="1160" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1660" y1="530" x2="1560" y2="790" stroke="#8d8880" stroke-width="2.6"/>
+  <!-- 3-D to 4-D -->
+  <line x1="280" y1="790" x2="920" y2="1040" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="680" y1="790" x2="920" y2="1040" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1160" y1="790" x2="920" y2="1040" stroke="#8d8880" stroke-width="2.6"/>
+  <line x1="1560" y1="790" x2="920" y2="1040" stroke="#8d8880" stroke-width="2.6"/>
+  <!-- nodes -->
+  <circle cx="920" cy="90" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="280" cy="300" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="700" cy="300" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1140" cy="300" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1560" cy="300" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="160" cy="530" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="460" cy="530" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="760" cy="530" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1060" cy="530" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1360" cy="530" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1660" cy="530" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="280" cy="790" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="680" cy="790" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1160" cy="790" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="1560" cy="790" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <circle cx="920" cy="1040" r="18" fill="#e7f4ee" stroke="#3e8f68" stroke-width="2.8"/>
+  <!-- names -->
+  <text class="name apex" x="920" y="32" text-anchor="middle">all (apex)</text>
+  <text class="name d1" x="250" y="300" text-anchor="end">time</text>
+  <text class="name d1" x="700" y="252" text-anchor="middle">item</text>
+  <text class="name d1" x="1140" y="252" text-anchor="middle">location</text>
+  <text class="name d1" x="1590" y="300" text-anchor="start">supplier</text>
+  <text class="name d2" x="160" y="582" text-anchor="middle">time, item</text>
+  <text class="name d2" x="460" y="482" text-anchor="middle">time, location</text>
+  <text class="name d2" x="760" y="582" text-anchor="middle">time, supplier</text>
+  <text class="name d2" x="1060" y="482" text-anchor="middle">item, location</text>
+  <text class="name d2" x="1360" y="582" text-anchor="middle">item, supplier</text>
+  <text class="name d2" x="1690" y="530" text-anchor="start">location, supplier</text>
+  <text class="name d3" x="280" y="848" text-anchor="middle">time, item,</text>
+  <text class="name d3" x="280" y="892" text-anchor="middle">location</text>
+  <text class="name d3" x="680" y="848" text-anchor="middle">time, item,</text>
+  <text class="name d3" x="680" y="892" text-anchor="middle">supplier</text>
+  <text class="name d3" x="1160" y="848" text-anchor="middle">time, location,</text>
+  <text class="name d3" x="1160" y="892" text-anchor="middle">supplier</text>
+  <text class="name d3" x="1560" y="848" text-anchor="middle">item, location,</text>
+  <text class="name d3" x="1560" y="892" text-anchor="middle">supplier</text>
+  <text class="name apex" x="920" y="1118" text-anchor="middle">time, item, location, supplier (base)</text>
+  <!-- ranks -->
+  <text class="rank" x="2100" y="90">0-D (apex) cuboid</text>
+  <text class="rank d1" x="2100" y="300">1-D cuboids</text>
+  <text class="rank d2" x="2100" y="530">2-D cuboids</text>
+  <text class="rank d3" x="2100" y="790">3-D cuboids</text>
+  <text class="rank" x="2100" y="1040">4-D (base) cuboid</text>
+</svg>

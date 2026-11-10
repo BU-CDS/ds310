@@ -323,7 +323,7 @@ Data Science 310
 <section id="the-lattice-of-cuboids-of-a-4d-cube" class="slide level2">
 <h2>The Lattice of Cuboids of a 4D Cube</h2>
 
-<img data-src="images/L18-OLAP2/lattice-4d.png" class="quarto-figure quarto-figure-center r-stretch" style="width:82.0%"></section>
+<img data-src="images/L18-OLAP2/lattice-4d.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:82.0%"></section>
 <section id="concept-hierarchies" class="slide level2">
 <h2>Concept Hierarchies</h2>
 <ul>
@@ -422,37 +422,57 @@ Data Science 310
 <ul>
 <li>Queries will often consist of drill-down or roll-up, ie, moving between cuboids</li>
 </ul></li>
-<li>By “materialize” a cuboid we mean to compute it in advance of a query, and maintain it if data changes
+</ul>
+<div class="fragment">
+<ul>
+<li>By <span style="color:#a00;"><strong>materialize</strong></span> a cuboid we mean to compute it in <strong>advance of a query,</strong> and maintain it if data changes
 <ul>
 <li>Materializing a cuboid will speed up queries</li>
 </ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
 <li>How many cuboids are in an <em>n</em>-dimensional data cube?
 <ul>
 <li>If there are no concept hierarchies, there are <span class="math inline">\(T = 2^{n}\)</span> cuboids
 <ul>
 <li>Every <em>n</em>-digit binary number represents a cuboid</li>
 </ul></li>
-<li>If each dimension has <span class="math inline">\(L_{i}\)</span> levels, there are <span class="math inline">\(T = \prod_{i=1}^{n}(L_{i}+1)\)</span> cuboids</li>
+<li>If each dimension has <span class="math inline">\(L_{i}\)</span> levels, there are <span class="math inline">\(T = \prod_{i=1}^{n}(L_{i}+1)\)</span> cuboids<br>
+</li>
 </ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
 <li>It may not be feasible or desirable to actually materialize every cuboid</li>
 </ul>
+</div>
 </section>
 <section id="counting-cuboids" class="slide level2">
 <h2>Counting Cuboids</h2>
 <ul>
-<li>In any cuboid, a dimension may be present or absent, and if present, may be aggregated at any level</li>
-<li>If the dimension is absent, we have summed over all values in that dimension</li>
-<li>Example:
+<li>In any cuboid, a dimension may be <em>present</em> or <em>absent</em>
 <ul>
-<li>Three dimensions: Product, Location, Time</li>
-<li>Three levels to Product, four levels to Location, five levels to Time</li>
-<li># Cuboids = (4 x 5 x 6) = 120</li>
+<li>and if present, may be aggregated at any level</li>
+</ul></li>
+<li>The absence of a dimension corresponds to summing over all values in that dimension</li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Example: a 3D cube with dimensions <em>Product</em>, <em>Location</em>, and <em>Time</em>:
+<ul>
+<li>If there are no levels (concept hierarchies), then there are 2 x 2 x 2 = <span class="math inline">\(2^3\)</span> = 8 cuboids</li>
+<li>If there are three levels to Product, four levels to Location, five levels to Time, then there are (3 + 1) x (4 + 1) x (5 + 1) = 4 x 5 x 6 = 120 cuboids</li>
 </ul></li>
 </ul>
+</div>
 
 <img data-src="images/L18-OLAP2/counting-cuboids.png" class="quarto-figure quarto-figure-center r-stretch" style="width:72.0%"></section>
 <section id="materialization-strategies" class="slide level2">
 <h2>Materialization Strategies</h2>
+<p>What options are there for materializing cuboids?</p>
 <ul>
 <li>Materialize every cuboid (full materialization)</li>
 <li>Don’t materialize any cuboids (other than the base)</li>
@@ -460,10 +480,10 @@ Data Science 310
 <ul>
 <li>Selection based on size, sharing, access frequency, etc</li>
 </ul></li>
-<li>Cuboids are equivalent to the results of GROUP BY operations</li>
 </ul>
+<p>Cuboids are equivalent to the results of <span style="color:#a00;"><strong>GROUP BY</strong></span> operations</p>
 
-<img data-src="images/L18-OLAP2/materialize-lattice.png" class="quarto-figure quarto-figure-center r-stretch" style="width:88.0%"></section>
+<img data-src="images/L18-OLAP2/lattice-4d.svg" class="quarto-figure quarto-figure-center r-stretch" style="width:88.0%"></section>
 <section id="materializing-cuboids" class="slide level2">
 <h2>Materializing Cuboids</h2>
 <div class="columns">
@@ -474,19 +494,25 @@ Data Science 310
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb1-1"><a aria-label="1"></a><span class="kw">SELECT</span> item, city, <span class="dt">year</span>, <span class="fu">SUM</span> (amount)</span>
 <span id="cb1-2"><a aria-label="2"></a><span class="kw">FROM</span> SALES</span>
 <span id="cb1-3"><a aria-label="3"></a><span class="kw">CUBE</span> <span class="kw">BY</span> item, city, <span class="dt">year</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="fragment">
 <ul>
-<li>Need compute the following GROUP-Bys:
+<li>This needs to compute the following GROUP-BYs:
 <ul>
 <li><span style="color:#a00;"><em>(city, item, year),</em></span></li>
 <li><span style="color:#a00;"><em>(city, item), (city, year), (item, year),</em></span></li>
 <li><span style="color:#a00;"><em>(city), (item), (year)</em></span></li>
 <li><span style="color:#a00;"><em>( )</em></span></li>
 </ul></li>
-<li>Example:</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>For example, to materialize the (city, item) cuboid:</li>
 </ul>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode numberSource sql number-lines code-with-copy"><code class="sourceCode sql"><span id="cb2-1"><a aria-label="1"></a><span class="kw">SELECT</span> city, item, <span class="fu">SUM</span>(amount)</span>
 <span id="cb2-2"><a aria-label="2"></a><span class="kw">FROM</span> SALES</span>
 <span id="cb2-3"><a aria-label="3"></a><span class="kw">GROUP</span> <span class="kw">BY</span> city, item</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </div><div class="column" style="width:45%;">
 <p><img data-src="images/L18-OLAP2/cubeby-lattice.png" style="width:100.0%"></p>
 </div></div>
