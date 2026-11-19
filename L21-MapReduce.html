@@ -101,7 +101,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-3c7d767b6398421b8ad970e764dec8dd.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-63fe159887f05859cebe3e3fcaf3662e.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -219,6 +219,8 @@ Data Science 310
 </section>
 <section id="mapreduce" class="slide level2">
 <h2>MapReduce</h2>
+<div class="columns">
+<div class="column" style="width:46%;">
 <p>A framework for computation on large data sets that are fragmented and replicated across a cluster of machines.</p>
 <div class="fragment sub">
 <ul>
@@ -238,9 +240,14 @@ Data Science 310
 <li>An open-source version is part of the Hadoop project (used in HW).</li>
 </ul>
 </div>
+</div><div class="column" style="width:54%;">
+<p><img data-src="images/L21-MapReduce/cluster.svg" style="width:100.0%" alt="Three machines, each with a CPU and a locally attached disk, cabled to a shared high-bandwidth interconnect."></p>
+</div></div>
 </section>
-<section id="sample-problem-totalling-customer-orders" class="slide level2">
+<section id="sample-orders" class="slide level2">
 <h2>Sample Problem: Totalling Customer Orders</h2>
+<div class="columns">
+<div class="column" style="width:54%;">
 <ul>
 <li>Acme Widgets is a company that sells only one type of product.</li>
 </ul>
@@ -258,21 +265,31 @@ Data Science 310
 </ul>
 </div>
 <div class="r-stack">
-<p><img data-src="images/L21-MapReduce/rec-1.png" class="fragment" style="width:88.0%" data-fragment-index="2"></p>
-<p><img data-src="images/L21-MapReduce/rec-2.png" class="fragment" style="width:88.0%" data-fragment-index="3"></p>
-<p><img data-src="images/L21-MapReduce/rec-3.png" class="fragment" style="width:88.0%" data-fragment-index="4"></p>
-<p><img data-src="images/L21-MapReduce/rec-4.png" class="fragment" style="width:88.0%" data-fragment-index="5"></p>
+<p><img data-src="images/L21-MapReduce/rec-1.png" class="fragment" style="width:100.0%" data-fragment-index="2"></p>
+<p><img data-src="images/L21-MapReduce/rec-2.png" class="fragment" style="width:100.0%" data-fragment-index="3"></p>
+<p><img data-src="images/L21-MapReduce/rec-3.png" class="fragment" style="width:100.0%" data-fragment-index="4"></p>
+<p><img data-src="images/L21-MapReduce/rec-4.png" class="fragment" style="width:100.0%" data-fragment-index="5"></p>
 </div>
 <div class="fragment" data-fragment-index="6">
 <ul>
 <li><em>Desired computation:</em> For each customer, compute the total amount in that customer’s active orders.</li>
 </ul>
 </div>
-<div class="fragment" data-fragment-index="7">
-<ul>
-<li>Inefficient approach: Ship all of the data to one machine and compute the totals there.</li>
-</ul>
-</div>
+</div><div class="column" style="width:46%;">
+<p><img data-src="images/L21-MapReduce/cluster-tuples.svg" style="width:100.0%" alt="Three machines on a high-bandwidth interconnect. Each local disk stores two order records."></p>
+</div></div>
+</section>
+<section id="inefficiently" class="slide level2">
+<h2>Sample Problem: Totalling Customer Orders (<span style="color:#a00;">Inefficiently</span>)</h2>
+<div class="columns">
+<div class="column" style="width:38%;">
+<p>Inefficient approach: Ship all of the data to one machine and compute the totals there.</p>
+<button type="button" class="ship-reset">
+Reset
+</button>
+</div><div class="column" style="width:62%;">
+<p><img data-src="images/L21-MapReduce/cluster-ship.svg" class="ship-anim" style="width:100.0%" alt="All six order records move from their local disks to the top machine."></p>
+</div></div>
 </section>
 <section id="sample-problem-totalling-customer-orders-cont." class="slide level2">
 <h2>Sample Problem: Totalling Customer Orders (cont.)</h2>
@@ -309,6 +326,183 @@ Data Science 310
 <p><img data-src="images/L21-MapReduce/shuffle-2.png" class="fragment" style="width:92.0%" data-fragment-index="8"></p>
 <p><img data-src="images/L21-MapReduce/shuffle-3.png" class="fragment" style="width:92.0%" data-fragment-index="9"></p>
 </div>
+</section>
+<section id="mr-steps" class="slide level2">
+<h2>Map, Distribute, Reduce</h2>
+<div class="columns">
+<div class="column" style="width:38%;">
+<ul class="mr-steps">
+<li data-phase="1">
+<strong>Map</strong> each record to (cust_id, amount active)
+</li>
+<li data-phase="2">
+<strong>Distribute</strong> the pairs by cust_id
+</li>
+<li data-phase="3">
+<strong>Reduce</strong> to one total per customer
+</li>
+</ul>
+<button type="button" class="mr-step">
+Step
+</button>
+</div><div class="column" style="width:62%;">
+<svg xmlns="http://www.w3.org/2000/svg" class="step-fig" viewbox="0 0 1160 740" role="img" aria-label="Cluster of three machines. Step through mapping each order to a customer-amount pair, distributing the pairs by customer, and reducing each customer to one total.">
+  <defs>
+    <lineargradient id="steps-fabric" gradientunits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="740">
+      <stop offset="0" stop-color="#1f618a"></stop>
+      <stop offset="0.55" stop-color="#174866"></stop>
+      <stop offset="1" stop-color="#102838"></stop>
+    </lineargradient>
+    <lineargradient id="steps-chassis" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfcfe"></stop>
+      <stop offset="1" stop-color="#e4ebf2"></stop>
+    </lineargradient>
+    <lineargradient id="steps-bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#31485c"></stop>
+      <stop offset="1" stop-color="#1a2c3b"></stop>
+    </lineargradient>
+    <lineargradient id="steps-chip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a6aab"></stop>
+      <stop offset="1" stop-color="#163e6b"></stop>
+    </lineargradient>
+    <lineargradient id="steps-cylBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f7fafc"></stop>
+      <stop offset="0.18" stop-color="#d5e1ea"></stop>
+      <stop offset="0.55" stop-color="#b7c8d4"></stop>
+      <stop offset="0.82" stop-color="#8ea4b4"></stop>
+      <stop offset="1" stop-color="#c5d4de"></stop>
+    </lineargradient>
+    <lineargradient id="steps-cylTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"></stop>
+      <stop offset="1" stop-color="#d4e2ec"></stop>
+    </lineargradient>
+    <filter id="steps-shadow" x="-20%" y="-16%" width="150%" height="150%">
+      <fedropshadow dx="0" dy="5" stddeviation="5" flood-color="#1a3044" flood-opacity="0.16"></fedropshadow>
+    </filter>
+    <style>
+      text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+      .tup {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 30px;
+        fill: #1c1c1c;
+      }
+      .full, .pair, .total { transition: opacity 0.4s ease; }
+      .pair, .total { opacity: 0; }
+      .phase-map .full, .phase-dist .full { opacity: 0; }
+      .phase-map .pair, .phase-dist .pair { opacity: 1; }
+      .phase-red .full, .phase-red .pair { opacity: 0; }
+      .phase-red .total { opacity: 1; }
+      .phase-reset .full, .phase-reset .pair, .phase-reset .total { transition: none; }
+      .id { fill: #2457c5; font-weight: 650; }
+      .on { fill: #178a17; font-weight: 650; }
+      .off { fill: #c0392b; font-weight: 650; }
+    </style>
+    <symbol id="steps-node" viewbox="0 0 280 220" overflow="visible">
+      <rect x="-7" y="96" width="16" height="28" rx="4" fill="#143044"></rect>
+      <g>
+        <rect width="280" height="220" rx="16" fill="url(#steps-chassis)"></rect>
+        <path d="M16 0 H264 Q280 0 280 16 V36 H0 V16 Q0 0 16 0 Z" fill="url(#steps-bezel)"></path>
+        <text x="14" y="19" fill="#ffffff" font-size="20" font-weight="600" dominant-baseline="middle">machine</text>
+        <g fill="#e6c98a" stroke="#c4a15a" stroke-width="0.6">
+          <rect x="36" y="46" width="7" height="10"></rect>
+          <rect x="54" y="46" width="7" height="10"></rect>
+          <rect x="72" y="46" width="7" height="10"></rect>
+          <rect x="90" y="46" width="7" height="10"></rect>
+          <rect x="36" y="128" width="7" height="10"></rect>
+          <rect x="54" y="128" width="7" height="10"></rect>
+          <rect x="72" y="128" width="7" height="10"></rect>
+          <rect x="90" y="128" width="7" height="10"></rect>
+          <rect x="16" y="66" width="10" height="7"></rect>
+          <rect x="16" y="84" width="10" height="7"></rect>
+          <rect x="16" y="102" width="10" height="7"></rect>
+          <rect x="16" y="120" width="10" height="7"></rect>
+          <rect x="108" y="66" width="10" height="7"></rect>
+          <rect x="108" y="84" width="10" height="7"></rect>
+          <rect x="108" y="102" width="10" height="7"></rect>
+          <rect x="108" y="120" width="10" height="7"></rect>
+        </g>
+        <rect x="24" y="54" width="86" height="76" rx="7" fill="url(#steps-chip)"></rect>
+        <circle cx="34" cy="64" r="3.5" fill="#e6c98a"></circle>
+        <rect x="42" y="70" width="50" height="44" rx="4" fill="#0c2744"></rect>
+        <g fill="#3d92f0">
+          <rect x="48" y="76" width="16" height="14" rx="2"></rect>
+          <rect x="70" y="76" width="16" height="14" rx="2"></rect>
+          <rect x="48" y="94" width="16" height="14" rx="2"></rect>
+          <rect x="70" y="94" width="16" height="14" rx="2"></rect>
+        </g>
+        <text x="67" y="198" text-anchor="middle" fill="#1c3144" font-size="20" font-weight="600">CPU</text>
+        <ellipse cx="198" cy="136" rx="46" ry="14" fill="url(#steps-cylBody)"></ellipse>
+        <rect x="152" y="78" width="92" height="58" fill="url(#steps-cylBody)"></rect>
+        <line x1="152" y1="78" x2="152" y2="136" stroke="#6e8798" stroke-width="1.5"></line>
+        <line x1="244" y1="78" x2="244" y2="136" stroke="#6e8798" stroke-width="1.5"></line>
+        <path d="M152 136 A46 14 0 0 0 244 136" fill="none" stroke="#6e8798" stroke-width="1.5"></path>
+        <ellipse cx="198" cy="78" rx="46" ry="14" fill="url(#steps-cylTop)" stroke="#6e8798" stroke-width="1.5"></ellipse>
+        <ellipse cx="182" cy="74" rx="16" ry="5" fill="#ffffff" opacity="0.55"></ellipse>
+        <text x="198" y="198" text-anchor="middle" fill="#1c3144" font-size="20" font-weight="600">local disk</text>
+      </g>
+    </symbol>
+  </defs>
+  <text x="28" y="370" fill="#16324a" font-size="26" font-weight="600" text-anchor="middle" dominant-baseline="middle" transform="rotate(-90 28 370)">high-bandwidth interconnect</text>
+  <rect x="62" y="18" width="22" height="696" rx="11" fill="url(#steps-fabric)"></rect>
+  <rect x="69" y="34" width="8" height="664" rx="4" fill="#7eebf5" opacity="0.9"></rect>
+  <g stroke-linecap="round" fill="none">
+    <path d="M84 128 H108" stroke="#49d6ea" stroke-width="16" opacity="0.18"></path>
+    <path d="M84 128 H108" stroke="#123044" stroke-width="10"></path>
+    <path d="M84 128 H108" stroke="#49d6ea" stroke-width="4"></path>
+    <path d="M84 366 H108" stroke="#49d6ea" stroke-width="16" opacity="0.18"></path>
+    <path d="M84 366 H108" stroke="#123044" stroke-width="10"></path>
+    <path d="M84 366 H108" stroke="#49d6ea" stroke-width="4"></path>
+    <path d="M84 604 H108" stroke="#49d6ea" stroke-width="16" opacity="0.18"></path>
+    <path d="M84 604 H108" stroke="#123044" stroke-width="10"></path>
+    <path d="M84 604 H108" stroke="#49d6ea" stroke-width="4"></path>
+  </g>
+  <g fill="#49d6ea">
+    <circle cx="84" cy="128" r="6"></circle>
+    <circle cx="84" cy="366" r="6"></circle>
+    <circle cx="84" cy="604" r="6"></circle>
+  </g>
+  <g filter="url(#steps-shadow)">
+    <use href="#steps-node" x="116" y="18" width="280" height="220"></use>
+    <use href="#steps-node" x="116" y="256" width="280" height="220"></use>
+    <use href="#steps-node" x="116" y="494" width="280" height="220"></use>
+  </g>
+  <g fill="#d7f4fb" font-size="20" font-weight="700" dominant-baseline="middle">
+    <text x="214" y="37">1</text>
+    <text x="214" y="275">2</text>
+    <text x="214" y="513">3</text>
+  </g>
+  <!-- full records, the mapped pairs, and the final totals -->
+  <g class="tup">
+    <g class="rec" data-dy-dist="-16" data-dy-red="24">
+      <text class="full" x="420" y="104"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, 500, '03/22/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="104"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="on">500</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="180" data-dy-red="220">
+      <text class="full" x="420" y="144"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, 50, '02/10/17', </tspan><tspan class="off">'done'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="144"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="off">0</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-214" data-dy-red="-214">
+      <text class="full" x="420" y="342"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, 150, '03/23/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="342"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="on">150</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-18" data-dy-red="-18">
+      <text class="full" x="420" y="382"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, 75, '03/28/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="382"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="on">75</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-412" data-dy-red="-452">
+      <text class="full" x="420" y="580"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, 80, '04/02/17', </tspan><tspan class="off">'done'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="580"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="off">0</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-216" data-dy-red="-256">
+      <text class="full" x="420" y="620"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, 220, '04/11/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="620"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="on">220</tspan><tspan>)</tspan></text>
+    </g>
+    <text class="total" x="420" y="128"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="on">650</tspan><tspan>)</tspan></text>
+    <text class="total" x="420" y="364"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="on">295</tspan><tspan>)</tspan></text>
+  </g>
+</svg>
+
+</div></div>
 </section>
 <section id="benefits-of-mapreduce" class="slide level2">
 <h2>Benefits of MapReduce</h2>
@@ -772,6 +966,128 @@ Data Science 310
 <span id="cb10-23"><a aria-label="23"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
 <span id="cb10-24"><a aria-label="24"></a>    Lecture_Ex_2.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
+<script>
+window.addEventListener("load", function () {
+  var deck = window.Reveal;
+  if (!deck) return;
+  function replay(slide) {
+    if (!slide) return;
+    var img = slide.querySelector("img.ship-anim");
+    if (!img) return;
+    var base = (img.getAttribute("data-src") || img.getAttribute("src") || "").split("?")[0];
+    if (!base) return;
+    img.removeAttribute("data-src");
+    img.setAttribute("src", base + "?t=" + Date.now());
+  }
+  function show(slide) {
+    replay(slide);
+    setupMrSteps(slide);
+  }
+  deck.on("ready", function (e) { show(e.currentSlide); });
+  deck.on("slidechanged", function (e) { show(e.currentSlide); });
+  if (deck.isReady && deck.isReady()) show(deck.getCurrentSlide());
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest(".ship-reset");
+    if (btn) {
+      e.preventDefault();
+      e.stopPropagation();
+      replay(btn.closest("section"));
+      return;
+    }
+    var step = e.target.closest && e.target.closest(".mr-step");
+    if (!step) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (step._advance) step._advance();
+  }, true);
+  function animateTranslate(g, toDy, dur) {
+    var fromDy = parseFloat(g.getAttribute("data-dy") || "0");
+    var start = performance.now();
+    return new Promise(function (resolve) {
+      function frame(now) {
+        var t = Math.min(1, (now - start) / dur);
+        var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        var y = fromDy + (toDy - fromDy) * e;
+        g.setAttribute("transform", "translate(0 " + y + ")");
+        if (t < 1) requestAnimationFrame(frame);
+        else {
+          g.setAttribute("data-dy", String(toDy));
+          g.setAttribute("transform", "translate(0 " + toDy + ")");
+          resolve();
+        }
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+  function setupMrSteps(slide) {
+    if (!slide || slide.id !== "mr-steps" || slide.dataset.stepsReady) return;
+    var svg = slide.querySelector("svg.step-fig");
+    var btn = slide.querySelector(".mr-step");
+    if (!svg || !btn) return;
+    slide.dataset.stepsReady = "1";
+    var phase = 0;
+    var busy = false;
+    var items = slide.querySelectorAll(".mr-steps li");
+    function highlight(n) {
+      items.forEach(function (li) {
+        li.classList.toggle("is-current", li.getAttribute("data-phase") === String(n));
+      });
+    }
+    function apply(next) {
+      highlight(next);
+      function move(attr) {
+        var jobs = [];
+        svg.querySelectorAll(".rec").forEach(function (g) {
+          jobs.push(animateTranslate(g, parseFloat(g.getAttribute(attr)), 900));
+        });
+        return Promise.all(jobs);
+      }
+      function wait(ms) {
+        return new Promise(function (resolve) { setTimeout(resolve, ms); });
+      }
+      if (next === 0) {
+        svg.classList.add("phase-reset");
+        svg.classList.remove("phase-map", "phase-dist", "phase-red");
+        svg.querySelectorAll(".rec").forEach(function (g) {
+          g.setAttribute("data-dy", "0");
+          g.setAttribute("transform", "translate(0 0)");
+        });
+        requestAnimationFrame(function () { svg.classList.remove("phase-reset"); });
+        btn.textContent = "Step";
+        return Promise.resolve();
+      }
+      if (next === 1) {
+        svg.classList.remove("phase-dist", "phase-red");
+        svg.classList.add("phase-map");
+        btn.textContent = "Step";
+        return wait(450);
+      }
+      if (next === 2) {
+        svg.classList.remove("phase-map", "phase-red");
+        svg.classList.add("phase-dist");
+        btn.textContent = "Step";
+        return move("data-dy-dist");
+      }
+      svg.classList.add("phase-dist");
+      btn.textContent = "Reset";
+      return move("data-dy-red").then(function () {
+        svg.classList.remove("phase-dist");
+        svg.classList.add("phase-red");
+        return wait(450);
+      });
+    }
+    btn._advance = function () {
+      if (busy) return;
+      var next = (phase + 1) % 4;
+      busy = true;
+      apply(next).then(function () {
+        phase = next;
+        busy = false;
+      });
+    };
+  }
+});
+</script>
 
 
 </section>

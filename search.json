@@ -4484,14 +4484,21 @@
     "href": "L21-MapReduce.html#mapreduce",
     "title": "Processing Distributed Data",
     "section": "MapReduce",
-    "text": "MapReduce\nA framework for computation on large data sets that are fragmented and replicated across a cluster of machines.\n\n\nspreads the computation across the machines, letting them work in parallel\n\n\n\n\ntries to minimize the amount of data that is transferred between machines\n\n\n\nThe original version was Google’s MapReduce system.\n\n\n\nAn open-source version is part of the Hadoop project (used in HW)."
+    "text": "MapReduce\n\n\nA framework for computation on large data sets that are fragmented and replicated across a cluster of machines.\n\n\nspreads the computation across the machines, letting them work in parallel\n\n\n\n\ntries to minimize the amount of data that is transferred between machines\n\n\n\nThe original version was Google’s MapReduce system.\n\n\n\nAn open-source version is part of the Hadoop project (used in HW)."
   },
   {
-    "objectID": "L21-MapReduce.html#sample-problem-totalling-customer-orders",
-    "href": "L21-MapReduce.html#sample-problem-totalling-customer-orders",
+    "objectID": "L21-MapReduce.html#sample-orders",
+    "href": "L21-MapReduce.html#sample-orders",
     "title": "Processing Distributed Data",
     "section": "Sample Problem: Totalling Customer Orders",
-    "text": "Sample Problem: Totalling Customer Orders\n\nAcme Widgets is a company that sells only one type of product.\n\n\n\nData set: a large collection of records about customer orders\n\nfragmented and replicated across a cluster of machines\n\n\n\n\n\nsample record:\n\n\n\n\n\n\n\n\n\n\nDesired computation: For each customer, compute the total amount in that customer’s active orders.\n\n\n\n\nInefficient approach: Ship all of the data to one machine and compute the totals there."
+    "text": "Sample Problem: Totalling Customer Orders\n\n\n\nAcme Widgets is a company that sells only one type of product.\n\n\n\nData set: a large collection of records about customer orders\n\nfragmented and replicated across a cluster of machines\n\n\n\n\n\nsample record:\n\n\n\n\n\n\n\n\n\n\nDesired computation: For each customer, compute the total amount in that customer’s active orders."
+  },
+  {
+    "objectID": "L21-MapReduce.html#inefficiently",
+    "href": "L21-MapReduce.html#inefficiently",
+    "title": "Processing Distributed Data",
+    "section": "Sample Problem: Totalling Customer Orders (Inefficiently)",
+    "text": "Sample Problem: Totalling Customer Orders (Inefficiently)\n\n\nInefficient approach: Ship all of the data to one machine and compute the totals there.\n\nReset"
   },
   {
     "objectID": "L21-MapReduce.html#sample-problem-totalling-customer-orders-cont.",
@@ -4499,6 +4506,13 @@
     "title": "Processing Distributed Data",
     "section": "Sample Problem: Totalling Customer Orders (cont.)",
     "text": "Sample Problem: Totalling Customer Orders (cont.)\n\nMapReduce does better using “divide-and-conquer” approach.\n\nsplits the collection of records into subcollections that are processed in parallel\n\n\n\n\nFor each subcollection, a mapper task maps the records to smaller key-value pairs – in this case, (cust_id, amount active).\n\n\n\n\n\n\n\n\n\n\n\nThese smaller pairs are distributed by cust_id to other tasks that again work in parallel.\n\n\n\n\nThese reducer tasks combine the pairs for a given cust_id to compute the per-customer totals:"
+  },
+  {
+    "objectID": "L21-MapReduce.html#mr-steps",
+    "href": "L21-MapReduce.html#mr-steps",
+    "title": "Processing Distributed Data",
+    "section": "Map, Distribute, Reduce",
+    "text": "Map, Distribute, Reduce\n\n\n\n\nMap each record to (cust_id, amount active)\n\n\nDistribute the pairs by cust_id\n\n\nReduce to one total per customer\n\n\n\nStep\n\n\n\n  \n    \n      \n      \n      \n    \n    \n      \n      \n    \n    \n      \n      \n    \n    \n      \n      \n    \n    \n      \n      \n      \n      \n      \n    \n    \n      \n      \n    \n    \n      \n    \n    \n    \n      \n      \n        \n        \n        machine\n        \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n          \n        \n        \n        \n        \n        \n          \n          \n          \n          \n        \n        CPU\n        \n        \n        \n        \n        \n        \n        \n        local disk\n      \n    \n  \n  high-bandwidth interconnect\n  \n  \n  \n    \n    \n    \n    \n    \n    \n    \n    \n    \n  \n  \n    \n    \n    \n  \n  \n    \n    \n    \n  \n  \n    1\n    2\n    3\n  \n  \n  \n    \n      ('U123', 500, '03/22/17', 'active')\n      ('U123', 500)\n    \n    \n      ('U456', 50, '02/10/17', 'done')\n      ('U456', 0)\n    \n    \n      ('U123', 150, '03/23/17', 'active')\n      ('U123', 150)\n    \n    \n      ('U456', 75, '03/28/17', 'active')\n      ('U456', 75)\n    \n    \n      ('U123', 80, '04/02/17', 'done')\n      ('U123', 0)\n    \n    \n      ('U456', 220, '04/11/17', 'active')\n      ('U456', 220)\n    \n    ('U123', 650)\n    ('U456', 295)"
   },
   {
     "objectID": "L21-MapReduce.html#benefits-of-mapreduce",
