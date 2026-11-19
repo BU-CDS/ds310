@@ -15,10 +15,15 @@ format:
     code-overflow: wrap
     code-block-height: 780px
     chalkboard: true
+    filters:
+      - filters/raw-svg.lua
 ---
 
-## MapReduce
+## MapReduce {#mapreduce}
 
+:::: {.columns}
+
+::: {.column width="46%"}
 A framework for computation on large data sets that are fragmented and replicated across a cluster of machines.
 
 ::: {.fragment .sub}
@@ -36,9 +41,19 @@ The original version was Google's MapReduce system.
 ::: {.fragment .sub}
 - An open-source version is part of the Hadoop project (used in HW).
 :::
+:::
 
-## Sample Problem: Totalling Customer Orders
+::: {.column width="54%"}
+![](images/L21-MapReduce/cluster.svg){fig-alt="Three machines, each with a CPU and a locally attached disk, cabled to a shared high-bandwidth interconnect." width="100%"}
+:::
 
+::::
+
+## Sample Problem: Totalling Customer Orders {#sample-orders}
+
+:::: {.columns}
+
+::: {.column width="54%"}
 - Acme Widgets is a company that sells only one type of product.
 
 ::: {.fragment fragment-index=1}
@@ -51,22 +66,44 @@ The original version was Google's MapReduce system.
 :::
 
 ::: {.r-stack}
-![](images/L21-MapReduce/rec-1.png){.fragment fragment-index=2 width="88%"}
+![](images/L21-MapReduce/rec-1.png){.fragment fragment-index=2 width="100%"}
 
-![](images/L21-MapReduce/rec-2.png){.fragment fragment-index=3 width="88%"}
+![](images/L21-MapReduce/rec-2.png){.fragment fragment-index=3 width="100%"}
 
-![](images/L21-MapReduce/rec-3.png){.fragment fragment-index=4 width="88%"}
+![](images/L21-MapReduce/rec-3.png){.fragment fragment-index=4 width="100%"}
 
-![](images/L21-MapReduce/rec-4.png){.fragment fragment-index=5 width="88%"}
+![](images/L21-MapReduce/rec-4.png){.fragment fragment-index=5 width="100%"}
 :::
 
 ::: {.fragment fragment-index=6}
 - *Desired computation:* For each customer, compute the total amount in that customer's active orders.
 :::
 
-::: {.fragment fragment-index=7}
-- Inefficient approach: Ship all of the data to one machine and compute the totals there.
 :::
+
+::: {.column width="46%"}
+![](images/L21-MapReduce/cluster-tuples.svg){fig-alt="Three machines on a high-bandwidth interconnect. Each local disk stores two order records." width="100%"}
+:::
+
+::::
+
+## Sample Problem: Totalling Customer Orders ([Inefficiently]{style="color:#a00;"}) {#inefficiently}
+
+:::: {.columns}
+
+::: {.column width="38%"}
+Inefficient approach: Ship all of the data to one machine and compute the totals there.
+
+<button type="button" class="ship-reset">Reset</button>
+:::
+
+::: {.column width="62%"}
+![](images/L21-MapReduce/cluster-ship.svg){.ship-anim fig-alt="All six order records move from their local disks to the top machine." width="100%"}
+:::
+
+::::
+
+
 
 ## Sample Problem: Totalling Customer Orders (cont.)
 
@@ -104,6 +141,28 @@ The original version was Google's MapReduce system.
 
 ![](images/L21-MapReduce/shuffle-3.png){.fragment fragment-index=9 width="92%"}
 :::
+
+## Map, Distribute, Reduce {#mr-steps}
+
+:::: {.columns}
+
+::: {.column width="38%"}
+<ul class="mr-steps">
+<li data-phase="1"><strong>Map</strong> each record to (cust_id, amount active)</li>
+<li data-phase="2"><strong>Distribute</strong> the pairs by cust_id</li>
+<li data-phase="3"><strong>Reduce</strong> to one total per customer</li>
+</ul>
+
+<button type="button" class="mr-step">Step</button>
+:::
+
+::: {.column width="62%"}
+```{.raw-svg}
+images/L21-MapReduce/cluster-steps.svg
+```
+:::
+
+::::
 
 ## Benefits of MapReduce
 
@@ -509,3 +568,128 @@ if __name__ == '__main__':
     Lecture_Ex_2.run()
 ```
 :::
+
+```{=html}
+<script>
+window.addEventListener("load", function () {
+  var deck = window.Reveal;
+  if (!deck) return;
+  function replay(slide) {
+    if (!slide) return;
+    var img = slide.querySelector("img.ship-anim");
+    if (!img) return;
+    var base = (img.getAttribute("data-src") || img.getAttribute("src") || "").split("?")[0];
+    if (!base) return;
+    img.removeAttribute("data-src");
+    img.setAttribute("src", base + "?t=" + Date.now());
+  }
+  function show(slide) {
+    replay(slide);
+    setupMrSteps(slide);
+  }
+  deck.on("ready", function (e) { show(e.currentSlide); });
+  deck.on("slidechanged", function (e) { show(e.currentSlide); });
+  if (deck.isReady && deck.isReady()) show(deck.getCurrentSlide());
+  document.addEventListener("click", function (e) {
+    var btn = e.target.closest && e.target.closest(".ship-reset");
+    if (btn) {
+      e.preventDefault();
+      e.stopPropagation();
+      replay(btn.closest("section"));
+      return;
+    }
+    var step = e.target.closest && e.target.closest(".mr-step");
+    if (!step) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (step._advance) step._advance();
+  }, true);
+  function animateTranslate(g, toDy, dur) {
+    var fromDy = parseFloat(g.getAttribute("data-dy") || "0");
+    var start = performance.now();
+    return new Promise(function (resolve) {
+      function frame(now) {
+        var t = Math.min(1, (now - start) / dur);
+        var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        var y = fromDy + (toDy - fromDy) * e;
+        g.setAttribute("transform", "translate(0 " + y + ")");
+        if (t < 1) requestAnimationFrame(frame);
+        else {
+          g.setAttribute("data-dy", String(toDy));
+          g.setAttribute("transform", "translate(0 " + toDy + ")");
+          resolve();
+        }
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+  function setupMrSteps(slide) {
+    if (!slide || slide.id !== "mr-steps" || slide.dataset.stepsReady) return;
+    var svg = slide.querySelector("svg.step-fig");
+    var btn = slide.querySelector(".mr-step");
+    if (!svg || !btn) return;
+    slide.dataset.stepsReady = "1";
+    var phase = 0;
+    var busy = false;
+    var items = slide.querySelectorAll(".mr-steps li");
+    function highlight(n) {
+      items.forEach(function (li) {
+        li.classList.toggle("is-current", li.getAttribute("data-phase") === String(n));
+      });
+    }
+    function apply(next) {
+      highlight(next);
+      function move(attr) {
+        var jobs = [];
+        svg.querySelectorAll(".rec").forEach(function (g) {
+          jobs.push(animateTranslate(g, parseFloat(g.getAttribute(attr)), 900));
+        });
+        return Promise.all(jobs);
+      }
+      function wait(ms) {
+        return new Promise(function (resolve) { setTimeout(resolve, ms); });
+      }
+      if (next === 0) {
+        svg.classList.add("phase-reset");
+        svg.classList.remove("phase-map", "phase-dist", "phase-red");
+        svg.querySelectorAll(".rec").forEach(function (g) {
+          g.setAttribute("data-dy", "0");
+          g.setAttribute("transform", "translate(0 0)");
+        });
+        requestAnimationFrame(function () { svg.classList.remove("phase-reset"); });
+        btn.textContent = "Step";
+        return Promise.resolve();
+      }
+      if (next === 1) {
+        svg.classList.remove("phase-dist", "phase-red");
+        svg.classList.add("phase-map");
+        btn.textContent = "Step";
+        return wait(450);
+      }
+      if (next === 2) {
+        svg.classList.remove("phase-map", "phase-red");
+        svg.classList.add("phase-dist");
+        btn.textContent = "Step";
+        return move("data-dy-dist");
+      }
+      svg.classList.add("phase-dist");
+      btn.textContent = "Reset";
+      return move("data-dy-red").then(function () {
+        svg.classList.remove("phase-dist");
+        svg.classList.add("phase-red");
+        return wait(450);
+      });
+    }
+    btn._advance = function () {
+      if (busy) return;
+      var next = (phase + 1) % 4;
+      busy = true;
+      apply(next).then(function () {
+        phase = next;
+        busy = false;
+      });
+    };
+  }
+});
+</script>
+```
