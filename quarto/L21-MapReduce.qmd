@@ -19,6 +19,141 @@ format:
       - filters/raw-svg.lua
 ---
 
+## Analytics on Distributed Data
+
+- We've been talking about how to manage data at scale
+
+::: {.fragment .sub}
+- Sharding: dividing data into smaller pieces
+:::
+
+::: {.fragment .sub}
+- Most commonly: by distributing table rows (tuples) across machines
+:::
+
+::: {.fragment}
+- So far, we've mainly been talking about **transactions**
+:::
+
+::: {.fragment}
+- Today we'll shift to talking about **analytics**
+:::
+
+::: {.fragment}
+- As a standard example, think of aggregation functions over GROUP-BYs
+:::
+
+::: {.fragment .sub}
+- Example: counting the number of orders for each customer
+:::
+
+::: {.fragment}
+- A key challenge is that we will want to distribute both data accesses **and** computation across machines
+:::
+
+## Where Did This Problem Come From? {#internet-scale}
+
+- Distributing data is an old idea, but the problem became **acute** around 2000, with the rise of **internet-scale data analysis**
+
+::: {.fragment}
+- The canonical example: Web **search engines**
+:::
+
+::: {.fragment .sub}
+- Crawl and store a copy of the entire Web: billions of pages
+:::
+
+::: {.fragment .sub}
+- Build an inverted index over all of those pages
+:::
+
+::: {.fragment .sub}
+- Analyze the Web's link graph (e.g., PageRank)
+:::
+
+::: {.fragment .sub}
+- Analyze the logs of hundreds of millions of users' queries and clicks
+:::
+
+::: {.fragment}
+- Notice that these are **analytics** workloads: scan everything, aggregate, repeat
+:::
+
+::: {.fragment}
+- The data was far too large to store on one machine, let alone to process on one machine
+:::
+
+::: {.fragment}
+- **Google** is the classic example of a company that hit this wall
+    - the methods it used to respond are now typical for how to do **analytics** at scale today
+:::
+
+## Google's Response {#google-response}
+
+:::: {.columns}
+
+::: {.column width="52%"}
+Google did two things:
+
+::: {.fragment}
+1. Built **huge clusters** of machines inside **data centers**
+:::
+
+::: {.fragment .sub}
+- thousands of cheap, commodity PCs rather than a few expensive servers
+:::
+
+::: {.fragment .sub}
+- at this scale, some machine is *always* broken
+:::
+
+::: {.fragment}
+2. Built **software frameworks** for doing analytics on those clusters
+:::
+
+::: {.fragment .sub}
+- Google File System (2003): distributed *storage* across the cluster
+:::
+
+::: {.fragment .sub}
+- MapReduce (2004): distributed *computation* across the cluster
+:::
+
+::: {.fragment .sub}
+- these hide parallelism, data movement, and failures from the programmer
+:::
+
+:::
+
+::: {.column width="48%"}
+![](images/L21-MapReduce/dc-google-council-bluffs.jpg){fig-alt="Aerial view of a long, low Google data center building in Council Bluffs, Iowa, surrounded by fields at sunset." width="100%"}
+
+::: {.photo-credit}
+Google data center, Council Bluffs, Iowa. Photo: Chad Davis, [CC BY 2.0](https://commons.wikimedia.org/wiki/File:Google_Data_Center,_Council_Bluffs_Iowa_(49062863796).jpg)
+:::
+:::
+
+::::
+
+## Inside a Data Center {#inside-datacenter}
+
+::: {.dc-grid}
+![](images/L21-MapReduce/dc-cern-aisle.jpg){fig-alt="A long aisle between two walls of densely packed servers, receding into the distance."}
+
+![](images/L21-MapReduce/dc-wikimedia-racks.jpg){fig-alt="A row of tall server racks, each filled with dozens of rack-mounted machines."}
+
+![](images/L21-MapReduce/dc-balticservers-racks.jpg){fig-alt="A wall of servers lit in blue, stacked many high and many wide."}
+
+![](images/L21-MapReduce/dc-cern-racks.jpg){fig-alt="Open server racks seen from the rear, with every slot filled and cabled."}
+:::
+
+- A rack holds about 40 servers; a row holds dozens of racks; a building holds many rows
+- Google's 2004 MapReduce paper describes a single cluster as "hundreds or thousands of machines"; today's largest data centers hold hundreds of thousands of servers each
+
+::: {.photo-credit}
+Photos: CERN Computer Centre (Simon Waldherr, CC BY-SA 4.0; Florian Hirzinger, CC BY-SA 3.0); Wikimedia Foundation servers (Victor Grigas, CC BY-SA 3.0); BalticServers (CC BY-SA 3.0). All via Wikimedia Commons.
+:::
+
 ## MapReduce {#mapreduce}
 
 :::: {.columns}
@@ -429,6 +564,18 @@ fields = line.split(",")
 
 ::: {.fragment .sub}
 - [no, because a person's name could have hyphens in it]{style="color:#3a5fcd;"}
+:::
+
+::: {.fragment}
+- Putting it all together, the final `mapper`:
+
+```python
+def mapper(self, _, line):
+    fields = line.split(",")
+    dob = fields[2]
+    month = dob.split("-")[1]
+    yield (month, 1)
+```
 :::
 
 ## Processing the List of Values in `reduce`
