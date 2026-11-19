@@ -4480,6 +4480,34 @@
     "text": "Distributed Concurrency Control (cont.)\n\nExample of why special steps are needed:\n\nvoting-based synchronous replication with 6 replicas\n\n\n\n\nlet’s say that we configure the voting as before:\n\neach write updates 3 copies\neach read accesses 4 copies\n\n\n\n\n\ncan end up with schedules that are not conflict serializable\n\n\n\n\nexample:"
   },
   {
+    "objectID": "L21-MapReduce.html#analytics-on-distributed-data",
+    "href": "L21-MapReduce.html#analytics-on-distributed-data",
+    "title": "Processing Distributed Data",
+    "section": "Analytics on Distributed Data",
+    "text": "Analytics on Distributed Data\n\nWe’ve been talking about how to manage data at scale\n\n\n\nSharding: dividing data into smaller pieces\n\n\n\n\nMost commonly: by distributing table rows (tuples) across machines\n\n\n\n\nSo far, we’ve mainly been talking about transactions\n\n\n\n\nToday we’ll shift to talking about analytics\n\n\n\n\nAs a standard example, think of aggregation functions over GROUP-BYs\n\n\n\n\nExample: counting the number of orders for each customer\n\n\n\n\nA key challenge is that we will want to distribute both data accesses and computation across machines"
+  },
+  {
+    "objectID": "L21-MapReduce.html#internet-scale",
+    "href": "L21-MapReduce.html#internet-scale",
+    "title": "Processing Distributed Data",
+    "section": "Where Did This Problem Come From?",
+    "text": "Where Did This Problem Come From?\n\nDistributing data is an old idea, but the problem became acute around 2000, with the rise of internet-scale data analysis\n\n\n\nThe canonical example: Web search engines\n\n\n\n\nCrawl and store a copy of the entire Web: billions of pages\n\n\n\n\nBuild an inverted index over all of those pages\n\n\n\n\nAnalyze the Web’s link graph (e.g., PageRank)\n\n\n\n\nAnalyze the logs of hundreds of millions of users’ queries and clicks\n\n\n\n\nNotice that these are analytics workloads: scan everything, aggregate, repeat\n\n\n\n\nThe data was far too large to store on one machine, let alone to process on one machine\n\n\n\n\nGoogle is the classic example of a company that hit this wall\n\nthe methods it used to respond are now typical for how to do analytics at scale today"
+  },
+  {
+    "objectID": "L21-MapReduce.html#google-response",
+    "href": "L21-MapReduce.html#google-response",
+    "title": "Processing Distributed Data",
+    "section": "Google’s Response",
+    "text": "Google’s Response\n\n\nGoogle did two things:\n\n\nBuilt huge clusters of machines inside data centers\n\n\n\n\nthousands of cheap, commodity PCs rather than a few expensive servers\n\n\n\n\nat this scale, some machine is always broken\n\n\n\n\nBuilt software frameworks for doing analytics on those clusters\n\n\n\n\nGoogle File System (2003): distributed storage across the cluster\n\n\n\n\nMapReduce (2004): distributed computation across the cluster\n\n\n\n\nthese hide parallelism, data movement, and failures from the programmer\n\n\n\n\n\nGoogle data center, Council Bluffs, Iowa. Photo: Chad Davis, CC BY 2.0"
+  },
+  {
+    "objectID": "L21-MapReduce.html#inside-datacenter",
+    "href": "L21-MapReduce.html#inside-datacenter",
+    "title": "Processing Distributed Data",
+    "section": "Inside a Data Center",
+    "text": "Inside a Data Center\n\n\n\n\n\n\n\nA rack holds about 40 servers; a row holds dozens of racks; a building holds many rows\nGoogle’s 2004 MapReduce paper describes a single cluster as “hundreds or thousands of machines”; today’s largest data centers hold hundreds of thousands of servers each\n\n\nPhotos: CERN Computer Centre (Simon Waldherr, CC BY-SA 4.0; Florian Hirzinger, CC BY-SA 3.0); Wikimedia Foundation servers (Victor Grigas, CC BY-SA 3.0); BalticServers (CC BY-SA 3.0). All via Wikimedia Commons."
+  },
+  {
     "objectID": "L21-MapReduce.html#mapreduce",
     "href": "L21-MapReduce.html#mapreduce",
     "title": "Processing Distributed Data",
@@ -4589,7 +4617,7 @@
     "href": "L21-MapReduce.html#processing-an-input-record-in-map",
     "title": "Processing Distributed Data",
     "section": "Processing an Input Record in map",
-    "text": "Processing an Input Record in map\ndef mapper(self, _, line):\n\nRecall: line represents one record.\n\nfor Example 1, it looks like: 111,Alan Turing,1912-06-23,al@aol.com\n\n\n\n\nTo extract the month string:\n\nsplit line on the commas to get the fields:\n\n\nfields = line.split(\",\")\n\n\n\nsimilarly, split the date field on the hyphens to get its components\n\n\n\n\ncould we just split line on the hyphens?\n\n\n\n\nno, because a person’s name could have hyphens in it"
+    "text": "Processing an Input Record in map\ndef mapper(self, _, line):\n\nRecall: line represents one record.\n\nfor Example 1, it looks like: 111,Alan Turing,1912-06-23,al@aol.com\n\n\n\n\nTo extract the month string:\n\nsplit line on the commas to get the fields:\n\n\nfields = line.split(\",\")\n\n\n\nsimilarly, split the date field on the hyphens to get its components\n\n\n\n\ncould we just split line on the hyphens?\n\n\n\n\nno, because a person’s name could have hyphens in it\n\n\n\n\nPutting it all together, the final mapper:\n\ndef mapper(self, _, line):\n    fields = line.split(\",\")\n    dob = fields[2]\n    month = dob.split(\"-\")[1]\n    yield (month, 1)"
   },
   {
     "objectID": "L21-MapReduce.html#processing-the-list-of-values-in-reduce",

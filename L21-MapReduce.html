@@ -101,7 +101,7 @@
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-63fe159887f05859cebe3e3fcaf3662e.css">
+  <link rel="stylesheet" href="site_libs/revealjs/dist/theme/quarto-ebe924753d6dafe2b811c0588ed6313d.css">
   <link href="site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
   <link href="site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
@@ -216,6 +216,159 @@ Data Science 310
     </div>
 </div>
 
+</section>
+<section id="analytics-on-distributed-data" class="slide level2">
+<h2>Analytics on Distributed Data</h2>
+<ul>
+<li>We’ve been talking about how to manage data at scale</li>
+</ul>
+<div class="fragment sub">
+<ul>
+<li>Sharding: dividing data into smaller pieces</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>Most commonly: by distributing table rows (tuples) across machines</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>So far, we’ve mainly been talking about <strong>transactions</strong></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Today we’ll shift to talking about <strong>analytics</strong></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>As a standard example, think of aggregation functions over GROUP-BYs</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>Example: counting the number of orders for each customer</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>A key challenge is that we will want to distribute both data accesses <strong>and</strong> computation across machines</li>
+</ul>
+</div>
+</section>
+<section id="internet-scale" class="slide level2">
+<h2>Where Did This Problem Come From?</h2>
+<ul>
+<li>Distributing data is an old idea, but the problem became <strong>acute</strong> around 2000, with the rise of <strong>internet-scale data analysis</strong></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>The canonical example: Web <strong>search engines</strong></li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>Crawl and store a copy of the entire Web: billions of pages</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>Build an inverted index over all of those pages</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>Analyze the Web’s link graph (e.g., PageRank)</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>Analyze the logs of hundreds of millions of users’ queries and clicks</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Notice that these are <strong>analytics</strong> workloads: scan everything, aggregate, repeat</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>The data was far too large to store on one machine, let alone to process on one machine</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li><strong>Google</strong> is the classic example of a company that hit this wall
+<ul>
+<li>the methods it used to respond are now typical for how to do <strong>analytics</strong> at scale today</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="google-response" class="slide level2 scrollable">
+<h2>Google’s Response</h2>
+<div class="columns">
+<div class="column" style="width:52%;">
+<p>Google did two things:</p>
+<div class="fragment">
+<ol type="1">
+<li>Built <strong>huge clusters</strong> of machines inside <strong>data centers</strong></li>
+</ol>
+</div>
+<div class="fragment sub">
+<ul>
+<li>thousands of cheap, commodity PCs rather than a few expensive servers</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>at this scale, some machine is <em>always</em> broken</li>
+</ul>
+</div>
+<div class="fragment">
+<ol start="2" type="1">
+<li>Built <strong>software frameworks</strong> for doing analytics on those clusters</li>
+</ol>
+</div>
+<div class="fragment sub">
+<ul>
+<li>Google File System (2003): distributed <em>storage</em> across the cluster</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>MapReduce (2004): distributed <em>computation</em> across the cluster</li>
+</ul>
+</div>
+<div class="fragment sub">
+<ul>
+<li>these hide parallelism, data movement, and failures from the programmer</li>
+</ul>
+</div>
+</div><div class="column" style="width:48%;">
+<p><img data-src="images/L21-MapReduce/dc-google-council-bluffs.jpg" style="width:100.0%" alt="Aerial view of a long, low Google data center building in Council Bluffs, Iowa, surrounded by fields at sunset."></p>
+<div class="photo-credit">
+<p>Google data center, Council Bluffs, Iowa. Photo: Chad Davis, <a href="https://commons.wikimedia.org/wiki/File:Google_Data_Center,_Council_Bluffs_Iowa_(49062863796).jpg">CC BY 2.0</a></p>
+</div>
+</div></div>
+</section>
+<section id="inside-datacenter" class="slide level2">
+<h2>Inside a Data Center</h2>
+<div class="dc-grid">
+<p><img data-src="images/L21-MapReduce/dc-cern-aisle.jpg" alt="A long aisle between two walls of densely packed servers, receding into the distance."></p>
+<p><img data-src="images/L21-MapReduce/dc-wikimedia-racks.jpg" alt="A row of tall server racks, each filled with dozens of rack-mounted machines."></p>
+<p><img data-src="images/L21-MapReduce/dc-balticservers-racks.jpg" alt="A wall of servers lit in blue, stacked many high and many wide."></p>
+<p><img data-src="images/L21-MapReduce/dc-cern-racks.jpg" alt="Open server racks seen from the rear, with every slot filled and cabled."></p>
+</div>
+<ul>
+<li>A rack holds about 40 servers; a row holds dozens of racks; a building holds many rows</li>
+<li>Google’s 2004 MapReduce paper describes a single cluster as “hundreds or thousands of machines”; today’s largest data centers hold hundreds of thousands of servers each</li>
+</ul>
+<div class="photo-credit">
+<p>Photos: CERN Computer Centre (Simon Waldherr, CC BY-SA 4.0; Florian Hirzinger, CC BY-SA 3.0); Wikimedia Foundation servers (Victor Grigas, CC BY-SA 3.0); BalticServers (CC BY-SA 3.0). All via Wikimedia Commons.</p>
+</div>
 </section>
 <section id="mapreduce" class="slide level2">
 <h2>MapReduce</h2>
@@ -802,6 +955,16 @@ Step
 <li><span style="color:#3a5fcd;">no, because a person’s name could have hyphens in it</span></li>
 </ul>
 </div>
+<div class="fragment">
+<ul>
+<li>Putting it all together, the final <code>mapper</code>:</li>
+</ul>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a aria-label="1"></a><span class="kw">def</span> mapper(<span class="va">self</span>, _, line):</span>
+<span id="cb9-2"><a aria-label="2"></a>    fields <span class="op">=</span> line.split(<span class="st">","</span>)</span>
+<span id="cb9-3"><a aria-label="3"></a>    dob <span class="op">=</span> fields[<span class="dv">2</span>]</span>
+<span id="cb9-4"><a aria-label="4"></a>    month <span class="op">=</span> dob.split(<span class="st">"-"</span>)[<span class="dv">1</span>]</span>
+<span id="cb9-5"><a aria-label="5"></a>    <span class="cf">yield</span> (month, <span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
 </section>
 <section id="processing-the-list-of-values-in-reduce" class="slide level2">
 <h2>Processing the List of Values in <code>reduce</code></h2>
@@ -825,10 +988,10 @@ Step
 </ul>
 </div>
 <div class="fragment" data-fragment-index="4">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb9-1"><a aria-label="1"></a>python lecture-ex-1.py lecture-data-1.txt</span>
-<span id="cb9-2"><a aria-label="2"></a>"12"    3</span>
-<span id="cb9-3"><a aria-label="3"></a>"06"    2</span>
-<span id="cb9-4"><a aria-label="4"></a>"03"    1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode numberSource text number-lines code-with-copy"><code class="sourceCode"><span id="cb10-1"><a aria-label="1"></a>python lecture-ex-1.py lecture-data-1.txt</span>
+<span id="cb10-2"><a aria-label="2"></a>"12"    3</span>
+<span id="cb10-3"><a aria-label="3"></a>"06"    2</span>
+<span id="cb10-4"><a aria-label="4"></a>"03"    1</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="example-2-month-with-the-most-birthdays" class="slide level2">
@@ -941,30 +1104,30 @@ Step
 <section id="example-2-chaining-jobs-cont." class="slide level2">
 <h2>Example 2: Chaining Jobs (cont.)</h2>
 <div class="big-code">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10" data-code-line-numbers="1,23-24|2-7|9-12|14-15|17-18|20-21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a aria-label="1"></a><span class="kw">class</span> Lecture_Ex_2(MRJob):</span>
-<span id="cb10-2"><a aria-label="2"></a>    <span class="kw">def</span> steps(<span class="va">self</span>):</span>
-<span id="cb10-3"><a aria-label="3"></a>        <span class="cf">return</span> [</span>
-<span id="cb10-4"><a aria-label="4"></a>            MRStep(mapper <span class="op">=</span> <span class="va">self</span>.mapper_get_months,</span>
-<span id="cb10-5"><a aria-label="5"></a>                   reducer <span class="op">=</span> <span class="va">self</span>.reducer_count_months),</span>
-<span id="cb10-6"><a aria-label="6"></a>            MRStep(mapper <span class="op">=</span> <span class="va">self</span>.mapper_single_key,</span>
-<span id="cb10-7"><a aria-label="7"></a>                   reducer <span class="op">=</span> <span class="va">self</span>.reducer_max)]</span>
-<span id="cb10-8"><a aria-label="8"></a></span>
-<span id="cb10-9"><a aria-label="9"></a>    <span class="kw">def</span> mapper_get_months(<span class="va">self</span>, _, line):</span>
-<span id="cb10-10"><a aria-label="10"></a>        words <span class="op">=</span> line.split(<span class="st">','</span>)</span>
-<span id="cb10-11"><a aria-label="11"></a>        year, month, day <span class="op">=</span> words[<span class="dv">2</span>].split(<span class="st">'-'</span>)</span>
-<span id="cb10-12"><a aria-label="12"></a>        <span class="cf">yield</span> (month, <span class="dv">1</span>)</span>
-<span id="cb10-13"><a aria-label="13"></a></span>
-<span id="cb10-14"><a aria-label="14"></a>    <span class="kw">def</span> reducer_count_months(<span class="va">self</span>, month, counts):</span>
-<span id="cb10-15"><a aria-label="15"></a>        <span class="cf">yield</span> (month, <span class="bu">sum</span>(counts))</span>
-<span id="cb10-16"><a aria-label="16"></a></span>
-<span id="cb10-17"><a aria-label="17"></a>    <span class="kw">def</span> mapper_single_key(<span class="va">self</span>, month, counts):</span>
-<span id="cb10-18"><a aria-label="18"></a>        <span class="cf">yield</span> (<span class="va">None</span>, (counts, month))</span>
-<span id="cb10-19"><a aria-label="19"></a></span>
-<span id="cb10-20"><a aria-label="20"></a>    <span class="kw">def</span> reducer_max(<span class="va">self</span>, _, month_count_pairs):</span>
-<span id="cb10-21"><a aria-label="21"></a>        <span class="cf">yield</span> <span class="bu">max</span>(month_count_pairs)</span>
-<span id="cb10-22"><a aria-label="22"></a></span>
-<span id="cb10-23"><a aria-label="23"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
-<span id="cb10-24"><a aria-label="24"></a>    Lecture_Ex_2.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11" data-code-line-numbers="1,23-24|2-7|9-12|14-15|17-18|20-21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a aria-label="1"></a><span class="kw">class</span> Lecture_Ex_2(MRJob):</span>
+<span id="cb11-2"><a aria-label="2"></a>    <span class="kw">def</span> steps(<span class="va">self</span>):</span>
+<span id="cb11-3"><a aria-label="3"></a>        <span class="cf">return</span> [</span>
+<span id="cb11-4"><a aria-label="4"></a>            MRStep(mapper <span class="op">=</span> <span class="va">self</span>.mapper_get_months,</span>
+<span id="cb11-5"><a aria-label="5"></a>                   reducer <span class="op">=</span> <span class="va">self</span>.reducer_count_months),</span>
+<span id="cb11-6"><a aria-label="6"></a>            MRStep(mapper <span class="op">=</span> <span class="va">self</span>.mapper_single_key,</span>
+<span id="cb11-7"><a aria-label="7"></a>                   reducer <span class="op">=</span> <span class="va">self</span>.reducer_max)]</span>
+<span id="cb11-8"><a aria-label="8"></a></span>
+<span id="cb11-9"><a aria-label="9"></a>    <span class="kw">def</span> mapper_get_months(<span class="va">self</span>, _, line):</span>
+<span id="cb11-10"><a aria-label="10"></a>        words <span class="op">=</span> line.split(<span class="st">','</span>)</span>
+<span id="cb11-11"><a aria-label="11"></a>        year, month, day <span class="op">=</span> words[<span class="dv">2</span>].split(<span class="st">'-'</span>)</span>
+<span id="cb11-12"><a aria-label="12"></a>        <span class="cf">yield</span> (month, <span class="dv">1</span>)</span>
+<span id="cb11-13"><a aria-label="13"></a></span>
+<span id="cb11-14"><a aria-label="14"></a>    <span class="kw">def</span> reducer_count_months(<span class="va">self</span>, month, counts):</span>
+<span id="cb11-15"><a aria-label="15"></a>        <span class="cf">yield</span> (month, <span class="bu">sum</span>(counts))</span>
+<span id="cb11-16"><a aria-label="16"></a></span>
+<span id="cb11-17"><a aria-label="17"></a>    <span class="kw">def</span> mapper_single_key(<span class="va">self</span>, month, counts):</span>
+<span id="cb11-18"><a aria-label="18"></a>        <span class="cf">yield</span> (<span class="va">None</span>, (counts, month))</span>
+<span id="cb11-19"><a aria-label="19"></a></span>
+<span id="cb11-20"><a aria-label="20"></a>    <span class="kw">def</span> reducer_max(<span class="va">self</span>, _, month_count_pairs):</span>
+<span id="cb11-21"><a aria-label="21"></a>        <span class="cf">yield</span> <span class="bu">max</span>(month_count_pairs)</span>
+<span id="cb11-22"><a aria-label="22"></a></span>
+<span id="cb11-23"><a aria-label="23"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:</span>
+<span id="cb11-24"><a aria-label="24"></a>    Lecture_Ex_2.run()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <script>
 window.addEventListener("load", function () {
