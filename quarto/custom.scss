@@ -276,3 +276,51 @@ $presentation-h2-font-size: 1.6em;
 .reveal .plus-minus ul ul ul {
   list-style-type: disc;
 }
+
+// Google's-response slide (L21): the two-part list stays on the left and
+// the data-center aerial on the right. The theme's inline column layout
+// would wrap the pair.
+.reveal #google-response .columns {
+  display: flex;
+  align-items: center;
+  gap: 0.8em;
+}
+.reveal #google-response .column {
+  min-width: 0;
+}
+.reveal #google-response .column img {
+  max-width: 100%;
+}
+
+// Small grey attribution line under a photo (used by L21-MapReduce.qmd).
+.reveal .photo-credit {
+  font-size: 0.45em;
+  color: #666;
+  line-height: 1.3;
+  margin-top: 0.4em;
+}
+.reveal .photo-credit a {
+  color: #666;
+}
+
+// Inside-a-data-center slide (L21): four photos in a 2 x 2 grid above
+// a short list of scale facts.
+.reveal #inside-datacenter .dc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 0 auto 0.5em;
+  width: 92%;
+}
+.reveal #inside-datacenter .dc-grid p {
+  margin: 0;
+}
+.reveal #inside-datacenter .dc-grid img {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0;
+}
+.reveal #inside-datacenter ul {
+  font-size: 0.8em;
+}
