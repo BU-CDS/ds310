@@ -154,6 +154,111 @@ $presentation-h2-font-size: 1.6em;
   pointer-events: none;
 }
 
+// Opening MapReduce slide: the definition stays on the left and the
+// cluster figure on the right. The theme's column layout can wrap a
+// pair this wide, so keep the two columns side by side.
+.reveal #mapreduce .columns {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+}
+.reveal #mapreduce .column {
+  min-width: 0;
+}
+.reveal #mapreduce .column img {
+  max-width: 100%;
+  max-height: 760px;
+}
+
+// Customer-orders slide: the walk-through stays on the left and a
+// smaller cluster, with a pair of records beside each disk, on the right.
+.reveal #sample-orders .columns {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+.reveal #sample-orders .column {
+  min-width: 0;
+}
+.reveal #sample-orders .column img {
+  max-width: 100%;
+  max-height: 700px;
+}
+
+// Inefficient-shipping slide: one sentence on the left, the cluster
+// animation on the right.
+.reveal #inefficiently .columns {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.reveal #inefficiently .column {
+  min-width: 0;
+}
+.reveal #inefficiently .column img {
+  max-width: 100%;
+  max-height: 760px;
+}
+.reveal #inefficiently .ship-reset {
+  display: inline-block;
+  margin-top: 1.1em;
+  padding: 0.2em 0.85em;
+  font-family: inherit;
+  font-size: 0.72em;
+  color: #a00;
+  background: #fff;
+  border: 2px solid #a00;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.reveal #inefficiently .ship-reset:hover {
+  color: #fff;
+  background: #a00;
+}
+
+// Map / distribute / reduce slide: the step list stays on the left
+// and the cluster figure on the right.
+.reveal #mr-steps .columns {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.reveal #mr-steps .column {
+  min-width: 0;
+}
+.reveal #mr-steps svg.step-fig {
+  width: 100%;
+  height: auto;
+  max-height: 760px;
+  display: block;
+}
+.reveal #mr-steps .mr-steps {
+  list-style: disc;
+  margin: 0 0 0 1em;
+}
+.reveal #mr-steps .mr-steps li {
+  margin: 0.45em 0;
+}
+.reveal #mr-steps .mr-steps li.is-current {
+  color: #a00;
+}
+.reveal #mr-steps .mr-step {
+  display: inline-block;
+  margin-top: 1.1em;
+  padding: 0.2em 0.85em;
+  font-family: inherit;
+  font-size: 0.72em;
+  color: #a00;
+  background: #fff;
+  border: 2px solid #a00;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.reveal #mr-steps .mr-step:hover {
+  color: #fff;
+  background: #a00;
+}
+
 // Large code block that should fill the slide rather than sit in a
 // small scrolling box: bigger type, and pairs with the deck's
 // code-block-height setting so all lines are visible

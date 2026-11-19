@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="step-fig" viewBox="0 0 1160 740" role="img"
+     aria-label="Cluster of three machines. Step through mapping each order to a customer-amount pair, distributing the pairs by customer, and reducing each customer to one total.">
+  <defs>
+    <linearGradient id="steps-fabric" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="740">
+      <stop offset="0" stop-color="#1f618a"/>
+      <stop offset="0.55" stop-color="#174866"/>
+      <stop offset="1" stop-color="#102838"/>
+    </linearGradient>
+    <linearGradient id="steps-chassis" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbfcfe"/>
+      <stop offset="1" stop-color="#e4ebf2"/>
+    </linearGradient>
+    <linearGradient id="steps-bezel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#31485c"/>
+      <stop offset="1" stop-color="#1a2c3b"/>
+    </linearGradient>
+    <linearGradient id="steps-chip" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a6aab"/>
+      <stop offset="1" stop-color="#163e6b"/>
+    </linearGradient>
+    <linearGradient id="steps-cylBody" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#f7fafc"/>
+      <stop offset="0.18" stop-color="#d5e1ea"/>
+      <stop offset="0.55" stop-color="#b7c8d4"/>
+      <stop offset="0.82" stop-color="#8ea4b4"/>
+      <stop offset="1" stop-color="#c5d4de"/>
+    </linearGradient>
+    <linearGradient id="steps-cylTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#d4e2ec"/>
+    </linearGradient>
+    <filter id="steps-shadow" x="-20%" y="-16%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#1a3044" flood-opacity="0.16"/>
+    </filter>
+    <style>
+      text { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; }
+      .tup {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 30px;
+        fill: #1c1c1c;
+      }
+      .full, .pair, .total { transition: opacity 0.4s ease; }
+      .pair, .total { opacity: 0; }
+      .phase-map .full, .phase-dist .full { opacity: 0; }
+      .phase-map .pair, .phase-dist .pair { opacity: 1; }
+      .phase-red .full, .phase-red .pair { opacity: 0; }
+      .phase-red .total { opacity: 1; }
+      .phase-reset .full, .phase-reset .pair, .phase-reset .total { transition: none; }
+      .id { fill: #2457c5; font-weight: 650; }
+      .on { fill: #178a17; font-weight: 650; }
+      .off { fill: #c0392b; font-weight: 650; }
+    </style>
+    <symbol id="steps-node" viewBox="0 0 280 220" overflow="visible">
+      <rect x="-7" y="96" width="16" height="28" rx="4" fill="#143044"/>
+      <g>
+        <rect width="280" height="220" rx="16" fill="url(#steps-chassis)"/>
+        <path d="M16 0 H264 Q280 0 280 16 V36 H0 V16 Q0 0 16 0 Z" fill="url(#steps-bezel)"/>
+        <text x="14" y="19" fill="#ffffff" font-size="20" font-weight="600" dominant-baseline="middle">machine</text>
+        <g fill="#e6c98a" stroke="#c4a15a" stroke-width="0.6">
+          <rect x="36" y="46" width="7" height="10"/>
+          <rect x="54" y="46" width="7" height="10"/>
+          <rect x="72" y="46" width="7" height="10"/>
+          <rect x="90" y="46" width="7" height="10"/>
+          <rect x="36" y="128" width="7" height="10"/>
+          <rect x="54" y="128" width="7" height="10"/>
+          <rect x="72" y="128" width="7" height="10"/>
+          <rect x="90" y="128" width="7" height="10"/>
+          <rect x="16" y="66" width="10" height="7"/>
+          <rect x="16" y="84" width="10" height="7"/>
+          <rect x="16" y="102" width="10" height="7"/>
+          <rect x="16" y="120" width="10" height="7"/>
+          <rect x="108" y="66" width="10" height="7"/>
+          <rect x="108" y="84" width="10" height="7"/>
+          <rect x="108" y="102" width="10" height="7"/>
+          <rect x="108" y="120" width="10" height="7"/>
+        </g>
+        <rect x="24" y="54" width="86" height="76" rx="7" fill="url(#steps-chip)"/>
+        <circle cx="34" cy="64" r="3.5" fill="#e6c98a"/>
+        <rect x="42" y="70" width="50" height="44" rx="4" fill="#0c2744"/>
+        <g fill="#3d92f0">
+          <rect x="48" y="76" width="16" height="14" rx="2"/>
+          <rect x="70" y="76" width="16" height="14" rx="2"/>
+          <rect x="48" y="94" width="16" height="14" rx="2"/>
+          <rect x="70" y="94" width="16" height="14" rx="2"/>
+        </g>
+        <text x="67" y="198" text-anchor="middle" fill="#1c3144" font-size="20" font-weight="600">CPU</text>
+        <ellipse cx="198" cy="136" rx="46" ry="14" fill="url(#steps-cylBody)"/>
+        <rect x="152" y="78" width="92" height="58" fill="url(#steps-cylBody)"/>
+        <line x1="152" y1="78" x2="152" y2="136" stroke="#6e8798" stroke-width="1.5"/>
+        <line x1="244" y1="78" x2="244" y2="136" stroke="#6e8798" stroke-width="1.5"/>
+        <path d="M152 136 A46 14 0 0 0 244 136" fill="none" stroke="#6e8798" stroke-width="1.5"/>
+        <ellipse cx="198" cy="78" rx="46" ry="14" fill="url(#steps-cylTop)" stroke="#6e8798" stroke-width="1.5"/>
+        <ellipse cx="182" cy="74" rx="16" ry="5" fill="#ffffff" opacity="0.55"/>
+        <text x="198" y="198" text-anchor="middle" fill="#1c3144" font-size="20" font-weight="600">local disk</text>
+      </g>
+    </symbol>
+  </defs>
+  <text x="28" y="370" fill="#16324a" font-size="26" font-weight="600"
+        text-anchor="middle" dominant-baseline="middle"
+        transform="rotate(-90 28 370)">high-bandwidth interconnect</text>
+  <rect x="62" y="18" width="22" height="696" rx="11" fill="url(#steps-fabric)"/>
+  <rect x="69" y="34" width="8" height="664" rx="4" fill="#7eebf5" opacity="0.9"/>
+  <g stroke-linecap="round" fill="none">
+    <path d="M84 128 H108" stroke="#49d6ea" stroke-width="16" opacity="0.18"/>
+    <path d="M84 128 H108" stroke="#123044" stroke-width="10"/>
+    <path d="M84 128 H108" stroke="#49d6ea" stroke-width="4"/>
+    <path d="M84 366 H108" stroke="#49d6ea" stroke-width="16" opacity="0.18"/>
+    <path d="M84 366 H108" stroke="#123044" stroke-width="10"/>
+    <path d="M84 366 H108" stroke="#49d6ea" stroke-width="4"/>
+    <path d="M84 604 H108" stroke="#49d6ea" stroke-width="16" opacity="0.18"/>
+    <path d="M84 604 H108" stroke="#123044" stroke-width="10"/>
+    <path d="M84 604 H108" stroke="#49d6ea" stroke-width="4"/>
+  </g>
+  <g fill="#49d6ea">
+    <circle cx="84" cy="128" r="6"/>
+    <circle cx="84" cy="366" r="6"/>
+    <circle cx="84" cy="604" r="6"/>
+  </g>
+  <g filter="url(#steps-shadow)">
+    <use href="#steps-node" x="116" y="18" width="280" height="220"/>
+    <use href="#steps-node" x="116" y="256" width="280" height="220"/>
+    <use href="#steps-node" x="116" y="494" width="280" height="220"/>
+  </g>
+  <g fill="#d7f4fb" font-size="20" font-weight="700" dominant-baseline="middle">
+    <text x="214" y="37">1</text>
+    <text x="214" y="275">2</text>
+    <text x="214" y="513">3</text>
+  </g>
+  <!-- full records, the mapped pairs, and the final totals -->
+  <g class="tup">
+    <g class="rec" data-dy-dist="-16" data-dy-red="24">
+      <text class="full" x="420" y="104"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, 500, '03/22/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="104"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="on">500</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="180" data-dy-red="220">
+      <text class="full" x="420" y="144"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, 50, '02/10/17', </tspan><tspan class="off">'done'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="144"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="off">0</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-214" data-dy-red="-214">
+      <text class="full" x="420" y="342"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, 150, '03/23/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="342"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="on">150</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-18" data-dy-red="-18">
+      <text class="full" x="420" y="382"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, 75, '03/28/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="382"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="on">75</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-412" data-dy-red="-452">
+      <text class="full" x="420" y="580"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, 80, '04/02/17', </tspan><tspan class="off">'done'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="580"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="off">0</tspan><tspan>)</tspan></text>
+    </g>
+    <g class="rec" data-dy-dist="-216" data-dy-red="-256">
+      <text class="full" x="420" y="620"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, 220, '04/11/17', </tspan><tspan class="on">'active'</tspan><tspan>)</tspan></text>
+      <text class="pair" x="420" y="620"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="on">220</tspan><tspan>)</tspan></text>
+    </g>
+    <text class="total" x="420" y="128"><tspan>(</tspan><tspan class="id">'U123'</tspan><tspan>, </tspan><tspan class="on">650</tspan><tspan>)</tspan></text>
+    <text class="total" x="420" y="364"><tspan>(</tspan><tspan class="id">'U456'</tspan><tspan>, </tspan><tspan class="on">295</tspan><tspan>)</tspan></text>
+  </g>
+</svg>
