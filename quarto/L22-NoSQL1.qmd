@@ -17,6 +17,8 @@ format:
 
 ## The Rise of NoSQL
 
+:::: {.columns}
+::: {.column width="54%"}
 - Beginning in the early 2000s, web-based applications increasingly needed to deal with massive amounts of:
     - data
     - traffic / queries
@@ -28,34 +30,64 @@ format:
     - cheaper
     - greater overall reliability
     - can take advantage of cloud-based storage
+:::
+
+::: {.column width="46%"}
+![](images/L22-NoSQL1/cluster.svg){fig-alt="Three commodity machines, each with a CPU and a locally attached disk, connected by a high-bandwidth interconnect." width="100%"}
+:::
+::::
 
 ## The Rise of NoSQL (cont.)
 
-- Problem: Relational DBMSs do not scale well to large clusters.
+- Distributing data and compuation can be effecitive, but there is a problem:  **Relational DBMSs do not scale well to large clusters.**
+   - A normalized database relies on joins to combine data from multiple tables.
+      - Join queries are difficult to scale across a cluster.
+      - Tables needed may be on different machines.
+   - A sharded table can have rows on different machines.
+      - Using traditional indexing, eg, B+-trees, is not efficient
+      - B+-trees are designed for single machines, with fast access to tree nodes.
+
+::: {.fragment}
 - Google and Amazon each developed their own alternative approaches to data management on clusters.
     - Google: BigTable
     - Amazon: DynamoDB
-- The papers that Google and Amazon published about their efforts got others interested in developing similar DBMSs.
+:::
 
+::: {.fragment}
+- The systems and papers that Google and Amazon published about their efforts got others interested in developing similar DBMSs.
+:::
+
+::: {.fragment}
 ::: {style="margin-left: 4em;"}
 &#10132; noSQL
+:::
 :::
 
 ## What Does NoSQL Mean?
 
-- Not well defined.
-- Typical characteristics of NoSQL DBMSs:
-    - don't use SQL / the relational model
-    - open-source
-    - designed for use on clusters
-        - support for sharding/fragmentation and replication
-    - schema-less or flexible schema
+The term "NoSQL" is not well defined, but it is generally used to describe a class of databases that are not relational.
+
+Typical characteristics of NoSQL DBMSs:
+
+::: {.incremental}
+- don't use SQL / the relational model
+- don't emphasize transactions
+    - probably don't support atomic operations, or independence of operations
+    - maybe don't even support consistency
+- do not enforce normalization - data can be structued in trees or other other forms
+- designed for use on clusters
+    - good support for sharding/fragmentation and replication
+- either schema-less or using a flexible schema
+:::
+
+<!--
 - One good overview:
 
 ::: {style="margin-left: 3em;"}
 Sadalage and Fowler, *NoSQL Distilled*\
 (Addison-Wesley, 2013).
 :::
+-->
 
 ## Flavors of NoSQL
 
@@ -66,7 +98,7 @@ Sadalage and Fowler, *NoSQL Distilled*\
     - column-family (aka big-table) stores
 - Some people also include graph databases.
     - very different than the others
-    - they are *not* designed for clusters
+    - they are *not* designed for clusters and are not sharded/fragmented
 
 ## Key-Value Stores
 
@@ -75,6 +107,8 @@ Sadalage and Fowler, *NoSQL Distilled*\
 - Queries are limited to query by key.
     - get/put/update/delete a key/value pair
     - iterate over key/value pairs
+- often in-memory, including across multiple machines
+- example: memcached
 
 ## Document Databases
 
@@ -82,11 +116,13 @@ Sadalage and Fowler, *NoSQL Distilled*\
 - Unlike key-value stores, the value is *not* opaque.
     - it is a *document* containing semistructured data
     - it *can* be examined and used by the DBMS
+    - for example, documents can represented in JSON or BSON (binary JSON)
 - Queries:
     - can be based on the key (as in key/value stores)
     - more often, are based on the contents of the document
 - Here again, there is support for sharding and replication.
     - the sharding can be based on values within the document
+- example: MongoDB
 
 ## Column-Family Databases
 
