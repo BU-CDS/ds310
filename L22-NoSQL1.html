@@ -218,6 +218,8 @@ Data Science 310
 </section>
 <section id="the-rise-of-nosql" class="slide level2">
 <h2>The Rise of NoSQL</h2>
+<div class="columns">
+<div class="column" style="width:54%;">
 <ul>
 <li>Beginning in the early 2000s, web-based applications increasingly needed to deal with massive amounts of:
 <ul>
@@ -237,42 +239,73 @@ Data Science 310
 <li>can take advantage of cloud-based storage</li>
 </ul></li>
 </ul>
+</div><div class="column" style="width:46%;">
+<p><img data-src="images/L22-NoSQL1/cluster.svg" style="width:100.0%" alt="Three commodity machines, each with a CPU and a locally attached disk, connected by a high-bandwidth interconnect."></p>
+</div></div>
 </section>
 <section id="the-rise-of-nosql-cont." class="slide level2">
 <h2>The Rise of NoSQL (cont.)</h2>
 <ul>
-<li>Problem: Relational DBMSs do not scale well to large clusters.</li>
+<li>Distributing data and compuation can be effecitive, but there is a problem: <strong>Relational DBMSs do not scale well to large clusters.</strong>
+<ul>
+<li>A normalized database relies on joins to combine data from multiple tables.
+<ul>
+<li>Join queries are difficult to scale across a cluster.</li>
+<li>Tables needed may be on different machines.</li>
+</ul></li>
+<li>A sharded table can have rows on different machines.
+<ul>
+<li>Using traditional indexing, eg, B+-trees, is not efficient</li>
+<li>B+-trees are designed for single machines, with fast access to tree nodes.</li>
+</ul></li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
 <li>Google and Amazon each developed their own alternative approaches to data management on clusters.
 <ul>
 <li>Google: BigTable</li>
 <li>Amazon: DynamoDB</li>
 </ul></li>
-<li>The papers that Google and Amazon published about their efforts got others interested in developing similar DBMSs.</li>
 </ul>
+</div>
+<div class="fragment">
+<ul>
+<li>The systems and papers that Google and Amazon published about their efforts got others interested in developing similar DBMSs.</li>
+</ul>
+</div>
+<div class="fragment">
 <div style="margin-left: 4em;">
 <p>➔ noSQL</p>
+</div>
 </div>
 </section>
 <section id="what-does-nosql-mean" class="slide level2">
 <h2>What Does NoSQL Mean?</h2>
+<p>The term “NoSQL” is not well defined, but it is generally used to describe a class of databases that are not relational.</p>
+<p>Typical characteristics of NoSQL DBMSs:</p>
 <ul>
-<li>Not well defined.</li>
-<li>Typical characteristics of NoSQL DBMSs:
+<li class="fragment">don’t use SQL / the relational model</li>
+<li class="fragment">don’t emphasize transactions
 <ul>
-<li>don’t use SQL / the relational model</li>
-<li>open-source</li>
-<li>designed for use on clusters
-<ul>
-<li>support for sharding/fragmentation and replication</li>
+<li class="fragment">probably don’t support atomic operations, or independence of operations</li>
+<li class="fragment">maybe don’t even support consistency</li>
 </ul></li>
-<li>schema-less or flexible schema</li>
+<li class="fragment">do not enforce normalization - data can be structued in trees or other other forms</li>
+<li class="fragment">designed for use on clusters
+<ul>
+<li class="fragment">good support for sharding/fragmentation and replication</li>
 </ul></li>
-<li>One good overview:</li>
+<li class="fragment">either schema-less or using a flexible schema</li>
 </ul>
-<div style="margin-left: 3em;">
-<p>Sadalage and Fowler, <em>NoSQL Distilled</em><br>
-(Addison-Wesley, 2013).</p>
-</div>
+<!--
+- One good overview:
+
+::: {style="margin-left: 3em;"}
+Sadalage and Fowler, *NoSQL Distilled*\
+(Addison-Wesley, 2013).
+:::
+-->
 </section>
 <section id="flavors-of-nosql" class="slide level2">
 <h2>Flavors of NoSQL</h2>
@@ -287,7 +320,7 @@ Data Science 310
 <li>Some people also include graph databases.
 <ul>
 <li>very different than the others</li>
-<li>they are <em>not</em> designed for clusters</li>
+<li>they are <em>not</em> designed for clusters and are not sharded/fragmented</li>
 </ul></li>
 </ul>
 </section>
@@ -303,6 +336,8 @@ Data Science 310
 <li>get/put/update/delete a key/value pair</li>
 <li>iterate over key/value pairs</li>
 </ul></li>
+<li>often in-memory, including across multiple machines</li>
+<li>example: memcached</li>
 </ul>
 </section>
 <section id="document-databases" class="slide level2">
@@ -313,6 +348,7 @@ Data Science 310
 <ul>
 <li>it is a <em>document</em> containing semistructured data</li>
 <li>it <em>can</em> be examined and used by the DBMS</li>
+<li>for example, documents can represented in JSON or BSON (binary JSON)</li>
 </ul></li>
 <li>Queries:
 <ul>
@@ -323,6 +359,7 @@ Data Science 310
 <ul>
 <li>the sharding can be based on values within the document</li>
 </ul></li>
+<li>example: MongoDB</li>
 </ul>
 </section>
 <section id="column-family-databases" class="slide level2">

@@ -151,42 +151,42 @@
     "href": "L22-NoSQL1.html#the-rise-of-nosql",
     "title": "NoSQL: Overview",
     "section": "The Rise of NoSQL",
-    "text": "The Rise of NoSQL\n\nBeginning in the early 2000s, web-based applications increasingly needed to deal with massive amounts of:\n\ndata\ntraffic / queries\n\nScalability is crucial.\n\nload can increase rapidly and unpredictably\n\nLarge servers are expensive and can only grow so large.\nSolution: use clusters of small commodity machines\n\nuse both fragmentation/sharding and replication\ncheaper\ngreater overall reliability\ncan take advantage of cloud-based storage"
+    "text": "The Rise of NoSQL\n\n\n\nBeginning in the early 2000s, web-based applications increasingly needed to deal with massive amounts of:\n\ndata\ntraffic / queries\n\nScalability is crucial.\n\nload can increase rapidly and unpredictably\n\nLarge servers are expensive and can only grow so large.\nSolution: use clusters of small commodity machines\n\nuse both fragmentation/sharding and replication\ncheaper\ngreater overall reliability\ncan take advantage of cloud-based storage"
   },
   {
     "objectID": "L22-NoSQL1.html#the-rise-of-nosql-cont.",
     "href": "L22-NoSQL1.html#the-rise-of-nosql-cont.",
     "title": "NoSQL: Overview",
     "section": "The Rise of NoSQL (cont.)",
-    "text": "The Rise of NoSQL (cont.)\n\nProblem: Relational DBMSs do not scale well to large clusters.\nGoogle and Amazon each developed their own alternative approaches to data management on clusters.\n\nGoogle: BigTable\nAmazon: DynamoDB\n\nThe papers that Google and Amazon published about their efforts got others interested in developing similar DBMSs.\n\n\n➔ noSQL"
+    "text": "The Rise of NoSQL (cont.)\n\nDistributing data and compuation can be effecitive, but there is a problem: Relational DBMSs do not scale well to large clusters.\n\nA normalized database relies on joins to combine data from multiple tables.\n\nJoin queries are difficult to scale across a cluster.\nTables needed may be on different machines.\n\nA sharded table can have rows on different machines.\n\nUsing traditional indexing, eg, B+-trees, is not efficient\nB+-trees are designed for single machines, with fast access to tree nodes.\n\n\n\n\n\nGoogle and Amazon each developed their own alternative approaches to data management on clusters.\n\nGoogle: BigTable\nAmazon: DynamoDB\n\n\n\n\n\nThe systems and papers that Google and Amazon published about their efforts got others interested in developing similar DBMSs.\n\n\n\n\n➔ noSQL"
   },
   {
     "objectID": "L22-NoSQL1.html#what-does-nosql-mean",
     "href": "L22-NoSQL1.html#what-does-nosql-mean",
     "title": "NoSQL: Overview",
     "section": "What Does NoSQL Mean?",
-    "text": "What Does NoSQL Mean?\n\nNot well defined.\nTypical characteristics of NoSQL DBMSs:\n\ndon’t use SQL / the relational model\nopen-source\ndesigned for use on clusters\n\nsupport for sharding/fragmentation and replication\n\nschema-less or flexible schema\n\nOne good overview:\n\n\nSadalage and Fowler, NoSQL Distilled\n(Addison-Wesley, 2013)."
+    "text": "What Does NoSQL Mean?\nThe term “NoSQL” is not well defined, but it is generally used to describe a class of databases that are not relational.\nTypical characteristics of NoSQL DBMSs:\n\ndon’t use SQL / the relational model\ndon’t emphasize transactions\n\nprobably don’t support atomic operations, or independence of operations\nmaybe don’t even support consistency\n\ndo not enforce normalization - data can be structued in trees or other other forms\ndesigned for use on clusters\n\ngood support for sharding/fragmentation and replication\n\neither schema-less or using a flexible schema"
   },
   {
     "objectID": "L22-NoSQL1.html#flavors-of-nosql",
     "href": "L22-NoSQL1.html#flavors-of-nosql",
     "title": "NoSQL: Overview",
     "section": "Flavors of NoSQL",
-    "text": "Flavors of NoSQL\n\nVarious taxonomies have been proposed\nThree of the main classes of NoSQL databases are:\n\nkey-value stores\ndocument databases\ncolumn-family (aka big-table) stores\n\nSome people also include graph databases.\n\nvery different than the others\nthey are not designed for clusters"
+    "text": "Flavors of NoSQL\n\nVarious taxonomies have been proposed\nThree of the main classes of NoSQL databases are:\n\nkey-value stores\ndocument databases\ncolumn-family (aka big-table) stores\n\nSome people also include graph databases.\n\nvery different than the others\nthey are not designed for clusters and are not sharded/fragmented"
   },
   {
     "objectID": "L22-NoSQL1.html#key-value-stores",
     "href": "L22-NoSQL1.html#key-value-stores",
     "title": "NoSQL: Overview",
     "section": "Key-Value Stores",
-    "text": "Key-Value Stores\n\nSimple data model: key/value pairs\n\nthe DBMS does not attempt to interpret the value\n\nQueries are limited to query by key.\n\nget/put/update/delete a key/value pair\niterate over key/value pairs"
+    "text": "Key-Value Stores\n\nSimple data model: key/value pairs\n\nthe DBMS does not attempt to interpret the value\n\nQueries are limited to query by key.\n\nget/put/update/delete a key/value pair\niterate over key/value pairs\n\noften in-memory, including across multiple machines\nexample: memcached"
   },
   {
     "objectID": "L22-NoSQL1.html#document-databases",
     "href": "L22-NoSQL1.html#document-databases",
     "title": "NoSQL: Overview",
     "section": "Document Databases",
-    "text": "Document Databases\n\nAlso store key/value pairs\nUnlike key-value stores, the value is not opaque.\n\nit is a document containing semistructured data\nit can be examined and used by the DBMS\n\nQueries:\n\ncan be based on the key (as in key/value stores)\nmore often, are based on the contents of the document\n\nHere again, there is support for sharding and replication.\n\nthe sharding can be based on values within the document"
+    "text": "Document Databases\n\nAlso store key/value pairs\nUnlike key-value stores, the value is not opaque.\n\nit is a document containing semistructured data\nit can be examined and used by the DBMS\nfor example, documents can represented in JSON or BSON (binary JSON)\n\nQueries:\n\ncan be based on the key (as in key/value stores)\nmore often, are based on the contents of the document\n\nHere again, there is support for sharding and replication.\n\nthe sharding can be based on values within the document\n\nexample: MongoDB"
   },
   {
     "objectID": "L22-NoSQL1.html#column-family-databases",
